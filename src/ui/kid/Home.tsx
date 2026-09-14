@@ -17,7 +17,7 @@ export default function Home({ profile, onStart, onParent }: { profile: Profile;
   const [streak, setStreak] = useState(0);
   const [days, setDays] = useState<string[]>([]);
   const [first, setFirst] = useState(true);
-  const [focus, setFocus] = useState<string | null>(null);
+  const [focus, setFocus] = useState<string[]>([]);
   const open = withinHours(profile);
   const doneToday = days.includes(ymd());
 
@@ -27,7 +27,7 @@ export default function Home({ profile, onStart, onParent }: { profile: Profile;
       setStreak(s);
       setDays(d);
       setFirst(count === 0);
-      setFocus(planLesson({ profile, ...model, mood: "futsu", today: ymd() }).focusSkill);
+      setFocus(planLesson({ profile, ...model, mood: "futsu", today: ymd() }).focusSkills);
     })();
   }, [profile]);
 
@@ -48,10 +48,15 @@ export default function Home({ profile, onStart, onParent }: { profile: Profile;
 
       <section className="home-card">
         <p className="home-teacher-name">{profile.teacherName} せんせいの きょうしつ</p>
-        {focus && open && (
+        {focus.length > 0 && open && (
           <div className="menu">
             <small>きょうの メイン</small>
-            <b>{skill(focus).kidLabel}</b>
+            {focus.map((id) => (
+              <b key={id}>
+                <em>{skill(id).subject === "japanese" ? "こくご" : "さんすう"}</em>
+                {skill(id).kidLabel}
+              </b>
+            ))}
           </div>
         )}
         <WeekStamps days={days} />

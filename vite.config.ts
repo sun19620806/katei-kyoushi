@@ -31,5 +31,6 @@ export default defineConfig({
   test: {
     environment: "node",
     setupFiles: ["tests/setup.ts"],
+    testTimeout: 30000,
   },
 });

@@ -1,0 +1,58 @@
+# 国語のヒント（スキル × 間違いの原因 × 段階）
+# 3段目は、問題ごとに書いた「その問題だけのヒント」（{item_hint}）を使う。
+# 答えの ことばを そのまま 書かない。使ってはいけない言葉は tests/content.test.ts の FORBIDDEN。
+
+hints:
+  # ───── かたかな ─────
+  - { skillId: jp.katakana, misconception: "*", level: 1, text: "こえに 出して、1もじずつ たしかめよう。" }
+  - { skillId: jp.katakana, misconception: "*", level: 2, text: "のばす 音は「ー」、つまる 音は 小さい「ッ」で 書くよ。" }
+  - { skillId: jp.katakana, misconception: "*", level: 3, text: "{item_hint}" }
+  - { skillId: jp.katakana, misconception: similar_katakana, level: 1, text: "にて いる かたかなが あるよ。「シ」と「ツ」、「ソ」と「ン」に 気を つけよう。" }
+  - { skillId: jp.katakana, misconception: similar_katakana, level: 2, text: "形を よく 見て、1もじずつ くらべよう。" }
+  - { skillId: jp.katakana, misconception: long_vowel_miss, level: 1, text: "のばす 音は「ー」で 書くよ。のばす ところは あるかな？" }
+  - { skillId: jp.katakana, misconception: sokuon_miss, level: 1, text: "つまる 音は 小さい「ッ」で 書くよ。" }
+  - { skillId: jp.katakana, misconception: youon_miss, level: 1, text: "小さい「ャ・ュ・ョ」が 入るか 見てみよう。" }
+  - { skillId: jp.katakana, misconception: dakuten_miss, level: 1, text: "「゛」や「゜」が つくか、こえに 出して たしかめよう。" }
+
+  # ───── 漢字の読み ─────
+  - { skillId: jp.kanji.read, misconception: "*", level: 1, text: "せんの ことばを、文の 中で こえに 出して 読んでみよう。" }
+  - { skillId: jp.kanji.read, misconception: "*", level: 2, text: "文の いみに 合う 読みかたを さがそう。" }
+  - { skillId: jp.kanji.read, misconception: "*", level: 3, text: "{item_hint}" }
+  - { skillId: jp.kanji.read, misconception: sokuon_miss, level: 1, text: "小さい「っ」が 入るか、ゆっくり 言って たしかめよう。" }
+  - { skillId: jp.kanji.read, misconception: long_vowel_miss, level: 1, text: "のばす 音が あるか、ゆっくり 言って みよう。" }
+  - { skillId: jp.kanji.read, misconception: dakuten_miss, level: 1, text: "「゛」が つくか、こえに 出して たしかめよう。" }
+  - { skillId: jp.kanji.read, misconception: youon_miss, level: 1, text: "小さい「ゃ・ゅ・ょ」が あるか 見てみよう。" }
+  - { skillId: jp.kanji.read, misconception: on_kun_mix, level: 1, text: "この ことばでは、漢字を どう 読むかな？ 文の いみを 考えよう。" }
+  - { skillId: jp.kanji.read, misconception: similar_kanji, level: 1, text: "よく にた 漢字が あるよ。形を よく 見よう。" }
+
+  # ───── 漢字の書き ─────
+  - { skillId: jp.kanji.write, misconception: "*", level: 1, text: "文の いみを 考えて、合う 漢字を さがそう。" }
+  - { skillId: jp.kanji.write, misconception: "*", level: 2, text: "漢字の 形と、あとに つく ひらがなを よく 見よう。" }
+  - { skillId: jp.kanji.write, misconception: "*", level: 3, text: "{item_hint}" }
+  - { skillId: jp.kanji.write, misconception: okurigana, level: 1, text: "漢字の あとに つく ひらがなは いくつかな？" }
+  - { skillId: jp.kanji.write, misconception: homophone, level: 1, text: "おなじ 読みの 漢字が あるよ。文の いみに 合うのは どれ？" }
+  - { skillId: jp.kanji.write, misconception: similar_kanji, level: 1, text: "形が にて いる 漢字が あるよ。よく 見て くらべよう。" }
+
+  # ───── 主語と述語 ─────
+  - { skillId: jp.grammar.subject, misconception: "*", level: 1, text: "文の 中で「だれが（なにが）」と「どうする」を さがそう。" }
+  - { skillId: jp.grammar.subject, misconception: "*", level: 2, text: "「〜が」「〜は」が「だれが」、文の おわりの ことばが「どうする」だよ。" }
+  - { skillId: jp.grammar.subject, misconception: "*", level: 3, text: "{item_hint}" }
+  - { skillId: jp.grammar.subject, misconception: predicate_for_subject, level: 1, text: "それは「どうする」の ことばだね。「だれが（なにが）」は どれ？" }
+  - { skillId: jp.grammar.subject, misconception: subject_for_predicate, level: 1, text: "それは「だれが（なにが）」の ことばだね。「どうする」は どれ？" }
+  - { skillId: jp.grammar.subject, misconception: modifier_chosen, level: 1, text: "それは、ようすを くわしく する ことばだよ。" }
+
+  # ───── 読みとり（ものがたり・せつめい文） ─────
+  - { skillId: jp.reading.story, misconception: "*", level: 1, text: "もんだいを もう いちど 読もう。なにを きかれて いるかな？" }
+  - { skillId: jp.reading.story, misconception: "*", level: 2, text: "ぶんしょうの 中で、その ことが 書いて ある ところを さがそう。" }
+  - { skillId: jp.reading.story, misconception: "*", level: 3, text: "{item_hint}" }
+  - { skillId: jp.reading.story, misconception: not_in_text, level: 1, text: "ぶんしょうに 書いて ある ことから えらぼう。" }
+  - { skillId: jp.reading.story, misconception: wrong_part, level: 1, text: "きかれて いる ばめんを、もう いちど さがそう。" }
+  - { skillId: jp.reading.story, misconception: word_match, level: 1, text: "おなじ ことばが 入って いるだけかも。いみを たしかめよう。" }
+  - { skillId: jp.reading.story, misconception: who_confused, level: 1, text: "だれが した ことか、ぶんしょうで たしかめよう。" }
+  - { skillId: jp.reading.explain, misconception: "*", level: 1, text: "もんだいを もう いちど 読もう。なにを きかれて いるかな？" }
+  - { skillId: jp.reading.explain, misconception: "*", level: 2, text: "ぶんしょうの 中で、その ことが 書いて ある ところを さがそう。" }
+  - { skillId: jp.reading.explain, misconception: "*", level: 3, text: "{item_hint}" }
+  - { skillId: jp.reading.explain, misconception: not_in_text, level: 1, text: "ぶんしょうに 書いて ある ことから えらぼう。" }
+  - { skillId: jp.reading.explain, misconception: wrong_part, level: 1, text: "きかれて いる ところを、もう いちど さがそう。" }
+  - { skillId: jp.reading.explain, misconception: word_match, level: 1, text: "おなじ ことばが 入って いるだけかも。いみを たしかめよう。" }
+  - { skillId: jp.reading.explain, misconception: who_confused, level: 1, text: "なんの ことを 書いて いるか、ぶんしょうで たしかめよう。" }

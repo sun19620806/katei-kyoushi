@@ -14,6 +14,8 @@ export interface SkillDef {
   group: string; // 親の画面でのまとまり
   /** 1学期までの内容。重点にはせず、ウォームアップと復習にだけ出す */
   review?: boolean;
+  /** 1問の重さ（読みとりは問いが3つあるので 3）。授業の問題数の配分に使う */
+  weight?: number;
 }
 
 export interface MisconceptionDef {
@@ -219,6 +221,8 @@ export interface Profile {
   parentPin: string;
   /** 出さないスキル（学校でまだ習っていない単元など）。新しいスキルは自動で出る */
   disabledSkills: SkillId[];
+  /** 授業で出す教科 */
+  subjects: ("math" | "japanese")[];
 }
 
 /** 1問ぶんの結果（何回答えても1つにまとめる） */
@@ -242,6 +246,8 @@ export interface PlannedItem {
 export interface LessonPlan {
   sessionId: string;
   focusSkill: SkillId;
+  /** 教科ごとの重点スキル（算数・国語） */
+  focusSkills: SkillId[];
   warmupIsStrong: boolean; // ウォームアップが本当に得意なスキルか（初日は false）
   items: PlannedItem[];
   choiceOptions: { easy: SkillId; challenge: SkillId };

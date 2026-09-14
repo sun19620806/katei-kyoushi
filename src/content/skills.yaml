@@ -1,7 +1,7 @@
-# スキルの地図（算数・小2 2学期から）
+# スキルの地図（算数・国語、小2 2学期から）
 # 並び順＝重点にする順番（前提スキルの習熟度が十分になったら次へ）。
 # review: true は1学期までの内容。重点にはせず、ウォームアップと復習にだけ出す。
-version: "2026-09-15.1"
+version: "2026-09-15.2"
 
 misconceptions:
   # たし算・ひき算
@@ -77,6 +77,39 @@ misconceptions:
     label: 直角がない形を選ぶ
   - id: unequal_sides
     label: 辺の長さが同じかを見ていない（長方形と正方形）
+  # 国語
+  - id: sokuon_miss
+    label: 小さい「っ」がぬける・よけいに入る
+  - id: long_vowel_miss
+    label: のばす音（う・い・ー）がぬける・よけいにつく
+  - id: dakuten_miss
+    label: 「゛」「゜」がぬける・よけいにつく
+  - id: youon_miss
+    label: 小さい「ゃ・ゅ・ょ」の書きまちがい
+  - id: on_kun_mix
+    label: 音読みと訓読みを取りちがえる
+  - id: similar_kanji
+    label: 形のにた漢字と取りちがえる
+  - id: homophone
+    label: 読みが同じ別の漢字を選ぶ
+  - id: okurigana
+    label: 送りがなのまちがい
+  - id: similar_katakana
+    label: 形のにたかたかな（シとツ、ソとン など）を取りちがえる
+  - id: predicate_for_subject
+    label: 主語をきかれて述語を選ぶ
+  - id: subject_for_predicate
+    label: 述語をきかれて主語を選ぶ
+  - id: modifier_chosen
+    label: 主語・述語ではない、くわしくする言葉を選ぶ
+  - id: not_in_text
+    label: 文章に書いていないことを選ぶ
+  - id: wrong_part
+    label: 文章のちがう場面・段落のことを選ぶ
+  - id: word_match
+    label: 同じ言葉が入っているだけの選択肢を選ぶ
+  - id: who_confused
+    label: 登場人物（説明しているもの）を取りちがえる
 
 skills:
   # ───── 1学期のふくしゅう ─────
@@ -303,3 +336,60 @@ skills:
     prereqs: [math.fraction.shape, math.mul.dan4]
     generator: fractionOf
     misconceptions: [gave_denominator, used_half, subtracted]
+
+  # ═════ 国語 ═════
+  - id: jp.katakana
+    subject: japanese
+    group: かたかな
+    label: かたかなで書く言葉
+    kidLabel: かたかな
+    prereqs: []
+    generator: jpKatakana
+    misconceptions: [similar_katakana, long_vowel_miss, sokuon_miss, youon_miss, dakuten_miss]
+
+  - id: jp.kanji.read
+    subject: japanese
+    group: 漢字
+    label: 2年の漢字の読み
+    kidLabel: かんじの よみ
+    prereqs: []
+    generator: jpKanjiRead
+    misconceptions: [sokuon_miss, long_vowel_miss, dakuten_miss, youon_miss, on_kun_mix, similar_kanji]
+
+  - id: jp.grammar.subject
+    subject: japanese
+    group: 文の しくみ
+    label: 主語と述語（だれが・どうする）
+    kidLabel: だれが・どうする
+    prereqs: []
+    generator: jpGrammar
+    misconceptions: [predicate_for_subject, subject_for_predicate, modifier_chosen]
+
+  - id: jp.reading.story
+    subject: japanese
+    group: 読みとり
+    label: 読みとり（ものがたり）
+    kidLabel: ものがたりを よもう
+    weight: 3
+    prereqs: []
+    generator: jpReadingStory
+    misconceptions: [not_in_text, wrong_part, word_match, who_confused]
+
+  - id: jp.kanji.write
+    subject: japanese
+    group: 漢字
+    label: 2年の漢字の書き（合う漢字を選ぶ）
+    kidLabel: かんじの かき
+    prereqs: [jp.kanji.read]
+    generator: jpKanjiWrite
+    misconceptions: [okurigana, homophone, similar_kanji]
+
+  - id: jp.reading.explain
+    subject: japanese
+    group: 読みとり
+    label: 読みとり（せつめい文）
+    kidLabel: せつめいの 文を よもう
+    weight: 3
+    prereqs: [jp.reading.story]
+    generator: jpReadingExplain
+    misconceptions: [not_in_text, wrong_part, word_match, who_confused]

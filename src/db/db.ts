@@ -43,6 +43,7 @@ export const DEFAULT_PROFILE: Profile = {
   speechRate: 1,
   parentPin: "",
   disabledSkills: [],
+  subjects: ["math", "japanese"],
 };
 
 /** v0.1 で使っていたスキル（「出す」スキルの一覧を、「出さない」一覧に変えるため） */
@@ -58,7 +59,7 @@ export async function getProfile(): Promise<Profile | null> {
   const stored = row.value as Profile & { enabledSkills?: string[] };
   const { enabledSkills, ...rest } = stored;
   const disabledSkills = stored.disabledSkills ?? (enabledSkills ? V01_SKILLS.filter((id) => !enabledSkills.includes(id)) : []);
-  return { ...DEFAULT_PROFILE, ...rest, disabledSkills };
+  return { ...DEFAULT_PROFILE, ...rest, disabledSkills, subjects: stored.subjects?.length ? stored.subjects : ["math", "japanese"] };
 }
 
 export const saveProfile = (p: Profile) => db.kv.put({ key: "profile", value: p });

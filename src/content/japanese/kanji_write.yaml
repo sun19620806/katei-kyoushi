@@ -1,0 +1,280 @@
+# 漢字の書き（ひらがなの ところに 合う 漢字を えらぶ）。小2 2学期。
+# reading: 漢字に する ひらがな（アプリは {blank} の ところに これを 出す）
+# answer: 正しい 書き方（2年で習う漢字を ふくむ）
+# sentence: {blank} を 1回だけ ふくむ 文
+# wrong: まちがいの せんたくし。mc = その答えを えらぶ 原因（skills.yaml の misconceptions の id）
+#   similar_kanji の せんたくしだけは、形の にた 3年いじょうの 漢字を つかって よい。
+# hint: 3だんめの ヒント（45文字以内）。答えも、まちがいの せんたくしも そのまま 書かない。
+# 文と ヒントの 漢字は 小1・小2で 習う ものだけ。
+
+items:
+  - id: kw001
+    reading: "はしる"
+    answer: "走る"
+    sentence: "ろうかを {blank}のは あぶないよ。"
+    wrong:
+      - { text: "走しる", mc: okurigana }
+      - { text: "起る", mc: similar_kanji }
+    hint: "「はしる」の おくりがなは 1もじだけ。"
+
+  - id: kw002
+    reading: "あるく"
+    answer: "歩く"
+    sentence: "犬と いっしょに 川ぞいを {blank}。"
+    wrong:
+      - { text: "歩るく", mc: okurigana }
+      - { text: "走く", mc: similar_kanji }
+    hint: "「あるく」の おくりがなは 1もじだよ。"
+
+  - id: kw003
+    reading: "あたらしい"
+    answer: "新しい"
+    sentence: "{blank} ノートを 買って もらった。"
+    wrong:
+      - { text: "新らしい", mc: okurigana }
+      - { text: "親しい", mc: similar_kanji }
+    hint: "おくりがなは 2もじ。右がわに「見」が つかない 字だよ。"
+
+  - id: kw004
+    reading: "あかるい"
+    answer: "明るい"
+    sentence: "まどを あけたら へやが {blank}。"
+    wrong:
+      - { text: "明かるい", mc: okurigana }
+      - { text: "明い", mc: okurigana }
+    hint: "「あかるい」の おくりがなは 2もじだよ。"
+
+  - id: kw005
+    reading: "すくない"
+    answer: "少ない"
+    sentence: "のこりの あめが {blank}。"
+    wrong:
+      - { text: "少くない", mc: okurigana }
+      - { text: "小ない", mc: similar_kanji }
+    hint: "おくりがなは 2もじ。「小」に 1画 たした 字だよ。"
+
+  - id: kw006
+    reading: "たのしい"
+    answer: "楽しい"
+    sentence: "みんなで 行く えんそくは {blank}。"
+    wrong:
+      - { text: "楽のしい", mc: okurigana }
+      - { text: "薬しい", mc: similar_kanji }
+    hint: "「たのしい」の おくりがなは 2もじだよ。"
+
+  - id: kw007
+    reading: "おしえる"
+    answer: "教える"
+    sentence: "先生が かけ算の しかたを {blank}。"
+    wrong:
+      - { text: "教しえる", mc: okurigana }
+      - { text: "数える", mc: similar_kanji }
+    hint: "おくりがなは 2もじ。「かぞえる」の 字と 見くらべよう。"
+
+  - id: kw008
+    reading: "こたえる"
+    answer: "答える"
+    sentence: "手を あげて しつもんに {blank}。"
+    wrong:
+      - { text: "答る", mc: okurigana }
+      - { text: "合える", mc: similar_kanji }
+    hint: "おくりがなは 2もじ。竹かんむりの ある 字だよ。"
+
+  - id: kw009
+    reading: "かよう"
+    answer: "通う"
+    sentence: "毎日 歩いて 学校に {blank}。"
+    wrong:
+      - { text: "通よう", mc: okurigana }
+      - { text: "道う", mc: similar_kanji }
+    hint: "「かよう」の おくりがなは 1もじだよ。"
+
+  - id: kw010
+    reading: "とまる"
+    answer: "止まる"
+    sentence: "赤しんごうで 車が {blank}。"
+    wrong:
+      - { text: "止る", mc: okurigana }
+      - { text: "正まる", mc: similar_kanji }
+    hint: "おくりがなは 2もじ。上に よこ線の ない 字だよ。"
+
+  - id: kw011
+    reading: "よわい"
+    answer: "弱い"
+    sentence: "きょうは 風が {blank}。"
+    wrong:
+      - { text: "弱わい", mc: okurigana }
+      - { text: "羽い", mc: similar_kanji }
+    hint: "「よわい」の おくりがなは 1もじだよ。"
+
+  - id: kw012
+    reading: "おなじ"
+    answer: "同じ"
+    sentence: "ぼくと {blank} 色の ぼうしだね。"
+    wrong:
+      - { text: "同なじ", mc: okurigana }
+      - { text: "向じ", mc: similar_kanji }
+    hint: "「おなじ」の おくりがなは 1もじだよ。"
+
+  - id: kw013
+    reading: "あう"
+    answer: "会う"
+    sentence: "こうえんで 友だちに {blank}。"
+    wrong:
+      - { text: "合う", mc: homophone }
+      - { text: "今う", mc: similar_kanji }
+    hint: "人と あう ときは、「会話」の はじめの 字を つかうよ。"
+
+  - id: kw014
+    reading: "きしゃ"
+    answer: "汽車"
+    sentence: "{blank}が けむりを 出して はしる。"
+    wrong:
+      - { text: "気車", mc: homophone }
+      - { text: "汽東", mc: similar_kanji }
+    hint: "のりものの「き」は、さんずいの ある 字だよ。"
+
+  - id: kw015
+    reading: "こうえん"
+    answer: "公園"
+    sentence: "日曜日に {blank}で あそんだ。"
+    wrong:
+      - { text: "公遠", mc: homophone }
+      - { text: "工園", mc: homophone }
+    hint: "「えん」は、まわりを 口の 形で かこんだ 字だよ。"
+
+  - id: kw016
+    reading: "てんすう"
+    answer: "点数"
+    sentence: "テストの {blank}を 家の 人に 見せた。"
+    wrong:
+      - { text: "店数", mc: homophone }
+      - { text: "点教", mc: similar_kanji }
+    hint: "「てん」は、下に 点が 4つ ある 字だよ。"
+
+  - id: kw017
+    reading: "はんぶん"
+    answer: "半分"
+    sentence: "ピザを {blank}に して 食べた。"
+    wrong:
+      - { text: "半文", mc: homophone }
+      - { text: "平分", mc: similar_kanji }
+    hint: "「ぶん」は、「分ける」と 同じ 字だよ。"
+
+  - id: kw018
+    reading: "まいにち"
+    answer: "毎日"
+    sentence: "{blank} 絵日記を 書いている。"
+    wrong:
+      - { text: "米日", mc: homophone }
+      - { text: "海日", mc: similar_kanji }
+    hint: "「まい」の 字には、さんずいが つかないよ。"
+
+  - id: kw019
+    reading: "あき"
+    answer: "秋"
+    sentence: "{blank}に なると 木の はが 赤く なる。"
+    wrong:
+      - { text: "空き", mc: homophone }
+      - { text: "科", mc: similar_kanji }
+    hint: "きせつの 名前だよ。右がわは「火」の 字だよ。"
+
+  - id: kw020
+    reading: "こうばん"
+    answer: "交番"
+    sentence: "道に まよったら {blank}で 聞こう。"
+    wrong:
+      - { text: "高番", mc: homophone }
+      - { text: "父番", mc: similar_kanji }
+    hint: "「こう」は、「交通」の はじめの 字だよ。"
+
+  - id: kw021
+    reading: "じかん"
+    answer: "時間"
+    sentence: "おやつの {blank}に なった。"
+    wrong:
+      - { text: "字間", mc: homophone }
+      - { text: "時門", mc: similar_kanji }
+    hint: "「かん」は、門の 中に「日」が ある 字だよ。"
+
+  - id: kw022
+    reading: "ずこう"
+    answer: "図工"
+    sentence: "{blank}の じゅぎょうで 木の はこを 作った。"
+    wrong:
+      - { text: "図交", mc: homophone }
+      - { text: "国工", mc: similar_kanji }
+    hint: "「こう」は 3画で 書ける 字だよ。「ず」の 中の 形も 見よう。"
+
+  - id: kw023
+    reading: "せいかつ"
+    answer: "生活"
+    sentence: "{blank}の じかんに あさがおを そだてた。"
+    wrong:
+      - { text: "正活", mc: homophone }
+      - { text: "生話", mc: similar_kanji }
+    hint: "「かつ」は、さんずいの ある 字だよ。"
+
+  - id: kw024
+    reading: "はかる"
+    answer: "計る"
+    sentence: "ストップウォッチで 時間を {blank}。"
+    wrong:
+      - { text: "図る", mc: homophone }
+      - { text: "計かる", mc: okurigana }
+    hint: "時間や 数を はかる ときは、ごんべんの 字だよ。"
+
+  - id: kw025
+    reading: "なく"
+    answer: "鳴く"
+    sentence: "朝から せみが {blank}。"
+    wrong:
+      - { text: "鳥く", mc: similar_kanji }
+      - { text: "鳴なく", mc: okurigana }
+    hint: "生きものが 声を 出す 字には、口が ついているよ。"
+
+  - id: kw026
+    reading: "ふとい"
+    answer: "太い"
+    sentence: "ぞうの 足は とても {blank}。"
+    wrong:
+      - { text: "犬い", mc: similar_kanji }
+      - { text: "太とい", mc: okurigana }
+    hint: "点の いちを よく 見よう。おくりがなは 1もじだよ。"
+
+  - id: kw027
+    reading: "ちず"
+    answer: "地図"
+    sentence: "{blank}を 見ながら 歩いた。"
+    wrong:
+      - { text: "池図", mc: similar_kanji }
+      - { text: "知図", mc: homophone }
+      - { text: "地国", mc: similar_kanji }
+    hint: "「ち」は 土へんの 字だよ。「ず」の 中の 形も 見よう。"
+
+  - id: kw028
+    reading: "いもうと"
+    answer: "妹"
+    sentence: "{blank}と 人形で あそんだ。"
+    wrong:
+      - { text: "姉", mc: similar_kanji }
+      - { text: "味", mc: similar_kanji }
+    hint: "女へんの 字だよ。右がわは「木」に よこ線を たした 形。"
+
+  - id: kw029
+    reading: "くも"
+    answer: "雲"
+    sentence: "空に 白い {blank}が うかんでいる。"
+    wrong:
+      - { text: "雪", mc: similar_kanji }
+      - { text: "電", mc: similar_kanji }
+    hint: "雨かんむりの 字だよ。下の 形を よく 見よう。"
+
+  - id: kw030
+    reading: "うみ"
+    answer: "海"
+    sentence: "夏休みに {blank}で およいだ。"
+    wrong:
+      - { text: "毎", mc: similar_kanji }
+      - { text: "池", mc: similar_kanji }
+    hint: "さんずいの 字で、右がわは「まい」と 読む 字だよ。"

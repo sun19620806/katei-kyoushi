@@ -1,0 +1,205 @@
+# 主語と 述語（文の 中から えらぶ）。小2 2学期。
+# sentence: 文（30文字以内、文節ごとに スペース）
+# ask: subject =「だれが（なにが）」/ predicate =「どうする・どんなだ・なんだ」
+# answer: 正しい 文節（文の 中に そのまま ある ことば）
+# wrong: まちがいの せんたくし（これも 文の 中に そのまま ある ことば）
+#   mc = その答えを えらぶ 原因（skills.yaml の misconceptions の id）
+# hint: 3だんめの ヒント（45文字以内）。答えも、まちがいの せんたくしも そのまま 書かない。
+
+items:
+  # ───── 主語（だれが・なにが） ─────
+  - id: gr001
+    sentence: "ことりが えだの 上で なく。"
+    ask: subject
+    answer: "ことりが"
+    wrong:
+      - { text: "なく", mc: predicate_for_subject }
+      - { text: "えだの", mc: modifier_chosen }
+    hint: "「だれが（なにが）」に あたる ことばを さがそう。"
+
+  - id: gr002
+    sentence: "きのう、ぼくは こうえんへ いった。"
+    ask: subject
+    answer: "ぼくは"
+    wrong:
+      - { text: "いった", mc: predicate_for_subject }
+      - { text: "こうえんへ", mc: modifier_chosen }
+      - { text: "きのう", mc: modifier_chosen }
+    hint: "「〜は」の 形でも「だれが」を あらわせるよ。"
+
+  - id: gr003
+    sentence: "赤い 花が たくさん さいた。"
+    ask: subject
+    answer: "花が"
+    wrong:
+      - { text: "さいた", mc: predicate_for_subject }
+      - { text: "赤い", mc: modifier_chosen }
+      - { text: "たくさん", mc: modifier_chosen }
+    hint: "「なにが」どう なったのかを 考えよう。"
+
+  - id: gr004
+    sentence: "あさ 早く、妹が 犬と さんぽに 出かけた。"
+    ask: subject
+    answer: "妹が"
+    wrong:
+      - { text: "出かけた", mc: predicate_for_subject }
+      - { text: "犬と", mc: modifier_chosen }
+      - { text: "さんぽに", mc: modifier_chosen }
+    hint: "「だれが」に あたる ことばは、文の はじめとは かぎらないよ。"
+
+  - id: gr005
+    sentence: "この ケーキは とても あまい。"
+    ask: subject
+    answer: "ケーキは"
+    wrong:
+      - { text: "あまい", mc: predicate_for_subject }
+      - { text: "とても", mc: modifier_chosen }
+    hint: "「なには」に あたる ことばを さがそう。"
+
+  - id: gr006
+    sentence: "わたしの 父は バスの うんてんしゅだ。"
+    ask: subject
+    answer: "父は"
+    wrong:
+      - { text: "うんてんしゅだ", mc: predicate_for_subject }
+      - { text: "わたしの", mc: modifier_chosen }
+      - { text: "バスの", mc: modifier_chosen }
+    hint: "「だれは」に あたる ことばを さがそう。"
+
+  - id: gr007
+    sentence: "校ていで 二年生が サッカーを する。"
+    ask: subject
+    answer: "二年生が"
+    wrong:
+      - { text: "する", mc: predicate_for_subject }
+      - { text: "校ていで", mc: modifier_chosen }
+      - { text: "サッカーを", mc: modifier_chosen }
+    hint: "「だれが」に あたる ことばを、文の 中から さがそう。"
+
+  - id: gr008
+    sentence: "雨の あと、空に 大きな にじが かかった。"
+    ask: subject
+    answer: "にじが"
+    wrong:
+      - { text: "かかった", mc: predicate_for_subject }
+      - { text: "大きな", mc: modifier_chosen }
+      - { text: "空に", mc: modifier_chosen }
+    hint: "「〜が」の 形の ことばを さがそう。"
+
+  - id: gr009
+    sentence: "ぼくの 家の 小犬も とても 元気だ。"
+    ask: subject
+    answer: "小犬も"
+    wrong:
+      - { text: "元気だ", mc: predicate_for_subject }
+      - { text: "家の", mc: modifier_chosen }
+    hint: "「〜も」の 形でも「なにが」を あらわせるよ。"
+
+  - id: gr010
+    sentence: "夜に なると、空で 星が 光る。"
+    ask: subject
+    answer: "星が"
+    wrong:
+      - { text: "光る", mc: predicate_for_subject }
+      - { text: "空で", mc: modifier_chosen }
+      - { text: "夜に", mc: modifier_chosen }
+    hint: "「なにが」に あたる ことばは、文の うしろの ほうに あるよ。"
+
+  # ───── 述語（どうする・どんなだ・なんだ） ─────
+  - id: gr011
+    sentence: "お兄さんが 大きな 声で 歌う。"
+    ask: predicate
+    answer: "歌う"
+    wrong:
+      - { text: "お兄さんが", mc: subject_for_predicate }
+      - { text: "声で", mc: modifier_chosen }
+      - { text: "大きな", mc: modifier_chosen }
+    hint: "文の おわりの「どう する」に あたる ことばだよ。"
+
+  - id: gr012
+    sentence: "きょうの 空は とても 青い。"
+    ask: predicate
+    answer: "青い"
+    wrong:
+      - { text: "空は", mc: subject_for_predicate }
+      - { text: "とても", mc: modifier_chosen }
+      - { text: "きょうの", mc: modifier_chosen }
+    hint: "「どんなだ」に あたる ことばを さがそう。"
+
+  - id: gr013
+    sentence: "くじらは 海に すむ どうぶつだ。"
+    ask: predicate
+    answer: "どうぶつだ"
+    wrong:
+      - { text: "くじらは", mc: subject_for_predicate }
+      - { text: "すむ", mc: modifier_chosen }
+      - { text: "海に", mc: modifier_chosen }
+    hint: "「なんだ」に あたる、文の いちばん おわりの ことばだよ。"
+
+  - id: gr014
+    sentence: "日曜日に、ぼくは おばあちゃんの 家へ 行った。"
+    ask: predicate
+    answer: "行った"
+    wrong:
+      - { text: "ぼくは", mc: subject_for_predicate }
+      - { text: "家へ", mc: modifier_chosen }
+      - { text: "日曜日に", mc: modifier_chosen }
+    hint: "「どう した」に あたる ことばを さがそう。"
+
+  - id: gr015
+    sentence: "あの 白い 鳥は はくちょうだ。"
+    ask: predicate
+    answer: "はくちょうだ"
+    wrong:
+      - { text: "鳥は", mc: subject_for_predicate }
+      - { text: "白い", mc: modifier_chosen }
+      - { text: "あの", mc: modifier_chosen }
+    hint: "「なんだ」に あたる ことばは、文の おわりに あるよ。"
+
+  - id: gr016
+    sentence: "かえるが 池に ぽちゃんと とびこんだ。"
+    ask: predicate
+    answer: "とびこんだ"
+    wrong:
+      - { text: "かえるが", mc: subject_for_predicate }
+      - { text: "ぽちゃんと", mc: modifier_chosen }
+      - { text: "池に", mc: modifier_chosen }
+    hint: "「どう した」に あたる、文の おわりの ことばだよ。"
+
+  - id: gr017
+    sentence: "あしたの 天気は 雨だ。"
+    ask: predicate
+    answer: "雨だ"
+    wrong:
+      - { text: "天気は", mc: subject_for_predicate }
+      - { text: "あしたの", mc: modifier_chosen }
+    hint: "「なんだ」に あたる ことばを さがそう。"
+
+  - id: gr018
+    sentence: "テストの 間、教室は とても しずかだ。"
+    ask: predicate
+    answer: "しずかだ"
+    wrong:
+      - { text: "教室は", mc: subject_for_predicate }
+      - { text: "とても", mc: modifier_chosen }
+      - { text: "テストの", mc: modifier_chosen }
+    hint: "「どんなだ」に あたる、文の おわりの ことばだよ。"
+
+  - id: gr019
+    sentence: "朝ごはんに、母が パンを やいた。"
+    ask: predicate
+    answer: "やいた"
+    wrong:
+      - { text: "母が", mc: subject_for_predicate }
+      - { text: "パンを", mc: modifier_chosen }
+      - { text: "朝ごはんに", mc: modifier_chosen }
+    hint: "「どう した」に あたる ことばは、文の おわりに あるよ。"
+
+  - id: gr020
+    sentence: "ティラノサウルスは 大きな きょうりゅうだ。"
+    ask: predicate
+    answer: "きょうりゅうだ"
+    wrong:
+      - { text: "ティラノサウルスは", mc: subject_for_predicate }
+      - { text: "大きな", mc: modifier_chosen }
+    hint: "「なんだ」に あたる ことばを、文の おわりから さがそう。"

@@ -18,6 +18,7 @@ const profile: Profile = {
   speechRate: 1,
   parentPin: "0000",
   disabledSkills: [],
+  subjects: ["math", "japanese"],
 };
 
 const mastered = (id: string): SkillState => ({ ...initialSkillState(id), attempts: 10, mastery: 0.9, masteredAt: "2026-09-01" });

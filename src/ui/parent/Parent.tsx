@@ -175,9 +175,14 @@ function Today({ data, profile }: { data: Data; profile: Profile }) {
 
       <section className="box">
         <h2>次の授業の予定</h2>
-        <p>
-          重点：<b>{skill(plan.focusSkill).label}</b>
-        </p>
+        <ul className="list">
+          {plan.focusSkills.map((id) => (
+            <li key={id}>
+              <span className="chip">{skill(id).subject === "japanese" ? "国語" : "算数"}</span>
+              <span className="list-text">重点：<b>{skill(id).label}</b></span>
+            </li>
+          ))}
+        </ul>
         <ul className="list">
           {[...new Set(plan.items.filter((i) => i.phase === "review").map((i) => i.skillId))].map((id) => (
             <li key={id}>復習：{skill(id).label}</li>
@@ -269,10 +274,24 @@ function Log({ data }: { data: Data }) {
       case "mul_word": return a.step === 0 ? "文章題（式）" : `文章題 ${p.a} × ${p.b}`;
       case "len_to_cm": return `${p.a}m${p.b}cm = □cm`;
       case "len_to_mcm": return `${p.cm}cm = ${p.a}m□cm`;
+      case "unit_to_small": return `${p.a}${p.unit?.big}${p.b}${p.unit?.small} = □${p.unit?.small}`;
+      case "unit_to_mixed": return `${p.unit?.total}${p.unit?.small} = ${p.a}${p.unit?.big}□${p.unit?.small}`;
+      case "clock_read": return `とけい ${p.clock?.h}時${p.clock?.m}分（${a.step === 0 ? "時" : "分"}）`;
+      case "clock_shift": return `${p.clock?.h}時${p.clock?.m}分の${p.clock?.shift}分${p.clock?.dir === "before" ? "前" : "後"}（${a.step === 0 ? "時" : "分"}）`;
+      case "fraction_of": return `${p.a}この1/${p.b}`;
+      case "fraction_shape": return `1/${p.a}の図`;
+      case "place_compose": return `4けたの数 ${p.b}`;
+      case "shape_pick": return p.steps[0]?.prompt ?? "形";
+      case "jp_choice": return `${skill(p.skillId).label}：${p.jp?.word ?? p.jp?.reading ?? p.jp?.title ?? ""}`;
       default: return "";
     }
   };
-  const givenText = (a: AnswerEvent) => (a.problem.steps?.[a.step ?? 0]?.type === "choice" ? a.problem.steps[a.step].choices?.[a.given] ?? "" : String(a.given));
+  const givenText = (a: AnswerEvent) => {
+    const st = a.problem.steps?.[a.step ?? 0];
+    if (st?.type !== "choice") return String(a.given);
+    const c = st.choices?.[a.given] ?? "";
+    return c.startsWith("shape:") || c.startsWith("frac:") ? `${a.given + 1}ばんの図` : c;
+  };
   return (
     <div className="panel-grid">
       {sessions.length === 0 && <p className="muted">まだ記録がありません。</p>}
@@ -372,6 +391,21 @@ function Settings({ profile, onProfileChange, onDataChange }: { profile: Profile
         <div className="row">
           <label>使える時間（から）<input type="time" value={p.allowedFrom} onChange={(e) => set("allowedFrom", e.target.value)} /></label>
           <label>（まで）<input type="time" value={p.allowedTo} onChange={(e) => set("allowedTo", e.target.value)} /></label>
+        </div>
+        <div className="row">
+          {(["math", "japanese"] as const).map((sub) => (
+            <label key={sub} className="switch">
+              <input
+                type="checkbox"
+                checked={p.subjects.includes(sub)}
+                onChange={(e) => {
+                  const next = e.target.checked ? [...p.subjects, sub] : p.subjects.filter((x) => x !== sub);
+                  if (next.length) set("subjects", next);
+                }}
+              />
+              {sub === "math" ? "算数を出す" : "国語を出す"}
+            </label>
+          ))}
         </div>
         <label className="switch"><input type="checkbox" checked={p.speech} onChange={(e) => set("speech", e.target.checked)} />先生の声で読み上げる</label>
         <label>読み上げの速さ<input type="range" min={0.7} max={1.3} step={0.05} value={p.speechRate} onChange={(e) => set("speechRate", Number(e.target.value))} /></label>

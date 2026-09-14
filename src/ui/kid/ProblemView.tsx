@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
 import { digit } from "../../domain/math/diagnose";
 import type { HintVisual, Problem } from "../../domain/types";
-import { RedCircle } from "../icons";
+import { RedCircle, SpeakerIcon } from "../icons";
+import { speak } from "../speech";
 import { ClockFace, FracGroups, PlaceBlocks, UnitTape } from "./visuals";
 
 export const opSymbol = (p: Problem) => (p.kind === "add" ? "+" : p.kind === "sub" ? "−" : "×");
@@ -34,6 +35,17 @@ export function problemSpeech(p: Problem, step: number): string {
     }
     case "shape":
       return p.steps[0].prompt;
+    case "kanji_read":
+      // 読みの問題は、文を読み上げると答えがわかってしまうので読まない
+      return "せんの 漢字の 読みかたは どれかな？";
+    case "kanji_write":
+      return `${p.jp!.sentence!.replace("{blank}", p.jp!.reading!)} ${p.jp!.reading}に 合う 漢字は どれ？`;
+    case "katakana":
+      return `${p.jp!.clue}。${p.jp!.reading}を かたかなで 書くと どれ？`;
+    case "grammar":
+      return `${p.jp!.sentence} ${p.steps[0].prompt}`;
+    case "reading":
+      return `もんだい${step + 1}。${p.steps[step].prompt}`;
     default:
       return `${p.a} ${opSymbol(p)} ${p.b} は？`;
   }
@@ -159,6 +171,13 @@ export default function ProblemView({ problem: p, step, input, visual, state, no
     }
     case "shape":
       body = <p className="shape-q">{p.steps[0].prompt}</p>;
+      break;
+    case "kanji_read":
+    case "kanji_write":
+    case "katakana":
+    case "grammar":
+    case "reading":
+      body = <JapaneseView problem={p} step={step} state={state} />;
       break;
     case "story": {
       const expr = p.steps[0].choices![p.steps[0].answer];
@@ -342,4 +361,112 @@ function MeterTape({ m }: { m: number }) {
       </div>
     </div>
   );
+}
+
+/** 国語の問題 */
+function JapaneseView({ problem: p, step, state }: { problem: Problem; step: number; state: ViewState }) {
+  const jp = p.jp!;
+  const done = state !== "answering";
+  const correctText = p.steps[step].choices?.[p.steps[step].answer] ?? "";
+  const split = (sentence: string, key: string) => {
+    const [before, after = ""] = sentence.split(key);
+    return [before, after];
+  };
+
+  switch (p.layout) {
+    case "kanji_read": {
+      const [before, after] = split(jp.sentence!, "{word}");
+      return (
+        <div className="jp">
+          <p className="jp-sentence">
+            {before}
+            {done ? (
+              <ruby className={`target ${state}`}>
+                {jp.word}
+                <rt>{correctText}</rt>
+              </ruby>
+            ) : (
+              <span className="target">{jp.word}</span>
+            )}
+            {after}
+          </p>
+        </div>
+      );
+    }
+    case "kanji_write": {
+      const [before, after] = split(jp.sentence!, "{blank}");
+      return (
+        <div className="jp">
+          <p className="jp-sentence">
+            {before}
+            {done ? (
+              <ruby className={`target filled ${state}`}>
+                {correctText}
+                <rt>{jp.reading}</rt>
+              </ruby>
+            ) : (
+              <span className="blank">{jp.reading}</span>
+            )}
+            {after}
+          </p>
+        </div>
+      );
+    }
+    case "katakana":
+      return (
+        <div className="jp katakana">
+          <p className="jp-clue">{jp.clue}</p>
+          <p className="jp-word">
+            <span className="kana-from">{jp.reading}</span>
+            <span className="arrow" aria-hidden="true">→</span>
+            <span className={`kana-to ${state}`}>{done ? correctText : "？"}</span>
+          </p>
+        </div>
+      );
+    case "grammar": {
+      const words = jp.sentence!.split(/(\s+)/);
+      return (
+        <div className="jp">
+          <p className="jp-ask">{jp.ask === "subject" ? "だれが（なにが）" : "どうする（どんなだ・なんだ）"}</p>
+          <p className="jp-sentence phrases">
+            {words.map((w, i) =>
+              /^\s+$/.test(w) ? (
+                " "
+              ) : (
+                <span key={i} className={`phrase ${done && w.replace(/[。、]/g, "") === correctText.replace(/[。、]/g, "") ? `hit ${state}` : ""}`}>
+                  {w}
+                </span>
+              ),
+            )}
+          </p>
+        </div>
+      );
+    }
+    default: {
+      // 読みとり：教科書のように たて書き
+      const paragraphs = (jp.passage ?? "").split("\n").filter(Boolean);
+      return (
+        <div className="reading">
+          <div className="reading-head">
+            <button className="listen" onClick={() => speak(`${jp.title}。 ${paragraphs.join(" ")}`)}>
+              <SpeakerIcon size={20} /> ぶんしょうを きく
+            </button>
+            <ol className="q-dots" aria-label={`もんだい ${step + 1} / ${p.steps.length}`}>
+              {p.steps.map((_, i) => (
+                <li key={i} className={i < step || (done && i === step) ? "done" : i === step ? "now" : ""}>
+                  {i + 1}
+                </li>
+              ))}
+            </ol>
+          </div>
+          <div className="reading-body" tabIndex={0}>
+            <h3>{jp.title}</h3>
+            {paragraphs.map((t, i) => (
+              <p key={i}>{t}</p>
+            ))}
+          </div>
+        </div>
+      );
+    }
+  }
 }

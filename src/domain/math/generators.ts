@@ -1,4 +1,4 @@
-import { skill, STORIES } from "../content";
+import { JP, type JpWrong, skill, STORIES } from "../content";
 import { fill } from "../fill";
 import { int, pick, type Rng, uid } from "../random";
 import type { Problem, SkillId, Step } from "../types";
@@ -306,7 +306,78 @@ const shapePick: Generator = (skillId, rng, recent) =>
     );
   }, recent);
 
+/** 国語：正解と「まちがい（原因つき）」から、選ぶステップを作る */
+function jpStep(rng: Rng, answer: string, wrong: JpWrong[], prompt: string): Step {
+  const options: [string, string | null][] = [[answer, null], ...wrong.map((w): [string, string] => [w.text, w.mc])];
+  const shuffled = options.sort(() => rng() - 0.5);
+  return {
+    type: "choice",
+    answer: shuffled.findIndex((o) => o[1] === null),
+    choices: shuffled.map((o) => o[0]),
+    choiceMcs: shuffled.map((o) => o[1]),
+    prompt,
+  };
+}
+
+/** 最近出していないものを選ぶ（a に番号を入れて、recent で重ならないようにする） */
+function jpPick<T>(rng: Rng, items: T[], recent?: Set<string>): [T, number] {
+  const fresh = items.map((_, i) => i).filter((i) => !recent?.has(`${i},0`));
+  const i = pick(rng, fresh.length ? fresh : items.map((_, k) => k));
+  return [items[i], i];
+}
+
+const jpKanjiRead: Generator = (skillId, rng, recent) => {
+  const [it, i] = jpPick(rng, JP.kanjiRead, recent);
+  return base(skillId, "jp_choice", i, 0, "kanji_read", [jpStep(rng, it.reading, it.wrong, "せんの 漢字の 読みかたは？")], {
+    jp: { itemId: it.id, sentence: it.sentence, word: it.word, hints: [it.hint] },
+  });
+};
+
+const jpKanjiWrite: Generator = (skillId, rng, recent) => {
+  const [it, i] = jpPick(rng, JP.kanjiWrite, recent);
+  return base(skillId, "jp_choice", i, 0, "kanji_write", [jpStep(rng, it.answer, it.wrong, "□に 合う 漢字は？")], {
+    jp: { itemId: it.id, sentence: it.sentence, reading: it.reading, hints: [it.hint] },
+  });
+};
+
+const jpKatakana: Generator = (skillId, rng, recent) => {
+  const [it, i] = jpPick(rng, JP.katakana, recent);
+  return base(skillId, "jp_choice", i, 0, "katakana", [jpStep(rng, it.answer, it.wrong, "かたかなで 書くと？")], {
+    jp: { itemId: it.id, reading: it.hiragana, clue: it.clue, hints: [it.hint] },
+  });
+};
+
+const jpGrammar: Generator = (skillId, rng, recent) => {
+  const [it, i] = jpPick(rng, JP.grammar, recent);
+  const prompt = it.ask === "subject" ? "「だれが（なにが）」は どれ？" : "「どうする（どんなだ）」は どれ？";
+  return base(skillId, "jp_choice", i, 0, "grammar", [jpStep(rng, it.answer, it.wrong, prompt)], {
+    jp: { itemId: it.id, sentence: it.sentence, ask: it.ask, hints: [it.hint] },
+  });
+};
+
+const jpReading =
+  (genre: "story" | "explain"): Generator =>
+  (skillId, rng, recent) => {
+    const passages = JP.reading.filter((p) => p.genre === genre);
+    const [ps, i] = jpPick(rng, passages, recent);
+    return base(
+      skillId,
+      "jp_choice",
+      i,
+      0,
+      "reading",
+      ps.questions.map((q) => jpStep(rng, q.answer, q.wrong, q.ask)),
+      { jp: { itemId: ps.id, title: ps.title, passage: ps.text.trim(), questions: ps.questions.map((q) => q.ask), hints: ps.questions.map((q) => q.hint) } },
+    );
+  };
+
 export const generators: Record<string, Generator> = {
+  jpKanjiRead,
+  jpKanjiWrite,
+  jpKatakana,
+  jpGrammar,
+  jpReadingStory: jpReading("story"),
+  jpReadingExplain: jpReading("explain"),
   add1d1dCarry,
   add2d2dCarry,
   add2d2dTo3d,

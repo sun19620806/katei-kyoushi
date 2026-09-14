@@ -64,6 +64,11 @@ const THINK_CARDS: Record<string, string[]> = {
   fraction_shape: ["おなじ 大きさか 見た", "いくつに わけたか かぞえた", "なんとなく", "わからない"],
   place_compose: ["くらいの へやに わけた", "0を わすれずに かいた", "なんとなく", "わからない"],
   shape_pick: ["へんと かどを かぞえた", "線が つながって いるか 見た", "なんとなく", "わからない"],
+  kanji_read: ["こえに 出して 読んだ", "しって いる ことばだった", "なんとなく", "わからない"],
+  kanji_write: ["文の いみを 考えた", "漢字の 形を よく 見た", "なんとなく", "わからない"],
+  katakana: ["こえに 出して たしかめた", "形を よく 見た", "なんとなく", "わからない"],
+  grammar: ["「〜が」を さがした", "文の おわりを 見た", "なんとなく", "わからない"],
+  reading: ["ぶんしょうに もどって さがした", "おぼえて いた", "なんとなく", "わからない"],
 };
 
 interface Summary {
@@ -166,11 +171,12 @@ export default function Lesson({ profile, onExit, trial }: { profile: Profile; o
     if (s.stage !== "answering" || !s.problem) return;
     const parts = [...prefix];
     const phase = currentPhase(s);
+    const phaseKey = phase === "main" ? `main:${s.problem.skillId}` : phase;
     if (s.isTwin) parts.push(line("twin"));
-    else if (phase !== lastPhase.current) {
+    else if (phaseKey !== lastPhase.current) {
       parts.push(line(`phase_${phase}`, { skill: skill(s.problem.skillId).kidLabel, strong: s.plan.warmupIsStrong ? "1" : undefined }));
     }
-    lastPhase.current = phase;
+    lastPhase.current = phaseKey;
     parts.push({ display: parts.length ? "" : s.problem.steps[0].prompt, speech: problemSpeech(s.problem, 0) });
     show(parts, "smile");
   };
@@ -209,7 +215,8 @@ export default function Lesson({ profile, onExit, trial }: { profile: Profile; o
       show([line("reveal", { answer: String(state.problem!.answer) })], "calm");
     } else if (state.stepAdvanced) {
       const st = currentStep(state)!;
-      show([line("step_ok"), { display: st.prompt, speech: st.prompt }], "smile");
+      const p = state.problem!;
+      show([line(p.kind === "mul_word" ? "step_ok_expr" : "step_ok"), { display: st.prompt, speech: problemSpeech(p, state.step) }], "smile");
     } else if (state.hint) {
       show([line("wrong_nudge"), { display: "", speech: state.hint.text }], "think");
     }
@@ -322,7 +329,15 @@ export default function Lesson({ profile, onExit, trial }: { profile: Profile; o
         </button>
         {ui === "run" && lesson && (
           <div className="progress-wrap">
-            <span className={`phase-chip ${phase}`}>{lesson.isTwin ? "もう いちど" : PHASE_LABEL[phase]}</span>
+            <span className={`phase-chip ${phase}`}>
+              {lesson.isTwin
+                ? "もう いちど"
+                : phase === "main" && lesson.problem
+                  ? skill(lesson.problem.skillId).subject === "japanese"
+                    ? "きょうの こくご"
+                    : "きょうの さんすう"
+                  : PHASE_LABEL[phase]}
+            </span>
             <div className="progress" aria-hidden="true">
               {lesson.plan.items.map((it, i) => (
                 <span key={i} className={`${it.phase} ${i < lesson.index ? "done" : i === lesson.index ? "now" : ""}`} />
@@ -402,7 +417,10 @@ export default function Lesson({ profile, onExit, trial }: { profile: Profile; o
 
           {ui === "run" && lesson && stage === "think" && (
             <div className="cards four">
-              {(THINK_CARDS[lesson.outcomes.at(-1)?.problem.kind ?? "add"] ?? THINK_CARDS.add).map((c) => (
+              {(() => {
+                const last = lesson.outcomes.at(-1)?.problem;
+                return THINK_CARDS[(last?.kind === "jp_choice" ? last.layout : last?.kind) ?? "add"] ?? THINK_CARDS.add;
+              })().map((c) => (
                 <button key={c} className="card think" onClick={() => think(c)}>
                   <b>{c}</b>
                 </button>

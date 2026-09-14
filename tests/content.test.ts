@@ -2,7 +2,8 @@
  * 教材ファイルの検証。Claude Code で教材を足したら、必ず `npm run validate` を実行する。
  */
 import { describe, expect, it } from "vitest";
-import { HINTS, LINES, MISCONCEPTIONS, SKILLS, STORIES } from "../src/domain/content";
+import { HINTS, JP, LINES, MISCONCEPTIONS, SKILLS, STORIES, skill } from "../src/domain/content";
+import { hintText } from "../src/domain/hints";
 import { findHint, fill, problemVars } from "../src/domain/hints";
 import { simulateWrong } from "../src/domain/math/diagnose";
 import { generators } from "../src/domain/math/generators";
@@ -109,5 +110,58 @@ describe("教材ファイル", () => {
       "growth_first_no_hint", "growth_faster", "growth_mastered", "growth_persisted", "growth_streak",
     ];
     for (const r of required) expect(scenes.has(r), r).toBe(true);
+  });
+
+  it("国語：正解・まちがい・原因・ヒントがそろっている", () => {
+    const check = (skillId: string, id: string, answer: string, wrong: { text: string; mc: string }[], hint: string | undefined, extra: string[]) => {
+      const mcs = new Set(skill(skillId).misconceptions);
+      const texts = wrong.map((w) => w.text);
+      expect(texts, id).not.toContain(answer);
+      expect(new Set(texts).size, id).toBe(texts.length);
+      expect(wrong.length, id).toBeGreaterThanOrEqual(2);
+      for (const w of wrong) expect(mcs.has(w.mc), `${id}: ${w.mc}`).toBe(true);
+      if (hint) {
+        expect(hint, id).not.toContain(answer);
+        expect(hint.length, id).toBeLessThanOrEqual(MAX_LEN);
+      }
+      for (const t of [answer, ...texts, hint ?? "", ...extra]) for (const f of FORBIDDEN) expect(t, `${id}: ${f}`).not.toContain(f);
+    };
+    for (const it of JP.kanjiRead) {
+      expect(it.sentence.split("{word}").length, it.id).toBe(2);
+      check("jp.kanji.read", it.id, it.reading, it.wrong, it.hint, [it.sentence]);
+    }
+    for (const it of JP.kanjiWrite) {
+      expect(it.sentence.split("{blank}").length, it.id).toBe(2);
+      check("jp.kanji.write", it.id, it.answer, it.wrong, it.hint, [it.sentence]);
+    }
+    for (const it of JP.katakana) check("jp.katakana", it.id, it.answer, it.wrong, it.hint, [it.clue]);
+    for (const it of JP.grammar) {
+      check("jp.grammar.subject", it.id, it.answer, it.wrong, it.hint, [it.sentence]);
+      for (const t of [it.answer, ...it.wrong.map((w) => w.text)]) expect(it.sentence, `${it.id}: ${t}`).toContain(t);
+    }
+    for (const ps of JP.reading) {
+      expect(ps.text.length, ps.id).toBeLessThanOrEqual(320);
+      for (const f of FORBIDDEN) expect(ps.text, `${ps.id}: ${f}`).not.toContain(f);
+      ps.questions.forEach((q, i) => check(`jp.reading.${ps.genre}`, `${ps.id}-q${i + 1}`, q.answer, q.wrong, q.hint, [q.ask]));
+    }
+  });
+
+  it("国語：どのヒントにも、正しい選択肢の ことばを そのまま 書かない", () => {
+    const rng = seededRng(11);
+    for (const s of SKILLS.filter((x) => x.subject === "japanese")) {
+      for (let i = 0; i < 40; i++) {
+        const p = generators[s.generator](s.id, rng);
+        p.steps.forEach((st, step) => {
+          const correct = st.choices![st.answer];
+          for (const mc of [...s.misconceptions, "unknown"]) {
+            for (const level of [1, 2, 3] as const) {
+              const h = hintText(p, step, mc, level);
+              expect(h, `${s.id} ${mc} L${level}`).not.toBeNull();
+              expect(h!.text, `${s.id} ${p.jp?.itemId} step${step}`).not.toContain(correct);
+            }
+          }
+        });
+      }
+    }
   });
 });

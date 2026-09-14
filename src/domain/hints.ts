@@ -46,6 +46,7 @@ export function problemVars(p: Problem): Record<string, string> {
     });
   }
   if (p.shape) text.target_def = SHAPE_DEFS[p.shape.target] ?? "";
+  if (p.jp) text.item_hint = "";
   return { ...Object.fromEntries(Object.entries(vars).map(([k, v]) => [k, String(v)])), ...text };
 }
 
@@ -88,5 +89,8 @@ export function findHint(p: Problem, step: number, misconception: MisconceptionI
 export function hintText(p: Problem, step: number, misconception: MisconceptionId | null, level: 1 | 2 | 3): { text: string; visual: HintVisual } | null {
   const h = findHint(p, step, misconception, level);
   if (!h) return null;
-  return { text: fill(h.text, problemVars(p)), visual: h.visual ?? "none" };
+  const vars = problemVars(p);
+  // 国語の3段目は「その問題だけのヒント」。無ければ2段目の共通ヒントをくり返さないよう、読みかえしをすすめる
+  if (p.jp) vars.item_hint = p.jp.hints?.[step] ?? "もう いちど、はじめから ゆっくり 読んでみよう。";
+  return { text: fill(h.text, vars), visual: h.visual ?? "none" };
 }
