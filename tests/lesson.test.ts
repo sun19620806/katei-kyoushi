@@ -64,7 +64,7 @@ describe("授業の計画", () => {
   it("「出さない」にしたスキルは出ない。前提が出さないスキルでも先に進める", () => {
     const off = { ...profile, disabledSkills: ["math.add.2d2d_to3d", "math.sub.3d2d_borrow"] };
     const plan = planLesson({ profile: off, states: {}, stumbles: {}, mood: "futsu", today: "2026-09-14" });
-    expect(plan.focusSkill).toBe("math.mul.dan5");
+    expect(plan.focusSkill).toBe("math.time.shift");
     expect(plan.items.map((i) => i.skillId)).not.toContain("math.add.2d2d_to3d");
   });
 });

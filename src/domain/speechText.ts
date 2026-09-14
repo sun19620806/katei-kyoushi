@@ -21,6 +21,11 @@ export function toSpeakable(text: string): string {
   let s = text;
   for (const [from, to] of READINGS) s = s.split(from).join(to);
   s = s
+    .replace(/(\d+)\/(\d+)/g, "$2ぶんの$1")
+    .replace(/mL/g, "ミリリットル")
+    .replace(/dL/g, "デシリットル")
+    .replace(/mm/g, "ミリ")
+    .replace(/(?<![a-zA-Z])L(?![a-zA-Z])/g, "リットル")
     .replace(/cm/g, "センチ")
     .replace(/(?<![a-zA-Z])m(?![a-zA-Z])/g, "メートル")
     .replace(/□/g, " しかく ")

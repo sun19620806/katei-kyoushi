@@ -21,13 +21,32 @@ export interface MisconceptionDef {
   label: string; // 親向け
 }
 
-export type ProblemKind = "add" | "sub" | "mul" | "mul_missing" | "mul_word" | "len_to_cm" | "len_to_mcm";
+export type ProblemKind =
+  | "add"
+  | "sub"
+  | "mul"
+  | "mul_missing"
+  | "mul_word"
+  | "len_to_cm" // v0.2 までの記録用（いまは unit_to_small）
+  | "len_to_mcm" // v0.2 までの記録用（いまは unit_to_mixed）
+  | "unit_to_small" // 1m20cm = □cm、2L3dL = □dL
+  | "unit_to_mixed" // 135cm = 1m□cm
+  | "clock_read" // とけいを読む
+  | "clock_shift" // ○分後・○分前の時こく
+  | "fraction_of" // 12この 1/4
+  | "fraction_shape" // 1/4 に色をぬった図をえらぶ
+  | "place_compose" // 1000を3こ、100を0こ… → 3052
+  | "shape_pick" // 三角形・四角形などをえらぶ
+  | "jp_choice"; // 国語（えらぶ問題）
 
 /** 1問の中の1つの答え（文章題は「式を選ぶ」→「答えを入れる」の2ステップ） */
 export interface Step {
   type: "number" | "choice";
   answer: number; // choice のときは正しい選択肢の番号
+  /** 選択肢。"shape:…" "frac:…" で始まるものは図としてえがく */
   choices?: string[];
+  /** 選択肢ごとの「それを選んだときの間違いの原因」（正解は null） */
+  choiceMcs?: (string | null)[];
   prompt: string; // 子ども向けの短い指示（例：しきを えらぼう）
   unit?: string; // 答えの単位（例：cm、こ）
 }
@@ -41,14 +60,59 @@ export interface Problem {
   a: number;
   b: number;
   answer: number; // 最後のステップの答え
-  layout: "inline" | "vertical" | "missing" | "story" | "length";
+  layout:
+    | "inline"
+    | "vertical"
+    | "missing"
+    | "story"
+    | "length"
+    | "unit"
+    | "clock"
+    | "fraction"
+    | "place"
+    | "shape"
+    | "kanji_read"
+    | "kanji_write"
+    | "katakana"
+    | "grammar"
+    | "reading";
   steps: Step[];
   story?: string; // 文章題の本文
   product?: number; // mul_missing の積
   cm?: number; // len_to_mcm の元の cm
+  unit?: { big: string; small: string; ratio: number; total?: number };
+  clock?: { h: number; m: number; shift?: number; dir?: "after" | "before" };
+  place?: { thousands: number; hundreds: number; tens: number; ones: number };
+  shape?: { target: string };
+  /** 国語の問題の中身 */
+  jp?: {
+    itemId: string;
+    sentence?: string; // {word} / {blank} を含む文
+    word?: string; // 読みの問題の漢字
+    reading?: string; // 書きの問題のひらがな
+    clue?: string; // かたかなの手がかり
+    ask?: "subject" | "predicate";
+    title?: string;
+    passage?: string;
+    questions?: string[]; // 読みとりの各ステップの問い
+    hints?: (string | undefined)[]; // ステップごとの「その問題だけのヒント」
+  };
 }
 
-export type HintVisual = "ones_highlight" | "tens_highlight" | "hundreds_highlight" | "carry_mark" | "borrow_mark" | "array" | "meter_tape" | "none";
+export type HintVisual =
+  | "ones_highlight"
+  | "tens_highlight"
+  | "hundreds_highlight"
+  | "carry_mark"
+  | "borrow_mark"
+  | "array"
+  | "meter_tape"
+  | "unit_tape"
+  | "hour_hand"
+  | "minute_hand"
+  | "frac_groups"
+  | "place_table"
+  | "none";
 
 export interface HintDef {
   skillId: SkillId | "*";

@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { digit } from "../../domain/math/diagnose";
 import type { HintVisual, Problem } from "../../domain/types";
 import { RedCircle } from "../icons";
+import { ClockFace, FracGroups, PlaceBlocks, UnitTape } from "./visuals";
 
 export const opSymbol = (p: Problem) => (p.kind === "add" ? "+" : p.kind === "sub" ? "−" : "×");
 
@@ -16,6 +17,23 @@ export function problemSpeech(p: Problem, step: number): string {
       return step === 0 ? `${p.story} しきを えらぼう。` : "こたえは？";
     case "length":
       return p.kind === "len_to_cm" ? `${p.a}m ${p.b}cmは なんcm？` : `${p.cm}cmは ${p.a}m なんcm？`;
+    case "unit": {
+      const u = p.unit!;
+      return p.kind === "unit_to_small" ? `${p.a}${u.big} ${p.b}${u.small}は なん${u.small}？` : `${u.total}${u.small}は ${p.a}${u.big} なん${u.small}？`;
+    }
+    case "clock":
+      if (step > 0) return p.steps[step].prompt;
+      return p.clock?.shift
+        ? `この とけいの ${p.clock.shift}分${p.clock.dir === "before" ? "前" : "後"}の 時こくは？ なん時？`
+        : "この とけいは なん時？";
+    case "fraction":
+      return `${p.a}この 1/${p.b}は なんこ？`;
+    case "place": {
+      const pl = p.place!;
+      return `1000を ${pl.thousands}こ、100を ${pl.hundreds}こ、10を ${pl.tens}こ、1を ${pl.ones}こ あわせた かずは？`;
+    }
+    case "shape":
+      return p.steps[0].prompt;
     default:
       return `${p.a} ${opSymbol(p)} ${p.b} は？`;
   }
@@ -74,6 +92,74 @@ export default function ProblemView({ problem: p, step, input, visual, state, no
           </div>
         );
       break;
+    case "unit": {
+      const u = p.unit!;
+      body =
+        p.kind === "unit_to_small" ? (
+          <div className="eq length">
+            <span>{p.a}</span><small>{u.big}</small>
+            <span>{p.b}</span><small>{u.small}</small>
+            <span className="op">=</span>
+            {box(value)}<small>{u.small}</small>
+          </div>
+        ) : (
+          <div className="eq length">
+            <span>{u.total}</span><small>{u.small}</small>
+            <span className="op">=</span>
+            <span>{p.a}</span><small>{u.big}</small>
+            {box(value)}<small>{u.small}</small>
+          </div>
+        );
+      break;
+    }
+    case "clock": {
+      const c = p.clock!;
+      const hot = visual === "hour_hand" ? "hour" : visual === "minute_hand" ? "minute" : null;
+      const hourText = step > 0 || state !== "answering" ? String(p.steps[0].answer) : onLast ? "" : input;
+      const minuteText = state !== "answering" ? String(p.steps[1].answer) : step === 1 ? input : "";
+      body = (
+        <div className="clock-wrap">
+          <ClockFace h={c.h} m={c.m} hot={hot} />
+          <div className="clock-side">
+            {c.shift && (
+              <p className="clock-q">
+                この とけいの <b>{c.shift}分{c.dir === "before" ? "前" : "後"}</b>の 時こくは？
+              </p>
+            )}
+            <div className="eq time">
+              <Answer value={hourText} state={step === 0 || state !== "answering" ? state : "correct-step"} extra={step === 0 && state === "answering" ? "now" : ""} />
+              <small>時</small>
+              <Answer value={minuteText} state={state} extra={step === 1 && state === "answering" ? "now" : ""} />
+              <small>分</small>
+            </div>
+          </div>
+        </div>
+      );
+      break;
+    }
+    case "fraction":
+      body = (
+        <div className="eq fraction">
+          <span>{p.a}</span><small>この</small>
+          <Frac n={1} d={p.b} />
+          <small>は</small>
+          {box(value)}<small>こ</small>
+        </div>
+      );
+      break;
+    case "place": {
+      const pl = p.place!;
+      body = (
+        <div className="place-wrap">
+          <PlaceBlocks {...pl} table={visual === "place_table"} />
+          <div className="eq">{box(value, "wide")}</div>
+        </div>
+      );
+      break;
+    }
+    case "shape":
+      body = <p className="shape-q">{p.steps[0].prompt}</p>;
+      break;
     case "story": {
       const expr = p.steps[0].choices![p.steps[0].answer];
       const exprKnown = step > 0 || state !== "answering";
@@ -103,22 +189,36 @@ export default function ProblemView({ problem: p, step, input, visual, state, no
   }
 
   const showArray = visual === "array" && (p.kind === "mul" || p.kind === "mul_missing" || p.kind === "mul_word");
+  const showUnitTape = (visual === "unit_tape" || visual === "meter_tape") && p.unit;
   return (
     <div className={`page state-${state}`}>
       {state === "correct" && noHint && <span className="badge-nohint">ヒントなし</span>}
       {state === "revealed" && <span className="badge-reveal">こたえ</span>}
       <div className="page-body">{body}</div>
       {showArray && <DotArray n={p.a} m={p.b} />}
-      {visual === "meter_tape" && <MeterTape m={p.a} />}
+      {visual === "meter_tape" && !p.unit && <MeterTape m={p.a} />}
+      {showUnitTape && <UnitTape a={p.a} big={p.unit!.big} small={p.unit!.small} ratio={p.unit!.ratio} />}
+      {visual === "frac_groups" && p.kind === "fraction_of" && <FracGroups a={p.a} b={p.b} />}
     </div>
   );
 }
 
-function Answer({ value, state, extra }: { value: string; state: ViewState; extra: string }) {
+function Answer({ value, state, extra }: { value: string; state: ViewState | "correct-step"; extra: string }) {
   return (
     <span className={`answer ${extra} ${state}`}>
       <span className="answer-text">{value || " "}</span>
       {state === "correct" && <RedCircle />}
+    </span>
+  );
+}
+
+/** たての分数 */
+function Frac({ n, d }: { n: number; d: number }) {
+  return (
+    <span className="frac" aria-label={`${d}ぶんの${n}`}>
+      <span>{n}</span>
+      <span className="frac-bar" />
+      <span>{d}</span>
     </span>
   );
 }

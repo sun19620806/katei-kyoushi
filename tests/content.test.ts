@@ -75,8 +75,11 @@ describe("教材ファイル", () => {
           if (st.type !== "number") return;
           for (const mc of [...s.misconceptions, "unknown"]) {
             for (const level of [1, 2, 3] as const) {
-              const text = fill(findHint(p, step, mc, level)!.text, problemVars(p));
-              const numbers = text.match(/\d+/g) ?? [];
+              const raw = findHint(p, step, mc, level)!.text;
+              const text = fill(raw, problemVars(p));
+              // 文にもともと書いてある数字（「1mは 100cm」など）は除き、変数から入った数字だけを見る
+              const fixed = new Set(raw.replace(/\{\w+\}/g, " ").match(/\d+/g) ?? []);
+              const numbers = (text.match(/\d+/g) ?? []).filter((n) => !fixed.has(n));
               expect(numbers, `${text}（答え ${st.answer}）`).not.toContain(String(st.answer));
             }
           }

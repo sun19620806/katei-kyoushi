@@ -30,8 +30,32 @@ export function problemVars(p: Problem): Record<string, string> {
     m_in_cm: p.a * 100,
     cm: p.cm ?? 0,
   };
-  return Object.fromEntries(Object.entries(vars).map(([k, v]) => [k, String(v)]));
+  const text: Record<string, string> = {};
+  if (p.unit) {
+    Object.assign(vars, { ratio: p.unit.ratio, a_in_small: p.a * p.unit.ratio, total: p.unit.total ?? 0 });
+    Object.assign(text, { big: p.unit.big, small: p.unit.small });
+  }
+  if (p.clock?.shift) {
+    const after = p.clock.dir !== "before";
+    const toHour = after ? 60 - p.clock.m : p.clock.m;
+    Object.assign(vars, { shift: p.clock.shift, to_hour: toHour, rest: p.clock.shift - toHour });
+    Object.assign(text, {
+      dir_verb: after ? "すすめる" : "もどす",
+      dir_label: after ? "後" : "前",
+      hour_change: after ? "ふえる" : "へる",
+    });
+  }
+  if (p.shape) text.target_def = SHAPE_DEFS[p.shape.target] ?? "";
+  return { ...Object.fromEntries(Object.entries(vars).map(([k, v]) => [k, String(v)])), ...text };
 }
+
+const SHAPE_DEFS: Record<string, string> = {
+  tri: "三角形は、3本の まっすぐな 線で かこまれた 形だよ。",
+  quad: "四角形は、4本の まっすぐな 線で かこまれた 形だよ。",
+  rect: "長方形は、4つの かどが みんな 直角の 四角形だよ。",
+  square: "正方形は、かどが みんな 直角で、へんの 長さが おなじ 四角形。",
+  right_tri: "直角三角形は、直角の かどが ある 三角形だよ。",
+};
 
 /**
  * ヒントを選ぶ。優先順：
@@ -49,8 +73,12 @@ export function findHint(p: Problem, step: number, misconception: MisconceptionI
     ["*", "*"],
   ];
   for (const [s, mc] of candidates) {
-    if (s === "*" && !isFact) continue;
-    const ok = (h: HintDef) => h.skillId === s && h.misconception === mc && h.level === level && (!h.kind || h.kind === p.kind);
+    // 共通ヒント（skillId: "*"）は、kind が合うもの。kind のない共通ヒントは九九用
+    const ok = (h: HintDef) =>
+      h.skillId === s &&
+      h.misconception === mc &&
+      h.level === level &&
+      (s === "*" ? (h.kind ? h.kind === p.kind : isFact) : !h.kind || h.kind === p.kind);
     const h = HINTS.find((h) => ok(h) && h.step === step) ?? HINTS.find((h) => ok(h) && h.step === undefined);
     if (h) return h;
   }

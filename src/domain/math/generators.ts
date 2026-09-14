@@ -2,7 +2,7 @@ import { skill, STORIES } from "../content";
 import { fill } from "../fill";
 import { int, pick, type Rng, uid } from "../random";
 import type { Problem, SkillId, Step } from "../types";
-import { diagnose, digit, exprText, simulateWrong } from "./diagnose";
+import { diagnose, digit, exprText, shiftTime, simulateWrong } from "./diagnose";
 
 /**
  * 問題の生成。数値は「間違い方ごとに違う答えになる」ように選ぶ。
@@ -158,16 +158,152 @@ const mulWord: Generator = (skillId, rng, recent) =>
     );
   }, recent);
 
-/** 1m20cm = □cm ／ 135cm = 1m□cm */
-const lengthMcm: Generator = (skillId, rng, recent) =>
+type UnitPair = { big: string; small: string; ratio: number };
+
+/** 単位のかきかえ：2m30cm = □cm ／ 135cm = 1m□cm（かさ・長さ共通） */
+const unitConvert =
+  (pairs: UnitPair[]): Generator =>
+  (skillId, rng, recent) =>
+    generate(() => {
+      const u = pick(rng, pairs);
+      const a = int(rng, 1, u.ratio === 1000 ? 2 : 3);
+      const b =
+        u.ratio === 10 ? int(rng, 1, 9) : u.ratio === 100 ? (rng() < 0.3 ? int(rng, 2, 9) : int(rng, 11, 99)) : pick(rng, [100, 200, 250, 300, 500, 600, 800]);
+      const total = a * u.ratio + b;
+      if (rng() < 0.5) {
+        return base(skillId, "unit_to_small", a, b, "unit", [numberStep(total, `なん${u.small}？`, u.small)], { unit: { ...u, total } });
+      }
+      if (b === 1 || b === a || b === u.ratio) return null; // ヒントの数字と答えが同じにならないように
+      return base(skillId, "unit_to_mixed", a, b, "unit", [numberStep(b, `□${u.small}は？`, u.small)], { unit: { ...u, total } });
+    }, recent);
+
+const lengthMcm = unitConvert([{ big: "m", small: "cm", ratio: 100 }]);
+const volume = unitConvert([
+  { big: "L", small: "dL", ratio: 10 },
+  { big: "dL", small: "mL", ratio: 100 },
+  { big: "L", small: "mL", ratio: 1000 },
+]);
+
+/** とけいを読む：なん時 → なん分 */
+const clockRead: Generator = (skillId, rng, recent) =>
   generate(() => {
-    const m = int(rng, 1, 3);
-    const cm = rng() < 0.3 ? int(rng, 1, 9) : int(rng, 11, 99);
-    if (rng() < 0.5) {
-      return base(skillId, "len_to_cm", m, cm, "length", [numberStep(m * 100 + cm, "なんcm？", "cm")]);
-    }
-    if (cm === 1 || cm === m) return null; // ヒントの「1m」などの数字と、答えが同じにならないように
-    return base(skillId, "len_to_mcm", m, cm, "length", [numberStep(cm, "□cmは？", "cm")], { cm: m * 100 + cm });
+    const h = int(rng, 1, 12);
+    const m = rng() < 0.75 ? int(rng, 1, 11) * 5 : int(rng, 1, 58);
+    if (m % 5 === 0 && m / 5 === h) return null;
+    return base(skillId, "clock_read", h, m, "clock", [numberStep(h, "なん時？", "時"), numberStep(m, "なん分？", "分")], { clock: { h, m } });
+  }, recent);
+
+/** ○分後・○分前の時こく（時をまたぐ） */
+const clockShift: Generator = (skillId, rng, recent) =>
+  generate(() => {
+    const h = int(rng, 1, 11);
+    const m = int(rng, 1, 11) * 5;
+    const shift = int(rng, 2, 5) * 10;
+    const dir = rng() < 0.6 ? "after" : "before";
+    const crosses = dir === "after" ? m + shift >= 60 : m < shift;
+    if (!crosses) return null;
+    const t = shiftTime(h, m, dir === "after" ? shift : -shift);
+    // ヒントの数字（のこりの分など）と答えが同じにならないように
+    const toHour = dir === "after" ? 60 - m : m;
+    const rest = shift - toHour;
+    if ([toHour, rest, shift].includes(t.m) || [toHour, rest, shift].includes(t.h)) return null;
+    return base(
+      skillId,
+      "clock_shift",
+      h,
+      m,
+      "clock",
+      [numberStep(t.h, "なん時？", "時"), numberStep(t.m, "なん分？", "分")],
+      { clock: { h, m, shift, dir } },
+    );
+  }, recent);
+
+/** 12この 1/4は なんこ？ */
+const fractionOf: Generator = (skillId, rng, recent) =>
+  generate(() => {
+    const b = pick(rng, [2, 3, 4, 8]);
+    const answer = int(rng, 2, b === 8 ? 3 : 6);
+    const a = answer * b;
+    if (answer === b) return null;
+    return base(skillId, "fraction_of", a, b, "fraction", [numberStep(answer, "なんこ？", "こ")]);
+  }, recent);
+
+/** 1/b に色をぬった図をえらぶ */
+const fractionShape: Generator = (skillId, rng, recent) =>
+  generate(() => {
+    const b = pick(rng, [2, 3, 4, 8]);
+    const shape = pick(rng, ["circle", "rect", "tape"]);
+    const other = pick(rng, [2, 3, 4, 8].filter((x) => x !== b));
+    const options: [string, string | null][] = [
+      [`frac:${b}:1:equal:${shape}`, null],
+      [`frac:${b}:1:unequal:${shape}`, "unequal_parts"],
+      [`frac:${other}:1:equal:${shape}`, "wrong_count"],
+      [`frac:${b}:2:equal:${shape}`, "shaded_count"],
+    ];
+    const shuffled = options.sort(() => rng() - 0.5);
+    return base(
+      skillId,
+      "fraction_shape",
+      b,
+      0,
+      "shape",
+      [
+        {
+          type: "choice",
+          answer: shuffled.findIndex((o) => o[1] === null),
+          choices: shuffled.map((o) => o[0]),
+          choiceMcs: shuffled.map((o) => o[1]),
+          prompt: `1/${b}に 色を ぬった 図は？`,
+        },
+      ],
+    );
+  }, recent);
+
+/** 1000を3こ、100を0こ、10を5こ、1を2こ → 3052 */
+const placeCompose: Generator = (skillId, rng, recent) =>
+  generate(() => {
+    const counts = [int(rng, 1, 9), int(rng, 1, 9), int(rng, 1, 9), int(rng, 1, 9)];
+    counts[int(rng, 1, 3)] = 0; // 百・十・一のどれかを0に
+    const [thousands, hundreds, tens, ones] = counts;
+    const n = thousands * 1000 + hundreds * 100 + tens * 10 + ones;
+    return base(skillId, "place_compose", thousands, n, "place", [numberStep(n, "あわせた かずは？")], {
+      place: { thousands, hundreds, tens, ones },
+    });
+  }, recent);
+
+const SHAPE_TARGETS: Record<string, { prompt: string; wrong: [string, string][] }> = {
+  tri: { prompt: "三角形は どれ？", wrong: [["tri_open", "open_shape"], ["tri_curve", "curved_side"], ["quad", "side_count"]] },
+  quad: { prompt: "四角形は どれ？", wrong: [["quad_open", "open_shape"], ["quad_curve", "curved_side"], ["pent", "side_count"]] },
+  rect: { prompt: "長方形は どれ？", wrong: [["parallelogram", "no_right_angle"], ["rect_open", "open_shape"], ["right_tri", "side_count"]] },
+  square: { prompt: "正方形は どれ？", wrong: [["rect", "unequal_sides"], ["rhombus", "no_right_angle"], ["square_open", "open_shape"]] },
+  right_tri: { prompt: "直角三角形は どれ？", wrong: [["tri", "no_right_angle"], ["right_tri_open", "open_shape"], ["rect", "side_count"]] },
+};
+
+/** 形をえらぶ */
+const shapePick: Generator = (skillId, rng, recent) =>
+  generate(() => {
+    const target = pick(rng, Object.keys(SHAPE_TARGETS));
+    const t = SHAPE_TARGETS[target];
+    const rot = () => pick(rng, [0, 0, 12, -15, 25, 90]);
+    const options: [string, string | null][] = [[`shape:${target}:${rot()}`, null], ...t.wrong.map(([code, mc]): [string, string] => [`shape:${code}:${rot()}`, mc])];
+    const shuffled = options.sort(() => rng() - 0.5);
+    return base(
+      skillId,
+      "shape_pick",
+      Object.keys(SHAPE_TARGETS).indexOf(target),
+      0,
+      "shape",
+      [
+        {
+          type: "choice",
+          answer: shuffled.findIndex((o) => o[1] === null),
+          choices: shuffled.map((o) => o[0]),
+          choiceMcs: shuffled.map((o) => o[1]),
+          prompt: t.prompt,
+        },
+      ],
+      { shape: { target } },
+    );
   }, recent);
 
 export const generators: Record<string, Generator> = {
@@ -188,4 +324,11 @@ export const generators: Record<string, Generator> = {
   mulMissing,
   mulWord,
   lengthMcm,
+  volume,
+  clockRead,
+  clockShift,
+  fractionOf,
+  fractionShape,
+  placeCompose,
+  shapePick,
 };

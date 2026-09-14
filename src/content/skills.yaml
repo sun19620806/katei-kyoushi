@@ -1,7 +1,7 @@
 # スキルの地図（算数・小2 2学期から）
 # 並び順＝重点にする順番（前提スキルの習熟度が十分になったら次へ）。
 # review: true は1学期までの内容。重点にはせず、ウォームアップと復習にだけ出す。
-version: "2026-09-14.2"
+version: "2026-09-15.1"
 
 misconceptions:
   # たし算・ひき算
@@ -28,11 +28,55 @@ misconceptions:
     label: □を求めるとき、積から引き算してしまう（例 □×7=42 → 35）
   - id: order_reversed
     label: 式が「いくつ分×1つ分」の順になっている
-  # 長さ
+  # 長さ・かさ（m_as_10cm / cm_whole は v0.2 までの記録用）
   - id: m_as_10cm
     label: 1mを10cmと考えてしまう
   - id: cm_whole
     label: 「□m□cm」の□cmに、全部のcmを書いてしまう
+  - id: ratio_wrong
+    label: 単位の関係（1m=100cm、1L=10dL など）を取りちがえる
+  - id: small_whole
+    label: 「□m□cm」などの小さい単位に、全部の数を書いてしまう
+  # 時こくと時間
+  - id: hands_swapped
+    label: 長いはりと短いはりを取りちがえる
+  - id: hour_ahead
+    label: 短いはりが次の数字に近いと、次の時と読んでしまう
+  - id: minute_as_number
+    label: 長いはりがさす数字を、そのまま「分」と読んでしまう
+  - id: no_hour_carry
+    label: 12をまたぐときに、時をかえ忘れる（3時70分など）
+  - id: hour_as_100
+    label: 1時間を100分と考えてしまう
+  - id: before_after_mix
+    label: 「前」と「後」を取りちがえる
+  # 分数
+  - id: gave_denominator
+    label: 1/4 の「4」をそのまま答えにしてしまう
+  - id: used_half
+    label: どの分数でも半分にしてしまう
+  - id: subtracted
+    label: 分けるかわりに、ひき算をしてしまう
+  - id: unequal_parts
+    label: 同じ大きさに分けていない図を選ぶ
+  - id: wrong_count
+    label: いくつに分けたかを数えまちがえる
+  - id: shaded_count
+    label: 色をぬった数（1つ分）を見ていない
+  # 大きい数
+  - id: zero_miss
+    label: 0この位に「0」を書かない（3052→352）
+  # 形
+  - id: open_shape
+    label: 線がつながっていない形を選ぶ
+  - id: curved_side
+    label: まがった線がある形を選ぶ
+  - id: side_count
+    label: 辺の数を数えまちがえる
+  - id: no_right_angle
+    label: 直角がない形を選ぶ
+  - id: unequal_sides
+    label: 辺の長さが同じかを見ていない（長方形と正方形）
 
 skills:
   # ───── 1学期のふくしゅう ─────
@@ -66,6 +110,16 @@ skills:
     generator: sub2d2dBorrow
     misconceptions: [smaller_from_larger, borrow_no_decrement, calc_slip]
 
+  - id: math.time.read
+    subject: math
+    group: 1学期のふくしゅう
+    review: true
+    label: 時こくを読む（なん時なん分）
+    kidLabel: とけいの よみかた
+    prereqs: []
+    generator: clockRead
+    misconceptions: [hands_swapped, hour_ahead, minute_as_number]
+
   # ───── 100をこえる筆算 ─────
   - id: math.add.2d2d_to3d
     subject: math
@@ -84,6 +138,34 @@ skills:
     prereqs: [math.sub.2d2d_borrow, math.add.2d2d_to3d]
     generator: sub3d2dBorrow
     misconceptions: [smaller_from_larger, borrow_no_decrement, calc_slip]
+
+  # ───── 時こくと時間・かさ・形 ─────
+  - id: math.time.shift
+    subject: math
+    group: 時こくと時間
+    label: ○分後・○分前の時こく（時をまたぐ）
+    kidLabel: なん分後・なん分前
+    prereqs: [math.time.read]
+    generator: clockShift
+    misconceptions: [no_hour_carry, hour_as_100, before_after_mix]
+
+  - id: math.volume
+    subject: math
+    group: かさ
+    label: かさ（L・dL・mL のかきかえ）
+    kidLabel: L と dL と mL
+    prereqs: []
+    generator: volume
+    misconceptions: [ratio_wrong, small_whole]
+
+  - id: math.shape.basic
+    subject: math
+    group: 形
+    label: 三角形・四角形・長方形・正方形・直角三角形
+    kidLabel: さんかくけいと しかくけい
+    prereqs: []
+    generator: shapePick
+    misconceptions: [open_shape, curved_side, side_count, no_right_angle, unequal_sides]
 
   # ───── かけ算 ─────
   - id: math.mul.dan5
@@ -185,7 +267,16 @@ skills:
     generator: mulMissing
     misconceptions: [neighbor_fact, product_minus]
 
-  # ───── 長さ ─────
+  # ───── 大きい数・長さ・分数 ─────
+  - id: math.number.4digit
+    subject: math
+    group: 大きい数
+    label: 4けたの数（1000・100・10・1 をあわせた数）
+    kidLabel: 4けたの かず
+    prereqs: []
+    generator: placeCompose
+    misconceptions: [zero_miss]
+
   - id: math.length.m_cm
     subject: math
     group: 長さ
@@ -193,4 +284,22 @@ skills:
     kidLabel: m と cm
     prereqs: [math.add.2d2d_carry]
     generator: lengthMcm
-    misconceptions: [m_as_10cm, cm_whole]
+    misconceptions: [ratio_wrong, small_whole]
+
+  - id: math.fraction.shape
+    subject: math
+    group: 分数
+    label: 分数（1/2・1/3・1/4・1/8 の図）
+    kidLabel: ぶんすうの え
+    prereqs: []
+    generator: fractionShape
+    misconceptions: [unequal_parts, wrong_count, shaded_count]
+
+  - id: math.fraction.of
+    subject: math
+    group: 分数
+    label: 分数（12この 1/4 は いくつ）
+    kidLabel: ぶんすうで わける
+    prereqs: [math.fraction.shape, math.mul.dan4]
+    generator: fractionOf
+    misconceptions: [gave_denominator, used_half, subtracted]

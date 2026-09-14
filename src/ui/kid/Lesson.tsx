@@ -56,6 +56,14 @@ const THINK_CARDS: Record<string, string[]> = {
   mul_word: ["1つ分を さがした", "え を おもいうかべた", "なんとなく", "わからない"],
   len_to_cm: ["1m=100cmを つかった", "ものさしを おもいうかべた", "なんとなく", "わからない"],
   len_to_mcm: ["1m=100cmを つかった", "ものさしを おもいうかべた", "なんとなく", "わからない"],
+  unit_to_small: ["1つ分の たんいを つかった", "ずを おもいうかべた", "なんとなく", "わからない"],
+  unit_to_mixed: ["1つ分の たんいを つかった", "ずを おもいうかべた", "なんとなく", "わからない"],
+  clock_read: ["みじかい はりから 見た", "5ずつ かぞえた", "なんとなく", "わからない"],
+  clock_shift: ["12で わけて かんがえた", "はりを うごかす ところを そうぞうした", "なんとなく", "わからない"],
+  fraction_of: ["おなじ かずずつ わけた", "九九を つかった", "なんとなく", "わからない"],
+  fraction_shape: ["おなじ 大きさか 見た", "いくつに わけたか かぞえた", "なんとなく", "わからない"],
+  place_compose: ["くらいの へやに わけた", "0を わすれずに かいた", "なんとなく", "わからない"],
+  shape_pick: ["へんと かどを かぞえた", "線が つながって いるか 見た", "なんとなく", "わからない"],
 };
 
 interface Summary {
@@ -272,7 +280,7 @@ export default function Lesson({ profile, onExit, trial }: { profile: Profile; o
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (!lesson || lesson.stage !== "answering" || currentStep(lesson)?.type !== "number") return;
-      if (/^\d$/.test(e.key)) setInput((v) => (v + e.key).replace(/^0+(?=\d)/, "").slice(0, 3));
+      if (/^\d$/.test(e.key)) setInput((v) => (v + e.key).replace(/^0+(?=\d)/, "").slice(0, 4));
       else if (e.key === "Backspace") setInput((v) => v.slice(0, -1));
       else if (e.key === "Enter") submit();
     };

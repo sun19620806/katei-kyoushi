@@ -393,6 +393,45 @@ button:disabled { cursor: default; }
 .story-eq .expr.blank { color: var(--grid-strong); }
 .story-eq small { font-family: var(--kid-font); font-size: 28px; color: var(--ink-2); }
 
+/* とけい */
+.clock-wrap { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; justify-content: center; }
+.clock-side { display: flex; flex-direction: column; gap: 14px; align-items: flex-start; }
+.clock-q { margin: 0; font-family: var(--kid-font); font-size: 26px; font-weight: 800; }
+.clock-q b { color: var(--pencil-deep); }
+.eq.time { font-size: 64px; }
+.answer.now { background: var(--pencil-tint); border-radius: 10px 10px 0 0; }
+.answer.correct-step { border-color: transparent; }
+
+/* 分数 */
+.eq.fraction { font-size: 64px; }
+.eq.fraction small { font-size: 30px; margin-left: 0; }
+.frac { display: inline-flex; flex-direction: column; align-items: center; font-size: 44px; line-height: 1; gap: 4px; }
+.frac-bar { width: 1.1em; height: 4px; background: var(--ink); border-radius: 2px; }
+.frac-groups { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.frac-groups .dot-group { flex-wrap: wrap; max-width: 420px; justify-content: center; }
+.plates { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.plate { display: flex; flex-wrap: wrap; gap: 4px; width: 78px; min-height: 44px; padding: 8px; border-radius: 999px; border: 3px solid var(--grid-strong); justify-content: center; align-content: center; }
+.plate.one { border-color: var(--orange); background: var(--orange-tint); }
+
+/* 位の積み木 */
+.place-wrap { display: flex; flex-direction: column; align-items: center; gap: 16px; width: 100%; }
+.place { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; width: 100%; max-width: 620px; font-family: var(--kid-font); }
+.place-col { display: flex; flex-direction: column; align-items: center; gap: 6px; border-radius: 12px; padding: 6px; }
+.place.table .place-col { background: var(--pencil-tint); }
+.place.table .place-col:nth-child(even) { background: var(--marker-tint); }
+.place-head { font-size: 15px; font-weight: 800; color: var(--ink-2); }
+.place-count { font-family: var(--num-font); font-size: 22px; font-weight: 800; }
+.place-blocks { display: flex; flex-wrap: wrap; gap: 3px; justify-content: center; align-content: flex-end; min-height: 70px; width: 100%; }
+.place-blocks span { background: var(--pencil); border-radius: 2px; }
+.b1000 span { width: 26px; height: 26px; box-shadow: inset 0 0 0 3px #fff, inset 0 0 0 5px var(--pencil); }
+.b100 span { width: 20px; height: 20px; opacity: .85; }
+.b10 span { width: 6px; height: 28px; }
+.b1 span { width: 8px; height: 8px; }
+.answer.wide { min-width: 3.4em; }
+
+/* 形 */
+.shape-q { margin: 0; font-family: var(--kid-font); font-size: 40px; font-weight: 900; text-align: center; }
+
 /* 図 */
 .dots { display: flex; flex-direction: column; gap: 5px; font-family: var(--kid-font); }
 .dot-row { display: flex; align-items: center; gap: 8px; }
@@ -456,6 +495,10 @@ button:disabled { cursor: default; }
   box-shadow: 0 5px 0 var(--ink);
 }
 .choicepad button:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--ink); }
+.choicepad.long button { font-family: var(--kid-font); font-size: 26px; min-height: 72px; padding: 8px 14px; text-wrap: balance; line-height: 1.35; }
+.choicepad.visual { display: grid; grid-template-columns: repeat(2, 1fr); }
+.choicepad.visual button { position: relative; display: grid; place-items: center; min-height: 140px; padding: 6px; }
+.choicepad.visual small { position: absolute; left: 10px; top: 6px; font-size: 16px; color: var(--ink-3); font-family: var(--num-font); }
 
 .hint-btn {
   display: inline-flex;

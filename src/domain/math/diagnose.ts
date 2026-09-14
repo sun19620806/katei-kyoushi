@@ -21,6 +21,9 @@ export function diagnose(p: Problem, step: number, given: number): Misconception
   if (given === s.answer) return null;
   const { a, b } = p;
 
+  // 選択肢ごとに原因が決まっている問題（国語・図形・分数の図など）
+  if (s.type === "choice" && s.choiceMcs) return s.choiceMcs[given] ?? "unknown";
+
   switch (p.kind) {
     case "add": {
       const onesSum = digit(a, 1) + digit(b, 1);
@@ -63,7 +66,76 @@ export function diagnose(p: Problem, step: number, given: number): Misconception
       if (given === p.cm) return "cm_whole";
       if (given === (p.cm ?? 0) - a * 10) return "m_as_10cm";
       return "unknown";
+    default:
+      return diagnoseByTable(p, step, given);
   }
+}
+
+/** 新しい種類の問題は「間違い方 → そのときの答え」の表で判定する（simulateWrong と同じ表） */
+function diagnoseByTable(p: Problem, step: number, given: number): MisconceptionId {
+  for (const [mc, value] of wrongTable(p, step)) if (value === given) return mc;
+  return "unknown";
+}
+
+const wrongRatio = (r: number) => (r === 10 ? 100 : r === 100 ? 10 : 100);
+const nextHour = (h: number) => (h % 12) + 1;
+
+/** 時こくを d 分うごかす */
+export function shiftTime(h: number, m: number, d: number): { h: number; m: number } {
+  let total = (h % 12) * 60 + m + d;
+  total = ((total % 720) + 720) % 720;
+  const hh = Math.floor(total / 60);
+  return { h: hh === 0 ? 12 : hh, m: total % 60 };
+}
+
+/** 問題の種類ごとの「間違い方 → そのときの答え」。起こりえない間違いは入れない。並び順＝判定の優先順 */
+export function wrongTable(p: Problem, step: number): [MisconceptionId, number][] {
+  const { a, b } = p;
+  const rows: [MisconceptionId, number | null][] = [];
+  switch (p.kind) {
+    case "unit_to_small": {
+      const r = p.unit!.ratio;
+      rows.push(["ratio_wrong", a * wrongRatio(r) + b]);
+      break;
+    }
+    case "unit_to_mixed": {
+      const { ratio, total = 0 } = p.unit!;
+      rows.push(["small_whole", total], ["ratio_wrong", total - a * wrongRatio(ratio)]);
+      break;
+    }
+    case "clock_read": {
+      const { h, m } = p.clock!;
+      if (step === 0) {
+        rows.push(["hands_swapped", m % 5 === 0 && m > 0 ? m / 5 : null], ["hour_ahead", m >= 30 ? nextHour(h) : null]);
+      } else {
+        rows.push(["minute_as_number", m % 5 === 0 && m > 0 ? m / 5 : null], ["hands_swapped", h * 5]);
+      }
+      break;
+    }
+    case "clock_shift": {
+      const { h, m, shift = 0, dir = "after" } = p.clock!;
+      const d = dir === "after" ? shift : -shift;
+      const opposite = shiftTime(h, m, -d);
+      if (dir === "after") {
+        if (step === 0) rows.push(["no_hour_carry", h], ["before_after_mix", opposite.h]);
+        else rows.push(["no_hour_carry", m + shift], ["before_after_mix", opposite.m]);
+      } else {
+        if (step === 0) rows.push(["no_hour_carry", h], ["before_after_mix", opposite.h]);
+        else rows.push(["hour_as_100", m + 100 - shift], ["before_after_mix", opposite.m]);
+      }
+      break;
+    }
+    case "fraction_of":
+      rows.push(["gave_denominator", b], ["used_half", b !== 2 && a % 2 === 0 ? a / 2 : null], ["subtracted", a - b]);
+      break;
+    case "place_compose": {
+      const { thousands, hundreds, tens, ones } = p.place!;
+      const nonZero = [thousands, hundreds, tens, ones].filter((x) => x !== 0).join("");
+      rows.push(["zero_miss", Number(nonZero)]);
+      break;
+    }
+  }
+  return rows.filter((r): r is [MisconceptionId, number] => r[1] !== null && r[1] >= 0);
 }
 
 /** 九九 a × b の間違い */
@@ -81,6 +153,10 @@ function diagnoseFact(a: number, b: number, given: number): MisconceptionId {
 export function simulateWrong(p: Problem, step: number, mc: MisconceptionId): number | null {
   const { a, b } = p;
   const s = p.steps[step];
+  if (s.type === "choice" && s.choiceMcs) {
+    const i = s.choiceMcs.indexOf(mc);
+    return i >= 0 ? i : null;
+  }
   const choiceIndex = (text: string) => {
     const i = s.choices?.indexOf(text) ?? -1;
     return i >= 0 ? i : null;
@@ -118,6 +194,8 @@ export function simulateWrong(p: Problem, step: number, mc: MisconceptionId): nu
       if (mc === "cm_whole") return p.cm ?? null;
       if (mc === "m_as_10cm") return (p.cm ?? 0) - a * 10;
       return null;
+    default:
+      return wrongTable(p, step).find((r) => r[0] === mc)?.[1] ?? null;
   }
 }
 

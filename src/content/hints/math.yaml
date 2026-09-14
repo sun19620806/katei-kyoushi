@@ -112,13 +112,68 @@ hints:
   - { skillId: math.mul.word, misconception: "*", step: 1, level: 2, text: "{n}×{m_minus1}は {prev}。そこに {n}を たすと？", visual: array }
   - { skillId: math.mul.word, misconception: "*", step: 1, level: 3, text: "{n}が {m}こ分。{prev}+{n}を けいさんしよう。", visual: array }
 
-  # ───── 長さ（m と cm） ─────
-  - { skillId: math.length.m_cm, kind: len_to_cm, misconception: "*", level: 1, text: "1mは なんcm だったかな？", visual: meter_tape }
-  - { skillId: math.length.m_cm, kind: len_to_cm, misconception: "*", level: 2, text: "1mは 100cm。{a}mは 100cmが {a}こ分 だよ。", visual: meter_tape }
-  - { skillId: math.length.m_cm, kind: len_to_cm, misconception: "*", level: 3, text: "{a}mは {m_in_cm}cm。それに {b}cmを たそう。", visual: meter_tape }
-  - { skillId: math.length.m_cm, kind: len_to_cm, misconception: m_as_10cm, level: 1, text: "1mの ながさは 100cm だよ。ものさし 3本より ながいね。", visual: meter_tape }
-  - { skillId: math.length.m_cm, kind: len_to_mcm, misconception: "*", level: 1, text: "100cmで 1m。{cm}cmの 中に、mは いくつ あるかな？", visual: meter_tape }
-  - { skillId: math.length.m_cm, kind: len_to_mcm, misconception: "*", level: 2, text: "{a}mは {m_in_cm}cm。のこりは なんcm？", visual: meter_tape }
-  - { skillId: math.length.m_cm, kind: len_to_mcm, misconception: "*", level: 3, text: "{cm}−{m_in_cm}を けいさんしよう。", visual: meter_tape }
-  - { skillId: math.length.m_cm, kind: len_to_mcm, misconception: cm_whole, level: 1, text: "□には、mに した のこりの cmだけを かくよ。", visual: meter_tape }
-  - { skillId: math.length.m_cm, kind: len_to_mcm, misconception: m_as_10cm, level: 1, text: "1mは 100cm だよ。{a}mは なんcm？", visual: meter_tape }
+  # ───── 単位のかきかえ（長さ・かさ共通） ─────
+  - { skillId: "*", kind: unit_to_small, misconception: "*", level: 1, text: "1{big}は なん{small}だったかな？", visual: unit_tape }
+  - { skillId: "*", kind: unit_to_small, misconception: "*", level: 2, text: "1{big}は {ratio}{small}。{a}{big}は {ratio}{small}が {a}こ分だよ。", visual: unit_tape }
+  - { skillId: "*", kind: unit_to_small, misconception: "*", level: 3, text: "{a}{big}は {a_in_small}{small}。それに {b}{small}を たそう。", visual: unit_tape }
+  - { skillId: "*", kind: unit_to_small, misconception: ratio_wrong, level: 1, text: "1{big}は {ratio}{small} だよ。{a}{big}は なん{small}？", visual: unit_tape }
+  - { skillId: "*", kind: unit_to_mixed, misconception: "*", level: 1, text: "{ratio}{small}で 1{big}。{total}{small}の 中に 1{big}は いくつ？", visual: unit_tape }
+  - { skillId: "*", kind: unit_to_mixed, misconception: "*", level: 2, text: "{a}{big}は {a_in_small}{small}。のこりは なん{small}？", visual: unit_tape }
+  - { skillId: "*", kind: unit_to_mixed, misconception: "*", level: 3, text: "{total}−{a_in_small} を けいさんしよう。", visual: unit_tape }
+  - { skillId: "*", kind: unit_to_mixed, misconception: small_whole, level: 1, text: "□には、{big}に した のこりの {small}だけを かくよ。", visual: unit_tape }
+  - { skillId: "*", kind: unit_to_mixed, misconception: ratio_wrong, level: 1, text: "1{big}は {ratio}{small} だよ。", visual: unit_tape }
+
+  # ───── とけいを読む ─────
+  - { skillId: math.time.read, misconception: "*", step: 0, level: 1, text: "みじかい はりを 見よう。みじかい はりが「時」だよ。", visual: hour_hand }
+  - { skillId: math.time.read, misconception: "*", step: 0, level: 2, text: "みじかい はりが すうじの あいだに あるときは、小さい ほうの すうじ。", visual: hour_hand }
+  - { skillId: math.time.read, misconception: "*", step: 0, level: 3, text: "みじかい はりが さいごに すぎた すうじを 読もう。", visual: hour_hand }
+  - { skillId: math.time.read, misconception: hands_swapped, step: 0, level: 1, text: "ながい はりは「分」、みじかい はりが「時」だよ。", visual: hour_hand }
+  - { skillId: math.time.read, misconception: hour_ahead, step: 0, level: 1, text: "みじかい はりは、まだ つぎの すうじに とどいて いないよ。", visual: hour_hand }
+  - { skillId: math.time.read, misconception: "*", step: 1, level: 1, text: "ながい はりを 見よう。ながい はりが「分」だよ。", visual: minute_hand }
+  - { skillId: math.time.read, misconception: "*", step: 1, level: 2, text: "ながい はりは、すうじ 1つで 5分ずつ ふえるよ。", visual: minute_hand }
+  - { skillId: math.time.read, misconception: "*", step: 1, level: 3, text: "小さい めもりは 1分。5ずつ かぞえて、のこりを たそう。", visual: minute_hand }
+  - { skillId: math.time.read, misconception: minute_as_number, step: 1, level: 1, text: "ながい はりの すうじは、そのまま 分では ないよ。5ずつ かぞえよう。", visual: minute_hand }
+  - { skillId: math.time.read, misconception: hands_swapped, step: 1, level: 1, text: "「分」は ながい はりで 読むよ。", visual: minute_hand }
+
+  # ───── ○分後・○分前 ─────
+  - { skillId: math.time.shift, misconception: "*", step: 0, level: 1, text: "ながい はりを {shift}分 {dir_verb}と、12を こえるかな？", visual: minute_hand }
+  - { skillId: math.time.shift, misconception: "*", step: 0, level: 2, text: "ながい はりが 12を こえたら、時が 1 {hour_change}よ。", visual: hour_hand }
+  - { skillId: math.time.shift, misconception: "*", step: 0, level: 3, text: "12まで {to_hour}分。そこで 時が かわるよ。", visual: hour_hand }
+  - { skillId: math.time.shift, misconception: before_after_mix, step: 0, level: 1, text: "「{dir_label}」だから、とけいの はりを {dir_verb}よ。", visual: minute_hand }
+  - { skillId: math.time.shift, misconception: no_hour_carry, step: 0, level: 1, text: "12を こえると、時も かわるよ。", visual: hour_hand }
+  - { skillId: math.time.shift, misconception: "*", step: 1, level: 1, text: "12を こえてから、なん分 {dir_verb}かな？", visual: minute_hand }
+  - { skillId: math.time.shift, misconception: "*", step: 1, level: 2, text: "12まで {to_hour}分。のこりは {rest}分だよ。", visual: minute_hand }
+  - { skillId: math.time.shift, misconception: "*", step: 1, level: 3, text: "12から {rest}分 {dir_verb}と、なん分かな？", visual: minute_hand }
+  - { skillId: math.time.shift, misconception: hour_as_100, step: 1, level: 1, text: "1時間は 60分。100分では ないよ。", visual: minute_hand }
+  - { skillId: math.time.shift, misconception: no_hour_carry, step: 1, level: 1, text: "60分に なったら、1時間に くりあがるよ。", visual: minute_hand }
+  - { skillId: math.time.shift, misconception: before_after_mix, step: 1, level: 1, text: "「{dir_label}」だから、はりを {dir_verb}よ。", visual: minute_hand }
+
+  # ───── 分数 ─────
+  - { skillId: math.fraction.of, misconception: "*", level: 1, text: "{a}こを {b}つに、おなじ かずずつ わけよう。", visual: frac_groups }
+  - { skillId: math.fraction.of, misconception: "*", level: 2, text: "1/{b}は、{b}つに わけた うちの 1つ分だよ。", visual: frac_groups }
+  - { skillId: math.fraction.of, misconception: "*", level: 3, text: "{b}× □ = {a} の □を かんがえよう。", visual: frac_groups }
+  - { skillId: math.fraction.of, misconception: gave_denominator, level: 1, text: "1/{b}の {b}は、わける かずだよ。1つ分は なんこ？", visual: frac_groups }
+  - { skillId: math.fraction.of, misconception: used_half, level: 1, text: "1/2では なくて 1/{b}。{b}つに わけよう。", visual: frac_groups }
+  - { skillId: math.fraction.of, misconception: subtracted, level: 1, text: "ひきざんでは なくて、おなじ かずずつ わけるよ。", visual: frac_groups }
+  - { skillId: math.fraction.shape, misconception: "*", level: 1, text: "おなじ 大きさに わけて あるかな？", visual: none }
+  - { skillId: math.fraction.shape, misconception: "*", level: 2, text: "ぜんぶで いくつに わけて あるか、かぞえよう。", visual: none }
+  - { skillId: math.fraction.shape, misconception: "*", level: 3, text: "{a}つに おなじ 大きさで わけた、1つに 色が ついた 図だよ。", visual: none }
+  - { skillId: math.fraction.shape, misconception: unequal_parts, level: 1, text: "わけた 大きさが ばらばらだと、1/{a}とは いわないよ。", visual: none }
+  - { skillId: math.fraction.shape, misconception: wrong_count, level: 1, text: "いくつに わけて あるか、かぞえてみよう。", visual: none }
+  - { skillId: math.fraction.shape, misconception: shaded_count, level: 1, text: "色が ついて いるのは 1つだけかな？", visual: none }
+
+  # ───── 4けたの数 ─────
+  - { skillId: math.number.4digit, misconception: "*", level: 1, text: "千・百・十・一の くらいに わけて かんがえよう。", visual: place_table }
+  - { skillId: math.number.4digit, misconception: "*", level: 2, text: "0この くらいには「0」を かくよ。", visual: place_table }
+  - { skillId: math.number.4digit, misconception: "*", level: 3, text: "千のくらいから じゅんに すうじを ならべよう。", visual: place_table }
+  - { skillId: math.number.4digit, misconception: zero_miss, level: 1, text: "0この くらいも「0」を かいて、へやを うめよう。", visual: place_table }
+
+  # ───── 形 ─────
+  - { skillId: math.shape.basic, misconception: "*", level: 1, text: "へんの かずと、かどの かずを かぞえよう。", visual: none }
+  - { skillId: math.shape.basic, misconception: "*", level: 2, text: "{target_def}", visual: none }
+  - { skillId: math.shape.basic, misconception: "*", level: 3, text: "線が つながって いるか、まがって いないか、かどを 1つずつ 見よう。", visual: none }
+  - { skillId: math.shape.basic, misconception: open_shape, level: 1, text: "線が つながって いない ところは ないかな？", visual: none }
+  - { skillId: math.shape.basic, misconception: curved_side, level: 1, text: "まがった 線が ある 形は、三角形や 四角形とは いわないよ。", visual: none }
+  - { skillId: math.shape.basic, misconception: side_count, level: 1, text: "へんは なん本 あるかな？ かぞえてみよう。", visual: none }
+  - { skillId: math.shape.basic, misconception: no_right_angle, level: 1, text: "かどが 直角か、三角じょうぎの かどで たしかめよう。", visual: none }
+  - { skillId: math.shape.basic, misconception: unequal_sides, level: 1, text: "へんの 長さが みんな おなじか、くらべてみよう。", visual: none }

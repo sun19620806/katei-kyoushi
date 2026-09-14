@@ -6,7 +6,7 @@ interface Props {
 }
 
 export default function NumPad({ value, onChange, onSubmit, disabled }: Props) {
-  const press = (d: string) => onChange((value + d).replace(/^0+(?=\d)/, "").slice(0, 3));
+  const press = (d: string) => onChange((value + d).replace(/^0+(?=\d)/, "").slice(0, 4));
   return (
     <div className="numpad">
       {["7", "8", "9", "4", "5", "6", "1", "2", "3"].map((d) => (
