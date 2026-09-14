@@ -29,6 +29,10 @@ export default function App() {
   if (profile === undefined) return null;
   if (profile === null) return <Setup onDone={reload} />;
 
+  // 開発中だけ：?trial=スキルID でその単元のおためし画面を直接開く（見た目の確認用）
+  const devTrial = import.meta.env.DEV ? new URLSearchParams(location.search).get("trial") : null;
+  if (devTrial) return <Lesson key={devTrial} profile={profile} trial={devTrial} onExit={() => (location.search = "")} />;
+
   switch (screen) {
     case "lesson":
       return <Lesson profile={profile} onExit={() => setScreen("home")} />;

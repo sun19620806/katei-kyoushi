@@ -103,8 +103,27 @@ function Today({ data, profile }: { data: Data; profile: Profile }) {
   const moods = data.sessions.filter((s) => s.kind === "start" && s.mood && s.at.slice(0, 10) >= addDays(today, -2)).map((s) => s.mood);
   const tiredStreak = moods.length >= 2 && moods.slice(-2).every((m) => m === "tsukare");
 
+  const firstTry = todays.length ? Math.round((noHint / todays.length) * 100) : 0;
   return (
     <div className="panel-grid">
+      <section className="kpi-strip wide" aria-label="今日の数字">
+        <div>
+          <small>今日の学習</small>
+          <b>{minutes}<span>分</span></b>
+        </div>
+        <div>
+          <small>取り組んだ問題</small>
+          <b>{todays.length}<span>問</span></b>
+        </div>
+        <div>
+          <small>ヒントなしで正解</small>
+          <b>{firstTry}<span>%</span></b>
+        </div>
+        <div>
+          <small>連続</small>
+          <b>{data.streak}<span>日</span></b>
+        </div>
+      </section>
       <section className="box wide">
         <h2>今日の連絡帳</h2>
         {todays.length === 0 ? (
@@ -129,7 +148,7 @@ function Today({ data, profile }: { data: Data; profile: Profile }) {
             {weekEpisodes.slice(0, 8).map((e) => (
               <li key={e.id}>
                 <span className="date">{e.date.slice(5).replace("-", "/")}</span>
-                {e.text}
+                <span className="list-text">{e.text}</span>
               </li>
             ))}
           </ul>
@@ -177,50 +196,56 @@ function SkillMap({ data, profile, onProfileChange, onTrial }: { data: Data; pro
     await saveProfile({ ...profile, disabledSkills });
     onProfileChange();
   };
+  const SYM_TEXT: Record<string, string> = { "◎": "身についた", "○": "だいたいできる", "△": "練習中", "−": "まだ" };
   return (
-    <div className="panel-grid">
+    <div className="stack">
+      <p className="legend">
+        {Object.entries(SYM_TEXT).map(([sym, text]) => (
+          <span key={sym}>
+            <span className="sym-chip" data-s={sym}>{sym}</span>
+            {text}
+          </span>
+        ))}
+      </p>
       {SKILL_GROUPS.map((g) => (
         <section className="box" key={g}>
           <h2>{g}</h2>
-          <table className="skills">
-            <tbody>
-              {SKILLS.filter((s) => s.group === g).map(({ id }) => {
-                const s = data.states[id];
-                const on = !profile.disabledSkills.includes(id);
-                const sym = masterySymbol(s);
-                return (
-                  <tr key={id} className={on ? "" : "off"}>
-                    <td className="sym">
-                      <span data-s={sym}>{sym}</span>
-                    </td>
-                    <td>
-                      {skill(id).label}
-                      <div className="bar">
-                        <span style={{ width: `${Math.round((s?.mastery ?? 0) * 100)}%` }} />
-                      </div>
-                    </td>
-                    <td className="num small">{s?.attempts ?? 0}問</td>
-                    <td className="num small">{s?.nextReview ? `復習 ${s.nextReview.slice(5).replace("-", "/")}` : ""}</td>
-                    <td>
-                      <label className="switch">
-                        <input type="checkbox" checked={on} onChange={() => toggle(id)} />
-                        出す
-                      </label>
-                    </td>
-                    <td>
-                      <button className="btn-mini" onClick={() => onTrial(id)}>
-                        ためす
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+          <ul className="skill-rows">
+            {SKILLS.filter((s) => s.group === g).map(({ id }) => {
+              const s = data.states[id];
+              const on = !profile.disabledSkills.includes(id);
+              const sym = masterySymbol(s);
+              return (
+                <li key={id} className={on ? "" : "off"}>
+                  <span className="sym-chip" data-s={sym} title={SYM_TEXT[sym]}>
+                    {sym}
+                  </span>
+                  <div className="skill-main">
+                    <span className="skill-name">{skill(id).label}</span>
+                    <div className="bar">
+                      <span style={{ width: `${Math.round((s?.mastery ?? 0) * 100)}%` }} />
+                    </div>
+                  </div>
+                  <span className="skill-meta">
+                    {s?.attempts ?? 0}問
+                    {s?.nextReview && <small>復習 {s.nextReview.slice(5).replace("-", "/")}</small>}
+                  </span>
+                  <label className="toggle">
+                    <input type="checkbox" checked={on} onChange={() => toggle(id)} />
+                    <span className="toggle-track" aria-hidden="true" />
+                    <span className="toggle-label">{on ? "出す" : "出さない"}</span>
+                  </label>
+                  <button className="btn-mini" onClick={() => onTrial(id)}>
+                    ためす
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
         </section>
       ))}
-      <p className="muted small wide">
-        ◎ 身についた（日をあけた復習でも解けた）　○ だいたいできる　△ 練習中　− まだ ／ 学校でまだ習っていない単元は「出す」を外してください。「1学期のふくしゅう」はウォームアップと復習にだけ出ます。「ためす」は3問だけ出して、記録は残しません。
+      <p className="muted small">
+        ◎ は、日をあけた復習でも解けたときに付きます。学校でまだ習っていない単元は「出さない」にしてください。「1学期のふくしゅう」はウォームアップと復習にだけ出ます。「ためす」は3問だけ出して、記録は残しません。
       </p>
     </div>
   );

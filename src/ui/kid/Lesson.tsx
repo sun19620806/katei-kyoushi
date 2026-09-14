@@ -85,6 +85,7 @@ export default function Lesson({ profile, onExit, trial }: { profile: Profile; o
   const [lesson, setLesson] = useState<LessonState | null>(null);
   const [input, setInput] = useState("");
   const [summary, setSummary] = useState<Summary | null>(null);
+  const [confirmQuit, setConfirmQuit] = useState(false);
 
   const model = useRef<{ states: Record<string, SkillState>; stumbles: Record<string, Stumble> }>({ states: {}, stumbles: {} });
   const recent = useRef<string[]>([]);
@@ -293,6 +294,20 @@ export default function Lesson({ profile, onExit, trial }: { profile: Profile; o
     onExit();
   };
 
+  /** とちゅうでやめても、解いた問題のぶんは学習の記録に反映する */
+  const quitAndSave = async () => {
+    stopSpeaking();
+    if (!trial && lesson && lesson.outcomes.length > 0 && ui === "run") {
+      const today = ymd();
+      const firstToday = !(await studyDays()).includes(today);
+      const minutes = Math.max(1, Math.round((Date.now() - startedAt.current) / 60_000));
+      await addEvent({ id: uid(), type: "session", sessionId: sessionId.current, at: new Date().toISOString(), kind: "finish", minutes });
+      const streak = await currentStreak(today);
+      await saveSessionResult(finalizeSession(model.current.states, model.current.stumbles, lesson.outcomes, today, firstToday ? streak : 0));
+    }
+    onExit();
+  };
+
   const stage = lesson?.stage;
   const step = lesson ? currentStep(lesson) : undefined;
   const total = lesson?.plan.items.length ?? 0;
@@ -302,7 +317,7 @@ export default function Lesson({ profile, onExit, trial }: { profile: Profile; o
   return (
     <main className="kid lesson">
       <header className="topbar">
-        <button className="quit" onClick={exit}>
+        <button className="quit" onClick={() => (ui === "run" && !trial ? setConfirmQuit(true) : exit())}>
           <CloseIcon /> やめる
         </button>
         {ui === "run" && lesson && (
@@ -320,6 +335,22 @@ export default function Lesson({ profile, onExit, trial }: { profile: Profile; o
           </div>
         )}
       </header>
+
+      {confirmQuit && (
+        <div className="dialog-back" role="dialog" aria-modal="true">
+          <div className="dialog">
+            <Teacher face="calm" size={88} />
+            <p>きょうは ここで おわりに する？</p>
+            <small>ここまでに といた ぶんは、ちゃんと のこるよ。</small>
+            <div className="dialog-actions">
+              <button onClick={quitAndSave}>おわる</button>
+              <button className="keep" onClick={() => setConfirmQuit(false)} autoFocus>
+                つづける
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className={`lesson-grid ${working ? "" : "wide"}`}>
         <section className="talk">
@@ -444,7 +475,7 @@ export default function Lesson({ profile, onExit, trial }: { profile: Profile; o
                   <NumPad value={input} onChange={setInput} onSubmit={() => submit()} />
                 )}
                 <button className="hint-btn" onClick={hint} disabled={lesson.hintLevel >= 3}>
-                  <BulbIcon /> ヒント
+                  <BulbIcon /> <span>ヒント</span>
                 </button>
               </>
             ) : (

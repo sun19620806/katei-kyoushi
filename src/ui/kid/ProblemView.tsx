@@ -286,10 +286,16 @@ function Hissan({ problem: p, shown, visual, state }: { problem: Problem; shown:
         ))}
       </div>
       <div className="h-row">
-        <span className="op">{opSymbol(p)}</span>
-        {places.map((pl) => (
-          <span key={pl} className={`cell ${hot(pl)}`}>{cell(p.b, pl, p.b >= pl)}</span>
-        ))}
+        {/* 記号は、下の数のいちばん上の位のすぐ左に書く（教科書と同じ） */}
+        <span className="op">{p.b >= 100 ? opSymbol(p) : ""}</span>
+        {places.map((pl) => {
+          const opHere = p.b < 100 && ((pl === 100 && p.b >= 10) || (pl === 10 && p.b < 10));
+          return (
+            <span key={pl} className={`cell ${hot(pl)} ${opHere ? "op" : ""}`}>
+              {opHere ? opSymbol(p) : cell(p.b, pl, p.b >= pl)}
+            </span>
+          );
+        })}
       </div>
       <div className="h-rule" />
       <div className={`h-row result ${state}`}>
