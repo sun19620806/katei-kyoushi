@@ -1,0 +1,61 @@
+# ヒント文（スキル × 間違いの原因 × 段階）
+# level 1: 気づかせる / 2: 考え方の道すじ / 3: ほぼ説明（答えは言わない）
+# skillId や misconception が "*" のものは、合うものが無いときの予備。
+# 使える変数: {a} {b} {a1} {a10} {b1} {b10} {ones_sum} {ones_sum_minus10}
+#   {a1_plus10} {a10_minus1} {n} {m} {prev} {m_minus1}
+#   a1 = aの一の位, a10 = aの十の位, n = 段(九九), m = かける数, prev = n×(m-1)
+# 使ってはいけない言葉は tests/content.test.ts の FORBIDDEN を参照。
+
+hints:
+  # ───── 1けた＋1けた（くり上がり） ─────
+  - { skillId: math.add.1d1d_carry, misconception: "*", level: 1, text: "{a}は あと いくつで 10に なるかな？" }
+  - { skillId: math.add.1d1d_carry, misconception: "*", level: 2, text: "{b}を わけて、まず {a}と あわせて 10を つくろう。" }
+  - { skillId: math.add.1d1d_carry, misconception: "*", level: 3, text: "10と、のこりの かずを あわせると いくつ？" }
+  - { skillId: math.add.1d1d_carry, misconception: no_carry, level: 1, text: "{a}と {b}を あわせると、10より おおきく なるね。" }
+  - { skillId: math.add.1d1d_carry, misconception: no_carry, level: 2, text: "10の まとまりが 1つ できたよ。それを わすれずに たそう。" }
+  - { skillId: math.add.1d1d_carry, misconception: no_carry, level: 3, text: "10と {ones_sum_minus10}を あわせた かずに なるよ。" }
+  - { skillId: math.add.1d1d_carry, misconception: count_slip, level: 1, text: "おしい！ もういちど ゆっくり かぞえてみよう。" }
+  - { skillId: math.add.1d1d_carry, misconception: count_slip, level: 2, text: "かぞえる ときは、{a}の つぎの かずから かぞえはじめるよ。" }
+  - { skillId: math.add.1d1d_carry, misconception: count_slip, level: 3, text: "{a}は あと いくつで 10かな？ 10を つくってから たすと まちがえにくいよ。" }
+
+  # ───── 2けた＋2けた（くり上がり） ─────
+  - { skillId: math.add.2d2d_carry, misconception: "*", level: 1, text: "まず 一のくらいから けいさんしよう。", visual: ones_highlight }
+  - { skillId: math.add.2d2d_carry, misconception: "*", level: 2, text: "{a1}+{b1}は 10より おおきいね。十のくらいに 1 くりあがるよ。", visual: carry_mark }
+  - { skillId: math.add.2d2d_carry, misconception: "*", level: 3, text: "十のくらいは {a10}+{b10}に、くりあがった 1を たそう。", visual: tens_highlight }
+  - { skillId: math.add.2d2d_carry, misconception: no_carry, level: 1, text: "一のくらいの {a1}+{b1}は いくつに なったかな？", visual: ones_highlight }
+  - { skillId: math.add.2d2d_carry, misconception: no_carry, level: 2, text: "10を こえたら、十のくらいに ちいさく 1を かいておこう。", visual: carry_mark }
+  - { skillId: math.add.2d2d_carry, misconception: no_carry, level: 3, text: "十のくらいは {a10}+{b10}+1 だよ。", visual: tens_highlight }
+  - { skillId: math.add.2d2d_carry, misconception: concat_ones, level: 1, text: "一のくらいには、すうじを 1つだけ かくんだよ。", visual: ones_highlight }
+  - { skillId: math.add.2d2d_carry, misconception: concat_ones, level: 2, text: "{ones_sum}の 1は 十のくらいへ おひっこし。一のくらいには のこりを かこう。", visual: carry_mark }
+  - { skillId: math.add.2d2d_carry, misconception: concat_ones, level: 3, text: "一のくらいは {ones_sum_minus10}。十のくらいは {a10}+{b10}+1 だよ。", visual: tens_highlight }
+  - { skillId: math.add.2d2d_carry, misconception: calc_slip, level: 1, text: "やりかたは あっているよ。どこか 1つだけ ずれたかも。", visual: none }
+  - { skillId: math.add.2d2d_carry, misconception: calc_slip, level: 2, text: "一のくらいと 十のくらいを、1つずつ たしかめよう。", visual: ones_highlight }
+  - { skillId: math.add.2d2d_carry, misconception: calc_slip, level: 3, text: "一のくらいは {a1}+{b1}={ones_sum}。十のくらいは {a10}+{b10}+1 だよ。", visual: tens_highlight }
+
+  # ───── 2けた−2けた（くり下がり） ─────
+  - { skillId: math.sub.2d2d_borrow, misconception: "*", level: 1, text: "一のくらいを 見てみよう。{a1}から {b1}は ひけるかな？", visual: ones_highlight }
+  - { skillId: math.sub.2d2d_borrow, misconception: "*", level: 2, text: "ひけない ときは、十のくらいから 10を 1つ かりてこよう。", visual: borrow_mark }
+  - { skillId: math.sub.2d2d_borrow, misconception: "*", level: 3, text: "一のくらいは {a1_plus10}−{b1}。十のくらいは 1 へって {a10_minus1}−{b10} だよ。", visual: tens_highlight }
+  - { skillId: math.sub.2d2d_borrow, misconception: smaller_from_larger, level: 1, text: "ひきざんは、うえの かずから したの かずを ひくよ。{a1}から {b1}は ひけるかな？", visual: ones_highlight }
+  - { skillId: math.sub.2d2d_borrow, misconception: smaller_from_larger, level: 2, text: "{b1}の ほうが おおきいね。十のくらいから 10を かりて、{a1_plus10}に しよう。", visual: borrow_mark }
+  - { skillId: math.sub.2d2d_borrow, misconception: smaller_from_larger, level: 3, text: "一のくらいは {a1_plus10}−{b1}。かした 十のくらいは {a10_minus1}に なるよ。", visual: tens_highlight }
+  - { skillId: math.sub.2d2d_borrow, misconception: borrow_no_decrement, level: 1, text: "一のくらいは よく できたね。十のくらいを 見てみよう。", visual: tens_highlight }
+  - { skillId: math.sub.2d2d_borrow, misconception: borrow_no_decrement, level: 2, text: "十のくらいは 10を 1つ かしたよね。{a10}は いくつに なったかな？", visual: borrow_mark }
+  - { skillId: math.sub.2d2d_borrow, misconception: borrow_no_decrement, level: 3, text: "十のくらいは {a10_minus1}−{b10} だよ。", visual: tens_highlight }
+  - { skillId: math.sub.2d2d_borrow, misconception: calc_slip, level: 1, text: "やりかたは あっているよ。どこか 1つだけ ずれたかも。", visual: none }
+  - { skillId: math.sub.2d2d_borrow, misconception: calc_slip, level: 2, text: "一のくらいの {a1_plus10}−{b1}を もういちど たしかめよう。", visual: ones_highlight }
+  - { skillId: math.sub.2d2d_borrow, misconception: calc_slip, level: 3, text: "こたえに したの かずを たすと、うえの かずに なるか たしかめよう。", visual: none }
+
+  # ───── 九九（どの段にも使う） ─────
+  - { skillId: "*", misconception: "*", level: 1, text: "{n}の だんを、{n}×1から となえてみよう。", visual: none }
+  - { skillId: "*", misconception: "*", level: 2, text: "{n}×{m_minus1}は {prev}。そこに {n}を たすと？", visual: array }
+  - { skillId: "*", misconception: "*", level: 3, text: "{n}が {m}こ ぶん だよ。{prev}+{n}を けいさんしよう。", visual: array }
+  - { skillId: "*", misconception: neighbor_fact, level: 1, text: "おしい！ となりの 九九に なっているかも。{n}×{m}を よく 見てね。", visual: none }
+  - { skillId: "*", misconception: neighbor_fact, level: 2, text: "{n}×{m_minus1}は {prev}。{m}こ めは いくつかな？", visual: array }
+  - { skillId: "*", misconception: neighbor_fact, level: 3, text: "{prev}に {n}を 1かい たすと こたえに なるよ。", visual: array }
+  - { skillId: "*", misconception: neighbor_dan, level: 1, text: "いまは {n}の だんだよ。となりの だんに なっていないかな？", visual: none }
+  - { skillId: "*", misconception: neighbor_dan, level: 2, text: "{n}が {m}こ ならぶよ。{n}の だんで となえてみよう。", visual: array }
+  - { skillId: "*", misconception: neighbor_dan, level: 3, text: "{n}×{m_minus1}は {prev}。そこに {n}を たそう。", visual: array }
+  - { skillId: "*", misconception: add_instead, level: 1, text: "これは たしざんじゃなくて、かけざんだよ。", visual: none }
+  - { skillId: "*", misconception: add_instead, level: 2, text: "{n}×{m}は、{n}が {m}こ ぶん という いみだよ。", visual: array }
+  - { skillId: "*", misconception: add_instead, level: 3, text: "{n}×{m_minus1}は {prev}。そこに {n}を たそう。", visual: array }

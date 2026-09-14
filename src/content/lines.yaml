@@ -1,0 +1,219 @@
+# 先生のセリフ（場面ごと）。同じ場面に複数の言い方を用意し、最近使ったものは避けて選ぶ。
+# 先生の人物像は docs/teacher-card.md を参照。
+# 使える変数: {name} {teacher} {skill} {episode} {favorite} {answer} {streak} {count}
+# needs に書いた変数が無いときは、その行は使わない。
+
+lines:
+  # ───── はじまり ─────
+  - id: greet.first
+    scene: greet_first
+    variants:
+      - "はじめまして、{name}。ぼくは {teacher}。コンピューターの なかに いる せんせいだよ。"
+
+  - id: intro.parent
+    scene: intro_parent
+    variants:
+      - "おうちの ひとも、せんせいの ノートを 見られるよ。"
+
+  - id: greet.plain
+    scene: greet
+    variants:
+      - "{name}、きたね。きょうも いっしょに やろう。"
+      - "やあ、{name}。まってたよ。"
+      - "{name}、こんにちは。きょうは どんな ちょうし？"
+
+  - id: greet.episode
+    scene: greet
+    needs: [episode]
+    variants:
+      - "{name}、このまえ {episode}ね。ちゃんと おぼえてるよ。"
+      - "やあ {name}。このまえは {episode}よね。きょうも いこう。"
+
+  - id: greet.streak
+    scene: greet
+    needs: [streak]
+    variants:
+      - "{name}、これで {streak}にち れんぞくだね。つづけるって すごい ちからだよ。"
+
+  - id: mood.question
+    scene: mood_question
+    variants:
+      - "きょうの げんきは どれくらい？"
+      - "いまの きもちに ちかいのは どれかな？"
+
+  - id: mood.genki
+    scene: mood_genki
+    variants:
+      - "いいね。じゃあ きょうは すこし チャレンジも してみよう。"
+      - "げんき いっぱいだね。はりきって いこう。"
+
+  - id: mood.futsu
+    scene: mood_futsu
+    variants:
+      - "ふつうの ひも だいじ。いつもどおり いこう。"
+      - "オッケー。ちょうど いい ペースで やろう。"
+
+  - id: mood.tsukare
+    scene: mood_tsukare
+    variants:
+      - "おしえてくれて ありがとう。きょうは みじかめに しよう。"
+      - "つかれてる ひも あるよね。できる ところだけ、ゆっくり やろう。"
+
+  # ───── ながれ ─────
+  - id: phase.warmup
+    scene: phase_warmup
+    variants:
+      - "まずは ウォーミングアップ。"
+
+  - id: phase.warmup_strong
+    scene: phase_warmup
+    needs: [strong]
+    variants:
+      - "はじめは {name}の とくいな もんだいから。"
+
+  - id: phase.review
+    scene: phase_review
+    needs: [skill]
+    variants:
+      - "つぎは {skill}の ふくしゅう。おぼえているかな？"
+      - "すこし まえに やった {skill}だよ。"
+
+  - id: phase.main
+    scene: phase_main
+    needs: [skill]
+    variants:
+      - "きょうの メインは {skill}。"
+      - "ここからは {skill}に ちょうせん しよう。"
+
+  - id: phase.choice
+    scene: phase_choice
+    variants:
+      - "つぎは {name}が きめて。どっちに する？"
+      - "ここで しつもん。つぎの もんだい、どっちが いい？"
+
+  - id: phase.finale
+    scene: phase_finale
+    variants:
+      - "さいごの 1もん。"
+      - "きょうの しめくくりは これ。"
+
+  # ───── こたえたとき ─────
+  - id: correct.plain
+    scene: correct
+    variants:
+      - "せいかい。"
+      - "うん、あってる。"
+      - "そのとおり。"
+      - "できたね。"
+
+  - id: correct.fast
+    scene: correct_fast
+    variants:
+      - "せいかい。いまのは はやかったね。"
+      - "すぐ わかったね。すっかり {name}の ものだ。"
+
+  - id: correct.after_hint
+    scene: correct_after_hint
+    variants:
+      - "せいかい。ヒントを うまく つかえたね。"
+      - "そう、それ。ヒントから じぶんで たどりついたね。"
+
+  - id: correct.after_struggle
+    scene: correct_after_struggle
+    variants:
+      - "さいごまで かんがえて、じぶんで こたえを 出したね。それが いちばん だいじな ところ。"
+      - "むずかしかったのに、あきらめなかったね。"
+
+  - id: wrong.nudge
+    scene: wrong_nudge
+    variants:
+      - "おしい。ヒントを 出すね。"
+      - "うーん、もう すこし。いっしょに 見てみよう。"
+      - "ここは ちょっと むずかしい ところ。ヒントだよ。"
+
+  - id: reveal
+    scene: reveal
+    needs: [answer]
+    variants:
+      - "こたえは {answer} だよ。どこで ずれたか、いっしょに たしかめよう。"
+      - "いまのは {answer}。むずかしい もんだいだったね。"
+
+  - id: twin
+    scene: twin
+    variants:
+      - "にている もんだいで、もう いちど やってみよう。"
+      - "こんどは これ。さっきと おなじ やりかたで できるよ。"
+
+  # ───── 先生に教えて ─────
+  - id: think.question
+    scene: think_question
+    variants:
+      - "いまの もんだい、どうやって かんがえたか せんせいに おしえて？"
+      - "しつもん。いまのは どうやって とけた？"
+
+  - id: think.thanks
+    scene: think_thanks
+    variants:
+      - "おしえてくれて ありがとう。{name}の かんがえかたが わかったよ。"
+      - "なるほど。こんど おうちの ひとにも せつめい してみてね。"
+
+  - id: think.unknown
+    scene: think_unknown
+    variants:
+      - "わからない って いえるのも だいじ。つぎに いっしょに たしかめよう。"
+
+  # ───── おわり ─────
+  - id: time.up
+    scene: time_up
+    variants:
+      - "きょうは ここまで。つづきは あしたに とっておこう。"
+
+  - id: finish.plain
+    scene: finish
+    needs: [count]
+    variants:
+      - "きょうは {count}もん やったね。おつかれさま。"
+      - "{count}もん、さいごまで できたね。"
+
+  - id: growth.first_no_hint
+    scene: growth_first_no_hint
+    needs: [skill]
+    variants:
+      - "きょうは {skill}を はじめて ヒントなしで とけたね。"
+
+  - id: growth.faster
+    scene: growth_faster
+    needs: [skill]
+    variants:
+      - "{skill}、まえより ずっと はやく とけるように なったよ。"
+
+  - id: growth.mastered
+    scene: growth_mastered
+    needs: [skill]
+    variants:
+      - "{skill}は、もう {name}の とくい わざ だね。"
+
+  - id: growth.persisted
+    scene: growth_persisted
+    variants:
+      - "きょうは むずかしい もんだいも、さいごまで じぶんで かんがえたね。"
+      - "わからなくても あきらめないで かんがえた。それが いちばん かっこいい ところ。"
+
+  - id: growth.streak
+    scene: growth_streak
+    needs: [streak]
+    variants:
+      - "これで {streak}にち れんぞく。まいにち つづけるって、ほんとうに すごいこと。"
+
+  - id: goodbye
+    scene: goodbye
+    variants:
+      - "また あした まってるね。"
+      - "じゃあね、{name}。あしたも いっしょに やろう。"
+      - "きょうも ありがとう。あした つづきを やろう。"
+
+  - id: goodbye.favorite
+    scene: goodbye
+    needs: [favorite]
+    variants:
+      - "じゃあね。{favorite}が すきな {name}、あしたも まってるよ。"
