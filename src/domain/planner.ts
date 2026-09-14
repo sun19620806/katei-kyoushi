@@ -1,4 +1,4 @@
-import { SKILLS } from "./content";
+import { SKILLS, skill } from "./content";
 import { UNLOCK_THRESHOLD, activeStumbles, initialSkillState, isSolidForNow } from "./learner";
 import { uid } from "./random";
 import type { LessonPlan, Mood, PlannedItem, Profile, SkillId, SkillState, Stumble } from "./types";
@@ -15,15 +15,23 @@ const isMastered = isSolidForNow;
 
 /** 今日の授業の計画。すべてルールで決める */
 export function planLesson({ profile, states, stumbles, mood, today }: PlanInput): LessonPlan {
-  const enabled = SKILLS.filter((s) => profile.enabledSkills.includes(s.id));
+  const disabled = new Set(profile.disabledSkills);
+  const enabled = SKILLS.filter((s) => !disabled.has(s.id));
   const st = (id: SkillId) => states[id] ?? initialSkillState(id);
+  // 前提スキルが「出さない」か「1学期のふくしゅう」なら、できているものとして扱う
   const unlocked = (id: SkillId) => {
     const def = enabled.find((s) => s.id === id);
-    return !!def && def.prereqs.every((p) => !profile.enabledSkills.includes(p) || st(p).mastery >= UNLOCK_THRESHOLD);
+    return (
+      !!def &&
+      def.prereqs.every((p) => disabled.has(p) || skill(p).review || st(p).mastery >= UNLOCK_THRESHOLD)
+    );
   };
 
   const stumbleSkills = new Set(activeStumbles(stumbles, today).filter((s) => s.status === "confirmed").map((s) => s.skillId));
-  const candidates = enabled.filter((s) => unlocked(s.id) && !isMastered(st(s.id)));
+  // 1学期のふくしゅうは、確認済みのつまずきがあるときだけ重点になる
+  const candidates = enabled.filter(
+    (s) => unlocked(s.id) && !isMastered(st(s.id)) && (!s.review || stumbleSkills.has(s.id)),
+  );
 
   // 重点スキル：確認済みのつまずき → 取り組み中で習熟度が低い順 → 地図の順の新しいスキル
   const focus =
@@ -33,11 +41,12 @@ export function planLesson({ profile, states, stumbles, mood, today }: PlanInput
     // 全部習得済みなら、復習がいちばん古いもの
     [...enabled].sort((a, b) => (st(a.id).nextReview ?? "").localeCompare(st(b.id).nextReview ?? ""))[0].id;
 
-  // ウォーミングアップ：いちばん得意なスキル（無ければ重点スキル）
+  // ウォーミングアップ：いちばん得意なスキル。記録がなければ、まだやっていない1学期のふくしゅう
   const strong = [...enabled]
     .filter((s) => s.id !== focus && st(s.id).attempts > 0 && st(s.id).mastery >= UNLOCK_THRESHOLD)
     .sort((a, b) => st(b.id).mastery - st(a.id).mastery)[0]?.id;
-  const warm = strong ?? focus;
+  const firstReview = enabled.find((s) => s.review && s.id !== focus && st(s.id).attempts === 0)?.id;
+  const warm = strong ?? firstReview ?? focus;
 
   const due = enabled
     .filter((s) => s.id !== focus && s.id !== warm && st(s.id).nextReview && st(s.id).nextReview! <= today)
@@ -48,8 +57,11 @@ export function planLesson({ profile, states, stumbles, mood, today }: PlanInput
   const review = due.slice(0, mood === "tsukare" ? 1 : 3);
   const mainCount = Math.max(3, total - 2 /* warmup */ - review.length - 1 /* choice */ - 1 /* finale */);
 
-  // チャレンジの選択肢：重点の次に進めるスキル。無ければ重点スキル
-  const next = enabled.find((s) => s.id !== focus && !isMastered(st(s.id)) && s.prereqs.includes(focus))?.id;
+  // チャレンジの選択肢：重点より後ろにある、まだ身についていないスキル（前提をほぼ満たすもの）
+  const focusIndex = enabled.findIndex((s) => s.id === focus);
+  const next = enabled.find(
+    (s, i) => i > focusIndex && !s.review && !isMastered(st(s.id)) && s.prereqs.every((p) => p === focus || disabled.has(p) || skill(p).review || st(p).mastery >= UNLOCK_THRESHOLD),
+  )?.id;
 
   const items: PlannedItem[] = [
     { phase: "warmup", skillId: warm },

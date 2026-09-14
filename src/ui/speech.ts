@@ -28,6 +28,9 @@ export function configureSpeech(opts: { enabled: boolean; rate: number }) {
 /** 記号を読みやすい言葉にする */
 export function toSpeakable(text: string) {
   return text
+    .replace(/(\d)\s*cm/g, "$1センチ")
+    .replace(/(\d)\s*m(?![a-z])/g, "$1メートル")
+    .replace(/□/g, " なに ")
     .replace(/×/g, " かける ")
     .replace(/[−-]/g, " ひく ")
     .replace(/\+/g, " たす ")

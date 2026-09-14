@@ -1,9 +1,12 @@
 # ヒント文（スキル × 間違いの原因 × 段階）
 # level 1: 気づかせる / 2: 考え方の道すじ / 3: ほぼ説明（答えは言わない）
 # skillId や misconception が "*" のものは、合うものが無いときの予備。
-# 使える変数: {a} {b} {a1} {a10} {b1} {b10} {ones_sum} {ones_sum_minus10}
-#   {a1_plus10} {a10_minus1} {n} {m} {prev} {m_minus1}
+# step: 文章題などで、そのステップのときだけ使う（0 = 式を選ぶ, 1 = 答え）
+# kind: その種類の問題のときだけ使う（len_to_cm / len_to_mcm など）
+# 使える変数: {a} {b} {a1} {a10} {a100} {b1} {b10} {ones_sum} {ones_sum_minus10} {tens_sum}
+#   {a1_plus10} {a10_minus1} {n} {m} {prev} {m_minus1} {product} {m_in_cm} {cm}
 #   a1 = aの一の位, a10 = aの十の位, n = 段(九九), m = かける数, prev = n×(m-1)
+#   product = □の九九の積, m_in_cm = a m を cm にしたもの, cm = 長さの問題の全部の cm
 # 使ってはいけない言葉は tests/content.test.ts の FORBIDDEN を参照。
 
 hints:
@@ -44,7 +47,35 @@ hints:
   - { skillId: math.sub.2d2d_borrow, misconception: borrow_no_decrement, level: 3, text: "十のくらいは {a10_minus1}−{b10} だよ。", visual: tens_highlight }
   - { skillId: math.sub.2d2d_borrow, misconception: calc_slip, level: 1, text: "やりかたは あっているよ。どこか 1つだけ ずれたかも。", visual: none }
   - { skillId: math.sub.2d2d_borrow, misconception: calc_slip, level: 2, text: "一のくらいの {a1_plus10}−{b1}を もういちど たしかめよう。", visual: ones_highlight }
-  - { skillId: math.sub.2d2d_borrow, misconception: calc_slip, level: 3, text: "こたえに したの かずを たすと、うえの かずに なるか たしかめよう。", visual: none }
+  - { skillId: math.sub.2d2d_borrow, misconception: calc_slip, level: 3, text: "こたえに 下の かずを たすと、上の かずに なるか たしかめよう。", visual: none }
+
+  # ───── 2けた＋2けた（答えが3けた） ─────
+  - { skillId: math.add.2d2d_to3d, misconception: "*", level: 1, text: "一のくらいから けいさんしよう。{a1}+{b1}は いくつ？", visual: ones_highlight }
+  - { skillId: math.add.2d2d_to3d, misconception: "*", level: 2, text: "10を こえたら、となりの くらいに 1 くりあがるよ。", visual: carry_mark }
+  - { skillId: math.add.2d2d_to3d, misconception: "*", level: 3, text: "十のくらいが 10を こえたら、百のくらいに 1を かこう。", visual: hundreds_highlight }
+  - { skillId: math.add.2d2d_to3d, misconception: no_carry, level: 1, text: "くりあがった 1を たしたかな？", visual: carry_mark }
+  - { skillId: math.add.2d2d_to3d, misconception: no_carry, level: 2, text: "十のくらいは {a10}+{b10}に、くりあがりの 1も たすよ。", visual: tens_highlight }
+  - { skillId: math.add.2d2d_to3d, misconception: no_carry, level: 3, text: "十のくらいの こたえが 10を こえたら、百のくらいに 1を かこう。", visual: hundreds_highlight }
+  - { skillId: math.add.2d2d_to3d, misconception: concat_ones, level: 1, text: "一のくらいには、すうじを 1つだけ かくよ。", visual: ones_highlight }
+  - { skillId: math.add.2d2d_to3d, misconception: concat_ones, level: 2, text: "{ones_sum}の 1は 十のくらいへ おひっこし。", visual: carry_mark }
+  - { skillId: math.add.2d2d_to3d, misconception: concat_ones, level: 3, text: "一のくらいは {ones_sum_minus10}。十のくらいに 1を たそう。", visual: tens_highlight }
+  - { skillId: math.add.2d2d_to3d, misconception: calc_slip, level: 1, text: "やりかたは あっているよ。どこか 1つだけ ずれたかも。", visual: none }
+  - { skillId: math.add.2d2d_to3d, misconception: calc_slip, level: 2, text: "一のくらい、十のくらいの じゅんに たしかめよう。", visual: ones_highlight }
+  - { skillId: math.add.2d2d_to3d, misconception: calc_slip, level: 3, text: "こたえから 下の かずを ひくと、上の かずに なるか たしかめよう。", visual: none }
+
+  # ───── 3けた−2けた（くり下がり2回） ─────
+  - { skillId: math.sub.3d2d_borrow, misconception: "*", level: 1, text: "一のくらいから。{a1}から {b1}は ひけるかな？", visual: ones_highlight }
+  - { skillId: math.sub.3d2d_borrow, misconception: "*", level: 2, text: "ひけない ときは、上の くらいから 10を かりる。十のくらいも おなじだよ。", visual: borrow_mark }
+  - { skillId: math.sub.3d2d_borrow, misconception: "*", level: 3, text: "十のくらいは、かした あとの かずに 10を もらって、{b10}を ひこう。", visual: tens_highlight }
+  - { skillId: math.sub.3d2d_borrow, misconception: smaller_from_larger, level: 1, text: "ひきざんは、上の かずから 下の かずを ひくよ。{a1}から {b1}は ひけるかな？", visual: ones_highlight }
+  - { skillId: math.sub.3d2d_borrow, misconception: smaller_from_larger, level: 2, text: "ひけない ときは、となりの くらいから 10を かりてこよう。", visual: borrow_mark }
+  - { skillId: math.sub.3d2d_borrow, misconception: smaller_from_larger, level: 3, text: "十のくらいも ひけないね。百のくらいから 10を かりよう。", visual: tens_highlight }
+  - { skillId: math.sub.3d2d_borrow, misconception: borrow_no_decrement, level: 1, text: "10を かした くらいは、1 へるよ。", visual: borrow_mark }
+  - { skillId: math.sub.3d2d_borrow, misconception: borrow_no_decrement, level: 2, text: "十のくらいは、一のくらいに かしたから 1 へっているよ。", visual: tens_highlight }
+  - { skillId: math.sub.3d2d_borrow, misconception: borrow_no_decrement, level: 3, text: "百のくらいも 十のくらいに かしたから、のこりは 0に なるよ。", visual: hundreds_highlight }
+  - { skillId: math.sub.3d2d_borrow, misconception: calc_slip, level: 1, text: "やりかたは あっているよ。どこか 1つだけ ずれたかも。", visual: none }
+  - { skillId: math.sub.3d2d_borrow, misconception: calc_slip, level: 2, text: "一のくらいから じゅんに、もういちど たしかめよう。", visual: ones_highlight }
+  - { skillId: math.sub.3d2d_borrow, misconception: calc_slip, level: 3, text: "こたえに 下の かずを たすと、上の かずに なるか たしかめよう。", visual: none }
 
   # ───── 九九（どの段にも使う） ─────
   - { skillId: "*", misconception: "*", level: 1, text: "{n}の だんを、{n}×1から となえてみよう。", visual: none }
@@ -59,3 +90,35 @@ hints:
   - { skillId: "*", misconception: add_instead, level: 1, text: "これは たしざんじゃなくて、かけざんだよ。", visual: none }
   - { skillId: "*", misconception: add_instead, level: 2, text: "{n}×{m}は、{n}が {m}こ ぶん という いみだよ。", visual: array }
   - { skillId: "*", misconception: add_instead, level: 3, text: "{n}×{m_minus1}は {prev}。そこに {n}を たそう。", visual: array }
+
+  # ───── □を使った九九 ─────
+  - { skillId: math.mul.missing, misconception: "*", level: 1, text: "{n}の だんで、こたえが {product}に なるのは どれかな？", visual: none }
+  - { skillId: math.mul.missing, misconception: "*", level: 2, text: "{n}の だんを {n}×2から となえて、{product}を さがそう。", visual: none }
+  - { skillId: math.mul.missing, misconception: "*", level: 3, text: "{n}×{m_minus1}は {prev}。{product}までは あと {n}。", visual: array }
+  - { skillId: math.mul.missing, misconception: product_minus, level: 1, text: "□は「{n}が なんこ分」の かずだよ。", visual: none }
+  - { skillId: math.mul.missing, misconception: product_minus, level: 2, text: "{n}の だんを となえて、{product}に なる ところを さがそう。", visual: none }
+  - { skillId: math.mul.missing, misconception: product_minus, level: 3, text: "{n}×{m_minus1}は {prev}。{product}までは あと {n}。", visual: array }
+  - { skillId: math.mul.missing, misconception: neighbor_fact, level: 1, text: "おしい！ {n}× □ を けいさんして、{product}に なるか たしかめよう。", visual: none }
+
+  # ───── かけ算の文章題 ─────
+  - { skillId: math.mul.word, misconception: "*", step: 0, level: 1, text: "1つ分は いくつかな？ それが いくつ分 あるかな？", visual: none }
+  - { skillId: math.mul.word, misconception: "*", step: 0, level: 2, text: "かけざんの しきは「1つ分 × いくつ分」の じゅんばんだよ。", visual: none }
+  - { skillId: math.mul.word, misconception: "*", step: 0, level: 3, text: "1つ分は {a}、いくつ分は {b}だよ。", visual: none }
+  - { skillId: math.mul.word, misconception: order_reversed, step: 0, level: 1, text: "かけざんの しきは「1つ分 × いくつ分」の じゅんに かくよ。", visual: none }
+  - { skillId: math.mul.word, misconception: order_reversed, step: 0, level: 2, text: "ぶんしょうの「〜ずつ」が 1つ分の かずだよ。", visual: none }
+  - { skillId: math.mul.word, misconception: add_instead, step: 0, level: 1, text: "おなじ かずずつ あるときは、かけざんが つかえるよ。", visual: none }
+  - { skillId: math.mul.word, misconception: add_instead, step: 0, level: 2, text: "「〜ずつ」の かずが、いくつ分 あるかな？", visual: none }
+  - { skillId: math.mul.word, misconception: "*", step: 1, level: 1, text: "{n}×{m}を 九九で けいさんしよう。", visual: none }
+  - { skillId: math.mul.word, misconception: "*", step: 1, level: 2, text: "{n}×{m_minus1}は {prev}。そこに {n}を たすと？", visual: array }
+  - { skillId: math.mul.word, misconception: "*", step: 1, level: 3, text: "{n}が {m}こ分。{prev}+{n}を けいさんしよう。", visual: array }
+
+  # ───── 長さ（m と cm） ─────
+  - { skillId: math.length.m_cm, kind: len_to_cm, misconception: "*", level: 1, text: "1mは なんcm だったかな？", visual: meter_tape }
+  - { skillId: math.length.m_cm, kind: len_to_cm, misconception: "*", level: 2, text: "1mは 100cm。{a}mは 100cmが {a}こ分 だよ。", visual: meter_tape }
+  - { skillId: math.length.m_cm, kind: len_to_cm, misconception: "*", level: 3, text: "{a}mは {m_in_cm}cm。それに {b}cmを たそう。", visual: meter_tape }
+  - { skillId: math.length.m_cm, kind: len_to_cm, misconception: m_as_10cm, level: 1, text: "1mの ながさは 100cm だよ。ものさし 3本より ながいね。", visual: meter_tape }
+  - { skillId: math.length.m_cm, kind: len_to_mcm, misconception: "*", level: 1, text: "100cmで 1m。{cm}cmの 中に、mは いくつ あるかな？", visual: meter_tape }
+  - { skillId: math.length.m_cm, kind: len_to_mcm, misconception: "*", level: 2, text: "{a}mは {m_in_cm}cm。のこりは なんcm？", visual: meter_tape }
+  - { skillId: math.length.m_cm, kind: len_to_mcm, misconception: "*", level: 3, text: "{cm}−{m_in_cm}を けいさんしよう。", visual: meter_tape }
+  - { skillId: math.length.m_cm, kind: len_to_mcm, misconception: cm_whole, level: 1, text: "□には、mに した のこりの cmだけを かくよ。", visual: meter_tape }
+  - { skillId: math.length.m_cm, kind: len_to_mcm, misconception: m_as_10cm, level: 1, text: "1mは 100cm だよ。{a}mは なんcm？", visual: meter_tape }

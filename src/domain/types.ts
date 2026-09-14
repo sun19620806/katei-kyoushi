@@ -11,6 +11,9 @@ export interface SkillDef {
   prereqs: SkillId[];
   generator: string; // domain/math/generators.ts のキー
   misconceptions: MisconceptionId[];
+  group: string; // 親の画面でのまとまり
+  /** 1学期までの内容。重点にはせず、ウォームアップと復習にだけ出す */
+  review?: boolean;
 }
 
 export interface MisconceptionDef {
@@ -18,24 +21,41 @@ export interface MisconceptionDef {
   label: string; // 親向け
 }
 
+export type ProblemKind = "add" | "sub" | "mul" | "mul_missing" | "mul_word" | "len_to_cm" | "len_to_mcm";
+
+/** 1問の中の1つの答え（文章題は「式を選ぶ」→「答えを入れる」の2ステップ） */
+export interface Step {
+  type: "number" | "choice";
+  answer: number; // choice のときは正しい選択肢の番号
+  choices?: string[];
+  prompt: string; // 子ども向けの短い指示（例：しきを えらぼう）
+  unit?: string; // 答えの単位（例：cm、こ）
+}
+
 /** 画面に出す問題。答えはコードで計算済み */
 export interface Problem {
   id: string;
   skillId: SkillId;
-  kind: "add" | "sub" | "mul";
+  kind: ProblemKind;
+  /** 意味は kind による。add/sub/mul は a ○ b、mul_missing は a × □ = product、len は m と cm */
   a: number;
   b: number;
-  answer: number;
-  /** 表示形式：横書きの式か筆算か */
-  layout: "inline" | "vertical";
+  answer: number; // 最後のステップの答え
+  layout: "inline" | "vertical" | "missing" | "story" | "length";
+  steps: Step[];
+  story?: string; // 文章題の本文
+  product?: number; // mul_missing の積
+  cm?: number; // len_to_mcm の元の cm
 }
 
-export type HintVisual = "ones_highlight" | "tens_highlight" | "carry_mark" | "borrow_mark" | "array" | "none";
+export type HintVisual = "ones_highlight" | "tens_highlight" | "hundreds_highlight" | "carry_mark" | "borrow_mark" | "array" | "meter_tape" | "none";
 
 export interface HintDef {
   skillId: SkillId | "*";
   misconception: MisconceptionId | "*";
   level: 1 | 2 | 3;
+  step?: number; // 指定があれば、そのステップのときだけ
+  kind?: ProblemKind; // 指定があれば、その種類の問題のときだけ
   text: string;
   visual?: HintVisual;
 }
@@ -85,7 +105,8 @@ export interface AnswerEvent {
   sessionId: string;
   at: string; // ISO
   problem: Problem;
-  given: number;
+  step: number; // 何ステップ目の回答か
+  given: number; // choice のときは選んだ番号
   correct: boolean;
   attemptNo: number; // この問題で何回目の回答か
   hintLevel: number; // 回答時点で見ていたヒント段階（0=なし）
@@ -132,7 +153,8 @@ export interface Profile {
   speech: boolean;
   speechRate: number;
   parentPin: string;
-  enabledSkills: SkillId[];
+  /** 出さないスキル（学校でまだ習っていない単元など）。新しいスキルは自動で出る */
+  disabledSkills: SkillId[];
 }
 
 /** 1問ぶんの結果（何回答えても1つにまとめる） */
@@ -142,7 +164,7 @@ export interface ProblemOutcome {
   firstTryCorrect: boolean; // ヒントなし・1回目で正解
   maxHintLevel: number; // 使ったヒントの最大段階
   revealed: boolean; // 答えを見せた
-  firstMs: number; // 1回目の回答までの時間
+  firstMs: number; // すべてのステップをはじめて答え終わるまでの時間
   misconceptions: string[]; // 間違えた回答それぞれの推定原因
   answerEventIds: string[];
   isTwin: boolean;

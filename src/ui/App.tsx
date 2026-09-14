@@ -8,11 +8,12 @@ import PinGate from "./parent/PinGate";
 import Setup from "./parent/Setup";
 import { configureSpeech } from "./speech";
 
-type Screen = "home" | "lesson" | "pin" | "parent";
+type Screen = "home" | "lesson" | "pin" | "parent" | "trial";
 
 export default function App() {
   const [profile, setProfile] = useState<Profile | null | undefined>(undefined);
   const [screen, setScreen] = useState<Screen>("home");
+  const [trialSkill, setTrialSkill] = useState<string | null>(null);
 
   const reload = useCallback(async () => {
     const p = await getProfile();
@@ -31,6 +32,8 @@ export default function App() {
   switch (screen) {
     case "lesson":
       return <Lesson profile={profile} onExit={() => setScreen("home")} />;
+    case "trial":
+      return <Lesson key={trialSkill} profile={profile} trial={trialSkill ?? undefined} onExit={() => setScreen("parent")} />;
     case "pin":
       return <PinGate pin={profile.parentPin} onOk={() => setScreen("parent")} onCancel={() => setScreen("home")} />;
     case "parent":
@@ -39,6 +42,10 @@ export default function App() {
           profile={profile}
           onProfileChange={reload}
           onExit={() => setScreen("home")}
+          onTrial={(id) => {
+            setTrialSkill(id);
+            setScreen("trial");
+          }}
         />
       );
     default:

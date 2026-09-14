@@ -1,30 +1,45 @@
-# スキルの地図（算数・MVP）
-# 前提スキル(prereqs)の習熟度が十分になってから、次のスキルを重点にする。
-version: "2026-09-14.1"
+# スキルの地図（算数・小2 2学期から）
+# 並び順＝重点にする順番（前提スキルの習熟度が十分になったら次へ）。
+# review: true は1学期までの内容。重点にはせず、ウォームアップと復習にだけ出す。
+version: "2026-09-14.2"
 
 misconceptions:
+  # たし算・ひき算
   - id: no_carry
-    label: 繰り上がりの1を足し忘れる
+    label: くり上がりの1を足し忘れる
   - id: concat_ones
     label: 一の位の合計をそのまま書く（例 38+25→513）
   - id: count_slip
     label: 数え足しで1ずれる
   - id: smaller_from_larger
-    label: 一の位で大きい数から小さい数を引いてしまう
+    label: 各位で大きい数から小さい数を引いてしまう
   - id: borrow_no_decrement
-    label: 十の位から借りたのに十の位を減らし忘れる
+    label: 上の位から借りたのに、その位を減らし忘れる
   - id: calc_slip
     label: 計算のうっかり（1ずれ）
+  # かけ算
   - id: neighbor_fact
     label: となりの九九と取り違える（例 7×8→49 や 63）
   - id: neighbor_dan
     label: となりの段と取り違える（例 7×8→48）
   - id: add_instead
     label: かけ算ではなく足し算をしてしまう
+  - id: product_minus
+    label: □を求めるとき、積から引き算してしまう（例 □×7=42 → 35）
+  - id: order_reversed
+    label: 式が「いくつ分×1つ分」の順になっている
+  # 長さ
+  - id: m_as_10cm
+    label: 1mを10cmと考えてしまう
+  - id: cm_whole
+    label: 「□m□cm」の□cmに、全部のcmを書いてしまう
 
 skills:
+  # ───── 1学期のふくしゅう ─────
   - id: math.add.1d1d_carry
     subject: math
+    group: 1学期のふくしゅう
+    review: true
     label: たし算（1けた＋1けた・くり上がり）
     kidLabel: くりあがりの たしざん
     prereqs: []
@@ -33,38 +48,65 @@ skills:
 
   - id: math.add.2d2d_carry
     subject: math
+    group: 1学期のふくしゅう
+    review: true
     label: たし算の筆算（2けた・くり上がり）
     kidLabel: ひっさんの たしざん
-    prereqs: [math.add.1d1d_carry]
+    prereqs: []
     generator: add2d2dCarry
     misconceptions: [no_carry, concat_ones, calc_slip]
 
   - id: math.sub.2d2d_borrow
     subject: math
+    group: 1学期のふくしゅう
+    review: true
     label: ひき算の筆算（2けた・くり下がり）
     kidLabel: ひっさんの ひきざん
-    prereqs: [math.add.2d2d_carry]
+    prereqs: []
     generator: sub2d2dBorrow
     misconceptions: [smaller_from_larger, borrow_no_decrement, calc_slip]
 
-  - id: math.mul.dan2
+  # ───── 100をこえる筆算 ─────
+  - id: math.add.2d2d_to3d
     subject: math
-    label: 九九 2の段
-    kidLabel: 2の だん
-    prereqs: [math.add.1d1d_carry]
-    generator: mulDan2
-    misconceptions: [neighbor_fact, add_instead]
+    group: 100をこえる ひっさん
+    label: たし算の筆算（答えが3けた・くり上がり2回まで）
+    kidLabel: 100を こえる たしざん
+    prereqs: [math.add.2d2d_carry]
+    generator: add2d2dTo3d
+    misconceptions: [no_carry, concat_ones, calc_slip]
 
+  - id: math.sub.3d2d_borrow
+    subject: math
+    group: 100をこえる ひっさん
+    label: ひき算の筆算（3けた−2けた・くり下がり2回）
+    kidLabel: 100より 大きい かずの ひきざん
+    prereqs: [math.sub.2d2d_borrow, math.add.2d2d_to3d]
+    generator: sub3d2dBorrow
+    misconceptions: [smaller_from_larger, borrow_no_decrement, calc_slip]
+
+  # ───── かけ算 ─────
   - id: math.mul.dan5
     subject: math
+    group: 九九
     label: 九九 5の段
     kidLabel: 5の だん
-    prereqs: [math.add.1d1d_carry]
+    prereqs: []
     generator: mulDan5
+    misconceptions: [neighbor_fact, add_instead]
+
+  - id: math.mul.dan2
+    subject: math
+    group: 九九
+    label: 九九 2の段
+    kidLabel: 2の だん
+    prereqs: []
+    generator: mulDan2
     misconceptions: [neighbor_fact, add_instead]
 
   - id: math.mul.dan3
     subject: math
+    group: 九九
     label: 九九 3の段
     kidLabel: 3の だん
     prereqs: [math.mul.dan2]
@@ -73,22 +115,34 @@ skills:
 
   - id: math.mul.dan4
     subject: math
+    group: 九九
     label: 九九 4の段
     kidLabel: 4の だん
-    prereqs: [math.mul.dan2]
+    prereqs: [math.mul.dan3]
     generator: mulDan4
     misconceptions: [neighbor_fact, neighbor_dan, add_instead]
 
+  - id: math.mul.word
+    subject: math
+    group: かけ算の文章題
+    label: かけ算の文章題（式を選んで答える）
+    kidLabel: かけざんの ぶんしょうもんだい
+    prereqs: [math.mul.dan5, math.mul.dan2]
+    generator: mulWord
+    misconceptions: [order_reversed, add_instead, neighbor_fact, neighbor_dan]
+
   - id: math.mul.dan6
     subject: math
+    group: 九九
     label: 九九 6の段
     kidLabel: 6の だん
-    prereqs: [math.mul.dan3, math.mul.dan5]
+    prereqs: [math.mul.dan4, math.mul.dan5]
     generator: mulDan6
     misconceptions: [neighbor_fact, neighbor_dan, add_instead]
 
   - id: math.mul.dan7
     subject: math
+    group: 九九
     label: 九九 7の段
     kidLabel: 7の だん
     prereqs: [math.mul.dan6]
@@ -97,16 +151,46 @@ skills:
 
   - id: math.mul.dan8
     subject: math
+    group: 九九
     label: 九九 8の段
     kidLabel: 8の だん
-    prereqs: [math.mul.dan4, math.mul.dan7]
+    prereqs: [math.mul.dan7]
     generator: mulDan8
     misconceptions: [neighbor_fact, neighbor_dan, add_instead]
 
   - id: math.mul.dan9
     subject: math
+    group: 九九
     label: 九九 9の段
     kidLabel: 9の だん
     prereqs: [math.mul.dan8]
     generator: mulDan9
     misconceptions: [neighbor_fact, neighbor_dan, add_instead]
+
+  - id: math.mul.mix
+    subject: math
+    group: 九九
+    label: 九九ミックス（2〜9の段）
+    kidLabel: 九九 ミックス
+    prereqs: [math.mul.dan6, math.mul.dan7, math.mul.dan8, math.mul.dan9]
+    generator: mulMix
+    misconceptions: [neighbor_fact, neighbor_dan, add_instead]
+
+  - id: math.mul.missing
+    subject: math
+    group: 九九
+    label: □を使った九九（□×7=42）
+    kidLabel: □に はいる かず
+    prereqs: [math.mul.mix]
+    generator: mulMissing
+    misconceptions: [neighbor_fact, product_minus]
+
+  # ───── 長さ ─────
+  - id: math.length.m_cm
+    subject: math
+    group: 長さ
+    label: 長さ（m と cm のかきかえ）
+    kidLabel: m と cm
+    prereqs: [math.add.2d2d_carry]
+    generator: lengthMcm
+    misconceptions: [m_as_10cm, cm_whole]

@@ -2,8 +2,9 @@
  * 教材ファイルの検証。Claude Code で教材を足したら、必ず `npm run validate` を実行する。
  */
 import { describe, expect, it } from "vitest";
-import { HINTS, LINES, MISCONCEPTIONS, SKILLS } from "../src/domain/content";
+import { HINTS, LINES, MISCONCEPTIONS, SKILLS, STORIES } from "../src/domain/content";
 import { findHint, fill, problemVars } from "../src/domain/hints";
+import { simulateWrong } from "../src/domain/math/diagnose";
 import { generators } from "../src/domain/math/generators";
 import { seededRng } from "../src/domain/random";
 
@@ -13,6 +14,7 @@ const LINE_VARS = new Set(["name", "teacher", "skill", "episode", "favorite", "a
 const MAX_LEN = 70;
 
 const allText = [...HINTS.map((h) => h.text), ...LINES.flatMap((l) => l.variants)];
+const STORY_MAX_LEN = 90;
 
 describe("教材ファイル", () => {
   it("禁止表現・URL・長すぎる文がない", () => {
@@ -20,6 +22,12 @@ describe("教材ファイル", () => {
       for (const w of FORBIDDEN) expect(t, t).not.toContain(w);
       expect(t).not.toMatch(/https?:|www\.|@/);
       expect(t.length, t).toBeLessThanOrEqual(MAX_LEN);
+    }
+    for (const st of STORIES) {
+      for (const w of FORBIDDEN) expect(st.text).not.toContain(w);
+      expect(st.text.length, st.text).toBeLessThanOrEqual(STORY_MAX_LEN);
+      expect(st.text).toContain("{a}");
+      expect(st.text).toContain("{b}");
     }
   });
 
@@ -37,16 +45,23 @@ describe("教材ファイル", () => {
     }
   });
 
-  it("すべてのスキル × 原因 × 段階にヒントがあり、変数が埋まる", () => {
+  it("すべてのスキル × ステップ × 原因 × 段階にヒントがあり、変数が埋まる", () => {
     const rng = seededRng(3);
     for (const s of SKILLS) {
-      const p = generators[s.generator](s.id, rng);
-      for (const mc of [...s.misconceptions, "unknown"]) {
-        for (const level of [1, 2, 3] as const) {
-          const h = findHint(p, mc, level);
-          expect(h, `${s.id} ${mc} L${level}`).toBeDefined();
-          expect(fill(h!.text, problemVars(p)), h!.text).not.toMatch(/\{/);
-        }
+      for (let i = 0; i < 30; i++) {
+        const p = generators[s.generator](s.id, rng);
+        p.steps.forEach((_, step) => {
+          // この問題で起こりうる間違い方だけ（例：一の位がくり上がらない問題に「一の位の合計をそのまま書く」はない）
+          const possible = s.misconceptions.filter((mc) => simulateWrong(p, step, mc) !== null);
+          for (const mc of [...possible, "unknown"]) {
+            for (const level of [1, 2, 3] as const) {
+              const h = findHint(p, step, mc, level);
+              expect(h, `${s.id} ${p.kind} step${step} ${mc} L${level}`).toBeDefined();
+              const text = fill(h!.text, problemVars(p));
+              expect(text, h!.text).not.toMatch(/\{|-\d|NaN/);
+            }
+          }
+        });
       }
     }
   });
@@ -56,13 +71,16 @@ describe("教材ファイル", () => {
     for (const s of SKILLS) {
       for (let i = 0; i < 50; i++) {
         const p = generators[s.generator](s.id, rng);
-        for (const mc of [...s.misconceptions, "unknown"]) {
-          for (const level of [1, 2, 3] as const) {
-            const text = fill(findHint(p, mc, level)!.text, problemVars(p));
-            const numbers = text.match(/\d+/g) ?? [];
-            expect(numbers, `${text}（答え ${p.answer}）`).not.toContain(String(p.answer));
+        p.steps.forEach((st, step) => {
+          if (st.type !== "number") return;
+          for (const mc of [...s.misconceptions, "unknown"]) {
+            for (const level of [1, 2, 3] as const) {
+              const text = fill(findHint(p, step, mc, level)!.text, problemVars(p));
+              const numbers = text.match(/\d+/g) ?? [];
+              expect(numbers, `${text}（答え ${st.answer}）`).not.toContain(String(st.answer));
+            }
           }
-        }
+        });
       }
     }
   });
@@ -83,7 +101,7 @@ describe("教材ファイル", () => {
     const required = [
       "greet_first", "greet", "mood_question", "mood_genki", "mood_futsu", "mood_tsukare",
       "phase_warmup", "phase_review", "phase_main", "phase_choice", "phase_finale",
-      "correct", "correct_fast", "correct_after_hint", "correct_after_struggle", "wrong_nudge",
+      "correct", "step_ok", "correct_fast", "correct_after_hint", "correct_after_struggle", "wrong_nudge",
       "reveal", "twin", "think_question", "think_thanks", "think_unknown", "time_up", "finish", "goodbye",
       "growth_first_no_hint", "growth_faster", "growth_mastered", "growth_persisted", "growth_streak",
     ];

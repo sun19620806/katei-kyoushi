@@ -12,6 +12,7 @@ const prob = (a: number, b: number): Problem => ({
   b,
   answer: a - b,
   layout: "vertical",
+  steps: [{ type: "number", answer: a - b, prompt: "" }],
 });
 
 const outcome = (over: Partial<ProblemOutcome> = {}): ProblemOutcome => ({

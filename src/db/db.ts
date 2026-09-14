@@ -1,5 +1,4 @@
 import Dexie, { type Table } from "dexie";
-import { SKILLS } from "../domain/content";
 import { ymd, streakDays } from "../domain/dates";
 import type { SessionResult } from "../domain/finalize";
 import type { Episode, LearnEvent, Profile, SkillId, SkillState, Stumble } from "../domain/types";
@@ -43,12 +42,23 @@ export const DEFAULT_PROFILE: Profile = {
   speech: true,
   speechRate: 1,
   parentPin: "",
-  enabledSkills: SKILLS.map((s) => s.id),
+  disabledSkills: [],
 };
+
+/** v0.1 で使っていたスキル（「出す」スキルの一覧を、「出さない」一覧に変えるため） */
+const V01_SKILLS = [
+  "math.add.1d1d_carry", "math.add.2d2d_carry", "math.sub.2d2d_borrow",
+  "math.mul.dan2", "math.mul.dan3", "math.mul.dan4", "math.mul.dan5",
+  "math.mul.dan6", "math.mul.dan7", "math.mul.dan8", "math.mul.dan9",
+];
 
 export async function getProfile(): Promise<Profile | null> {
   const row = await db.kv.get("profile");
-  return row ? { ...DEFAULT_PROFILE, ...(row.value as Profile) } : null;
+  if (!row) return null;
+  const stored = row.value as Profile & { enabledSkills?: string[] };
+  const { enabledSkills, ...rest } = stored;
+  const disabledSkills = stored.disabledSkills ?? (enabledSkills ? V01_SKILLS.filter((id) => !enabledSkills.includes(id)) : []);
+  return { ...DEFAULT_PROFILE, ...rest, disabledSkills };
 }
 
 export const saveProfile = (p: Profile) => db.kv.put({ key: "profile", value: p });

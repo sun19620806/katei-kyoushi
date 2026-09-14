@@ -124,6 +124,13 @@ lines:
       - "さいごまで かんがえて、じぶんで こたえを 出したね。それが いちばん だいじな ところ。"
       - "むずかしかったのに、あきらめなかったね。"
 
+  - id: step.ok
+    scene: step_ok
+    variants:
+      - "そう、その しき。"
+      - "しきは ばっちり。"
+      - "いい しきだね。"
+
   - id: wrong.nudge
     scene: wrong_nudge
     variants:

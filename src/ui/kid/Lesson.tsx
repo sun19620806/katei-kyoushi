@@ -17,37 +17,59 @@ import { finalizeSession } from "../../domain/finalize";
 import { pickLine } from "../../domain/lines";
 import { planLesson } from "../../domain/planner";
 import { uid } from "../../domain/random";
-import type { Episode, Mood, Profile, SkillState, Stumble } from "../../domain/types";
+import type { Episode, LessonPhase, Mood, Profile, SkillState, Stumble } from "../../domain/types";
 import {
   afterThink,
   answer,
   choose,
   currentPhase,
+  currentStep,
   type LessonState,
   next,
   requestHint,
   startLesson,
 } from "../../engine/lesson";
+import { ArrowIcon, BulbIcon, CloseIcon, MoodFace, SpeakerIcon, StarIcon } from "../icons";
 import { speak, stopSpeaking } from "../speech";
 import Teacher, { type Face } from "../Teacher";
+import ChoicePad from "./ChoicePad";
 import NumPad from "./NumPad";
 import ProblemView, { problemSpeech } from "./ProblemView";
+import WeekStamps from "./WeekStamps";
 
 type Ui = "loading" | "mood" | "run" | "summary";
+type Said = { display: string; speech: string };
+
+const PHASE_LABEL: Record<LessonPhase, string> = {
+  warmup: "ウォームアップ",
+  review: "ふくしゅう",
+  main: "きょうの メイン",
+  choice: "えらんだ もんだい",
+  finale: "さいごの 1もん",
+};
 
 const THINK_CARDS: Record<string, string[]> = {
-  add: ["10を つくった", "一のくらいから たした", "ゆびで かぞえた", "わからない"],
+  add: ["一のくらいから たした", "10を つくった", "ゆびで かぞえた", "わからない"],
   sub: ["10を かりた", "たしざんで たしかめた", "なんとなく", "わからない"],
   mul: ["九九を となえた", "まえの こたえに たした", "おぼえていた", "わからない"],
+  mul_missing: ["九九を となえて さがした", "おぼえていた", "なんとなく", "わからない"],
+  mul_word: ["1つ分を さがした", "え を おもいうかべた", "なんとなく", "わからない"],
+  len_to_cm: ["1m=100cmを つかった", "ものさしを おもいうかべた", "なんとなく", "わからない"],
+  len_to_mcm: ["1m=100cmを つかった", "ものさしを おもいうかべた", "なんとなく", "わからない"],
 };
 
 interface Summary {
   count: number;
-  lines: string[];
+  noHint: number;
+  minutes: number;
   growth: Episode[];
+  days: string[];
 }
 
-export default function Lesson({ profile, onExit }: { profile: Profile; onExit: () => void }) {
+/**
+ * trial にスキルを渡すと「おためし」：そのスキルを3問だけ出し、記録は残さない（おうちの人が中身を確かめる用）。
+ */
+export default function Lesson({ profile, onExit, trial }: { profile: Profile; onExit: () => void; trial?: string }) {
   const rng = Math.random;
   const [ui, setUi] = useState<Ui>("loading");
   const [bubble, setBubble] = useState("");
@@ -66,16 +88,18 @@ export default function Lesson({ profile, onExit }: { profile: Profile; onExit: 
   const vars = { name: profile.name, teacher: profile.teacherName, favorite: profile.favorites[0] };
   const speechVars = { name: profile.nameYomi || profile.name };
 
+  const record = trial ? () => undefined : addEvent;
+
   /** 場面のセリフを選ぶ（使った記録も残す） */
-  const line = (scene: string, extra: Record<string, string | undefined> = {}) => {
+  const line = (scene: string, extra: Record<string, string | undefined> = {}): Said => {
     const l = pickLine(scene, { ...vars, ...extra }, recent.current, rng, speechVars);
     if (!l) return { display: "", speech: "" };
     recent.current = [l.key, ...recent.current].slice(0, 40);
-    logLine(l.key);
+    if (!trial) logLine(l.key);
     return l;
   };
 
-  const show = (parts: { display: string; speech: string }[], f: Face = "smile") => {
+  const show = (parts: Said[], f: Face = "smile") => {
     const display = parts.map((p) => p.display).filter(Boolean).join(" ");
     const speech = parts.map((p) => p.speech).filter(Boolean).join("。 ");
     setBubble(display);
@@ -98,6 +122,15 @@ export default function Lesson({ profile, onExit }: { profile: Profile; onExit: 
       if (cancelled) return;
       model.current = m;
       recent.current = keys;
+      if (trial) {
+        const plan = { ...planLesson({ profile, ...m, mood: "futsu", today: ymd() }), sessionId: sessionId.current };
+        const trialPlan = { ...plan, items: [0, 1, 2].map(() => ({ phase: "main" as const, skillId: trial })), choiceOptions: { easy: trial, challenge: trial } };
+        const s = startLesson(trialPlan, Date.now(), rng);
+        setLesson(s);
+        setUi("run");
+        announce(s, [{ display: "おためし モード（きろくは のこりません）", speech: "" }]);
+        return;
+      }
       if (sessions === 0) {
         show([line("greet_first"), line("intro_parent"), line("mood_question")]);
       } else {
@@ -115,7 +148,7 @@ export default function Lesson({ profile, onExit }: { profile: Profile; onExit: 
   }, []);
 
   /** 新しい問題を出したときの声かけ */
-  const announce = (s: LessonState, prefix: { display: string; speech: string }[] = []) => {
+  const announce = (s: LessonState, prefix: Said[] = []) => {
     if (s.stage === "done") return finish(s, prefix);
     if (s.stage === "choice") {
       lastPhase.current = "choice";
@@ -129,13 +162,12 @@ export default function Lesson({ profile, onExit }: { profile: Profile; onExit: 
       parts.push(line(`phase_${phase}`, { skill: skill(s.problem.skillId).kidLabel, strong: s.plan.warmupIsStrong ? "1" : undefined }));
     }
     lastPhase.current = phase;
-    const p = s.problem;
-    parts.push({ display: "", speech: p.layout === "vertical" ? `ひっさんで けいさんしよう。${problemSpeech(p)}` : problemSpeech(p) });
+    parts.push({ display: parts.length ? "" : s.problem.steps[0].prompt, speech: problemSpeech(s.problem, 0) });
     show(parts, "smile");
   };
 
   const pickMood = (mood: Mood) => {
-    addEvent({ id: uid(), type: "session", sessionId: sessionId.current, at: new Date().toISOString(), kind: "start", mood });
+    record({ id: uid(), type: "session", sessionId: sessionId.current, at: new Date().toISOString(), kind: "start", mood });
     const plan = { ...planLesson({ profile, ...model.current, mood, today: ymd() }), sessionId: sessionId.current };
     const s = startLesson(plan, Date.now(), rng);
     startedAt.current = Date.now();
@@ -144,10 +176,12 @@ export default function Lesson({ profile, onExit }: { profile: Profile; onExit: 
     announce(s, [line(`mood_${mood}`)]);
   };
 
-  const submit = () => {
-    if (!lesson || !input) return;
-    const { state, event } = answer(lesson, Number(input), Date.now());
-    addEvent(event);
+  const submit = (given?: number) => {
+    if (!lesson || lesson.stage !== "answering") return;
+    const value = given ?? (input === "" ? NaN : Number(input));
+    if (Number.isNaN(value)) return;
+    const { state, event } = answer(lesson, value, Date.now());
+    record(event);
     setInput("");
     setLesson(state);
     if (state.stage === "correct") {
@@ -156,7 +190,7 @@ export default function Lesson({ profile, onExit }: { profile: Profile; onExit: 
       const scene =
         o.maxHintLevel >= 2
           ? "correct_after_struggle"
-          : o.maxHintLevel >= 1
+          : o.maxHintLevel >= 1 || !o.firstTryCorrect
             ? "correct_after_hint"
             : median && o.firstMs < median * 0.7
               ? "correct_fast"
@@ -164,6 +198,9 @@ export default function Lesson({ profile, onExit }: { profile: Profile; onExit: 
       show([line(scene)], scene === "correct" ? "smile" : "wow");
     } else if (state.stage === "revealed") {
       show([line("reveal", { answer: String(state.problem!.answer) })], "calm");
+    } else if (state.stepAdvanced) {
+      const st = currentStep(state)!;
+      show([line("step_ok"), { display: st.prompt, speech: st.prompt }], "smile");
     } else if (state.hint) {
       show([line("wrong_nudge"), { display: "", speech: state.hint.text }], "think");
     }
@@ -181,13 +218,14 @@ export default function Lesson({ profile, onExit }: { profile: Profile; onExit: 
     const timeUp = Date.now() - startedAt.current > profile.maxMinutes * 60_000;
     const s = next(lesson, Date.now(), rng, timeUp);
     setLesson(s);
+    setInput("");
     if (s.stage === "think") return show([line("think_question")], "think");
     announce(s, s.timeUp && !lesson.timeUp ? [line("time_up")] : []);
   };
 
   const think = (card: string) => {
     if (!lesson) return;
-    addEvent({ id: uid(), type: "session", sessionId: sessionId.current, at: new Date().toISOString(), kind: "note", thinkCard: card });
+    record({ id: uid(), type: "session", sessionId: sessionId.current, at: new Date().toISOString(), kind: "note", thinkCard: card });
     const s = afterThink(lesson, Date.now(), rng);
     setLesson(s);
     announce(s, [line(card === "わからない" ? "think_unknown" : "think_thanks")]);
@@ -195,134 +233,224 @@ export default function Lesson({ profile, onExit }: { profile: Profile; onExit: 
 
   const pick = (which: "easy" | "challenge") => {
     if (!lesson) return;
-    addEvent({ id: uid(), type: "session", sessionId: sessionId.current, at: new Date().toISOString(), kind: "note", choice: which });
+    record({ id: uid(), type: "session", sessionId: sessionId.current, at: new Date().toISOString(), kind: "note", choice: which });
     const s = choose(lesson, which, Date.now(), rng);
     setLesson(s);
     announce(s);
   };
 
-  async function finish(s: LessonState, prefix: { display: string; speech: string }[]) {
+  async function finish(s: LessonState, prefix: Said[]) {
     setUi("summary");
+    if (trial) {
+      const main = s.outcomes.filter((o) => !o.isTwin);
+      setSummary({ count: main.length, noHint: main.filter((o) => o.firstTryCorrect).length, minutes: Math.max(1, Math.round((Date.now() - startedAt.current) / 60_000)), growth: [], days: [] });
+      return show([{ display: "おためし おわり。", speech: "おためし おわり。" }]);
+    }
     const today = ymd();
     const firstToday = !(await studyDays()).includes(today);
-    const minutes = Math.round((Date.now() - startedAt.current) / 60_000);
+    const minutes = Math.max(1, Math.round((Date.now() - startedAt.current) / 60_000));
     await addEvent({ id: uid(), type: "session", sessionId: sessionId.current, at: new Date().toISOString(), kind: "finish", minutes });
     const streak = await currentStreak(today);
     const result = finalizeSession(model.current.states, model.current.stumbles, s.outcomes, today, firstToday ? streak : 0);
     await saveSessionResult(result);
 
-    const count = s.outcomes.filter((o) => !o.isTwin).length;
+    const main = s.outcomes.filter((o) => !o.isTwin);
     const growthLines = result.episodes.slice(0, 2).map((e) =>
       line(`growth_${e.kind}`, { skill: e.skillId ? skill(e.skillId).kidLabel : undefined, streak: String(streak) }),
     );
-    const parts = [...prefix, line("finish", { count: String(count) }), ...growthLines, line("goodbye")];
-    setSummary({ count, lines: parts.map((p) => p.display).filter(Boolean), growth: result.episodes });
-    show(parts, "smile");
+    setSummary({
+      count: main.length,
+      noHint: main.filter((o) => o.firstTryCorrect).length,
+      minutes,
+      growth: result.episodes,
+      days: await studyDays(),
+    });
+    show([...prefix, line("finish", { count: String(main.length) }), ...growthLines, line("goodbye")], "smile");
   }
 
-  const choiceLabel = (id: string) => skill(id).kidLabel;
+  // 外付けキーボード（と開発中の Mac）でも答えられるように
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (!lesson || lesson.stage !== "answering" || currentStep(lesson)?.type !== "number") return;
+      if (/^\d$/.test(e.key)) setInput((v) => (v + e.key).replace(/^0+(?=\d)/, "").slice(0, 3));
+      else if (e.key === "Backspace") setInput((v) => v.slice(0, -1));
+      else if (e.key === "Enter") submit();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  });
+
+  const exit = () => {
+    stopSpeaking();
+    onExit();
+  };
+
   const stage = lesson?.stage;
-  const cards = lesson?.problem ? THINK_CARDS[lesson.problem.kind] : THINK_CARDS.add;
+  const step = lesson ? currentStep(lesson) : undefined;
   const total = lesson?.plan.items.length ?? 0;
+  const working = ui === "run" && !!lesson?.problem && (stage === "answering" || stage === "correct" || stage === "revealed");
+  const phase = lesson ? currentPhase(lesson) : "warmup";
 
   return (
     <main className="kid lesson">
-      <header className="lesson-top">
-        <button className="corner-link" onClick={() => { stopSpeaking(); onExit(); }}>
-          やめる
+      <header className="topbar">
+        <button className="quit" onClick={exit}>
+          <CloseIcon /> やめる
         </button>
         {ui === "run" && lesson && (
-          <div className="progress" aria-label={`${Math.min(lesson.index + 1, total)} / ${total}`}>
-            {lesson.plan.items.map((_, i) => (
-              <span key={i} className={i < lesson.index ? "done" : i === lesson.index ? "now" : ""} />
-            ))}
+          <div className="progress-wrap">
+            <span className={`phase-chip ${phase}`}>{lesson.isTwin ? "もう いちど" : PHASE_LABEL[phase]}</span>
+            <div className="progress" aria-hidden="true">
+              {lesson.plan.items.map((it, i) => (
+                <span key={i} className={`${it.phase} ${i < lesson.index ? "done" : i === lesson.index ? "now" : ""}`} />
+              ))}
+            </div>
+            <span className="count">
+              {Math.min(lesson.index + 1, total)}
+              <small>/{total}</small>
+            </span>
           </div>
         )}
       </header>
 
-      <section className="teacher-row">
-        <Teacher face={face} size={112} />
-        <div className="bubble" aria-live="polite">
-          {bubble}
-          {lesson?.hint && stage === "answering" && <p className="hint">{lesson.hint.text}</p>}
-          <button className="replay" onClick={() => speak(lastSpeech.current)} aria-label="もういちど きく">
-            もういちど きく
-          </button>
-        </div>
-      </section>
-
-      {ui === "mood" && (
-        <section className="cards three">
-          <button className="card" onClick={() => pickMood("genki")}><b>げんき</b></button>
-          <button className="card" onClick={() => pickMood("futsu")}><b>ふつう</b></button>
-          <button className="card" onClick={() => pickMood("tsukare")}><b>つかれた</b></button>
+      <div className={`lesson-grid ${working ? "" : "wide"}`}>
+        <section className="talk">
+          <Teacher face={face} size={92} />
+          <div className="bubble" aria-live="polite">
+            <p>{bubble}</p>
+            {working && stage === "answering" && lesson?.hint && (
+              <div className="hint">
+                <span className="hint-chip">
+                  <BulbIcon size={18} /> ヒント {lesson.hintLevel}/3
+                </span>
+                <p>
+                  <mark>{lesson.hint.text}</mark>
+                </p>
+              </div>
+            )}
+            <button className="replay" onClick={() => speak(lastSpeech.current)} aria-label="もういちど きく">
+              <SpeakerIcon />
+            </button>
+          </div>
         </section>
-      )}
 
-      {ui === "run" && lesson && stage === "choice" && (
-        <section className="cards two">
-          <button className="card" onClick={() => pick("easy")}>
-            <small>とくいな</small>
-            <b>{choiceLabel(lesson.plan.choiceOptions.easy)}</b>
-          </button>
-          <button className="card challenge" onClick={() => pick("challenge")}>
-            <small>チャレンジ</small>
-            <b>{choiceLabel(lesson.plan.choiceOptions.challenge)}</b>
-          </button>
+        <section className="board">
+          {ui === "mood" && (
+            <div className="cards three">
+              {(["genki", "futsu", "tsukare"] as Mood[]).map((m) => (
+                <button key={m} className="card mood" onClick={() => pickMood(m)}>
+                  <MoodFace mood={m} size={84} />
+                  <b>{m === "genki" ? "げんき" : m === "futsu" ? "ふつう" : "つかれた"}</b>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {ui === "run" && lesson && stage === "choice" && (
+            <div className="cards two">
+              <button className="card pick" onClick={() => pick("easy")}>
+                <small>とくいな もんだい</small>
+                <b>{skill(lesson.plan.choiceOptions.easy).kidLabel}</b>
+              </button>
+              <button className="card pick challenge" onClick={() => pick("challenge")}>
+                <small>
+                  <StarIcon size={20} /> チャレンジ
+                </small>
+                <b>{skill(lesson.plan.choiceOptions.challenge).kidLabel}</b>
+              </button>
+            </div>
+          )}
+
+          {ui === "run" && lesson && stage === "think" && (
+            <div className="cards four">
+              {(THINK_CARDS[lesson.outcomes.at(-1)?.problem.kind ?? "add"] ?? THINK_CARDS.add).map((c) => (
+                <button key={c} className="card think" onClick={() => think(c)}>
+                  <b>{c}</b>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {working && lesson?.problem && (
+            <ProblemView
+              problem={lesson.problem}
+              step={lesson.step}
+              input={input}
+              visual={stage === "answering" ? (lesson.hint?.visual ?? null) : null}
+              state={stage as "answering" | "correct" | "revealed"}
+              noHint={!!lesson.outcomes.at(-1)?.firstTryCorrect}
+            />
+          )}
+
+          {ui === "summary" && summary && (
+            <div className="summary">
+              <p className="summary-title">きょうの ノート</p>
+              <div className="summary-stats">
+                <div>
+                  <b>{summary.count}</b>
+                  <small>もん</small>
+                </div>
+                <div>
+                  <b>{summary.noHint}</b>
+                  <small>ヒントなし</small>
+                </div>
+                <div>
+                  <b>{summary.minutes}</b>
+                  <small>ふん</small>
+                </div>
+              </div>
+              {summary.growth.length > 0 && (
+                <ul className="growth">
+                  {summary.growth.map((g) => (
+                    <li key={g.id}>{g.text}</li>
+                  ))}
+                </ul>
+              )}
+              {!trial && <WeekStamps days={summary.days} />}
+              <button className="btn-start" onClick={exit}>
+                おわる
+              </button>
+            </div>
+          )}
         </section>
-      )}
 
-      {ui === "run" && lesson && stage === "think" && (
-        <section className="cards four">
-          {cards.map((c) => (
-            <button key={c} className="card" onClick={() => think(c)}><b>{c}</b></button>
-          ))}
-        </section>
-      )}
-
-      {ui === "run" && lesson?.problem && (stage === "answering" || stage === "correct" || stage === "revealed") && (
-        <section className="work">
-          <ProblemView
-            problem={lesson.problem}
-            input={stage === "correct" ? String(lesson.problem.answer) : input}
-            visual={stage === "answering" ? (lesson.hint?.visual ?? null) : null}
-            revealed={stage === "revealed"}
-            state={stage}
-          />
-          <div className="controls">
-            {stage === "answering" ? (
+        {working && lesson?.problem && (
+          <section className="panel">
+            {stage === "answering" && step ? (
               <>
-                <NumPad value={input} onChange={setInput} onSubmit={submit} />
-                <button className="btn hint-btn" onClick={hint} disabled={lesson.hintLevel >= 3}>
-                  ヒント
+                <div className="step-head">
+                  {lesson.problem.steps.length > 1 && (
+                    <ol className="step-dots">
+                      {lesson.problem.steps.map((_, i) => (
+                        <li key={i} className={i < lesson.step ? "done" : i === lesson.step ? "now" : ""}>
+                          {i + 1}
+                        </li>
+                      ))}
+                    </ol>
+                  )}
+                  <span className="step-prompt">{step.prompt}</span>
+                </div>
+                {step.type === "choice" ? (
+                  <ChoicePad choices={step.choices ?? []} onPick={(i) => submit(i)} />
+                ) : (
+                  <NumPad value={input} onChange={setInput} onSubmit={() => submit()} />
+                )}
+                <button className="hint-btn" onClick={hint} disabled={lesson.hintLevel >= 3}>
+                  <BulbIcon /> ヒント
                 </button>
               </>
             ) : (
-              <button className="btn next" onClick={goNext}>
-                {stage === "revealed" && !lesson.isTwin ? "にた もんだいへ" : "つぎへ"}
-              </button>
+              <div className="after">
+                <p className={`after-label ${stage}`}>{stage === "correct" ? "せいかい" : "こたえを たしかめよう"}</p>
+                <button className="btn-next" onClick={goNext} autoFocus>
+                  {stage === "revealed" && !lesson.isTwin ? "にた もんだいへ" : "つぎへ"}
+                  <ArrowIcon />
+                </button>
+              </div>
             )}
-          </div>
-        </section>
-      )}
-
-      {ui === "summary" && summary && (
-        <section className="summary">
-          <p className="big-count">
-            {summary.count}<small>もん</small>
-          </p>
-          {summary.growth.length > 0 && (
-            <ul className="growth">
-              {summary.growth.map((g) => (
-                <li key={g.id}>{g.text}</li>
-              ))}
-            </ul>
-          )}
-          <button className="btn start" onClick={() => { stopSpeaking(); onExit(); }}>
-            おわる
-          </button>
-        </section>
-      )}
+          </section>
+        )}
+      </div>
     </main>
   );
 }
