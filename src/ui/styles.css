@@ -83,36 +83,57 @@ button:disabled { cursor: default; }
 /* ───────── ホーム ───────── */
 .home {
   display: grid;
-  grid-template-columns: 1fr minmax(360px, 460px);
-  gap: 32px;
+  grid-template-columns: minmax(0, 1fr) minmax(380px, 500px);
+  gap: 28px 40px;
   align-items: center;
   align-content: center;
   position: relative;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 @media (orientation: portrait), (max-width: 860px) {
-  .home { grid-template-columns: 1fr; justify-items: center; gap: 20px; }
+  .home { grid-template-columns: minmax(0, 1fr); justify-items: center; gap: 22px; padding-top: 64px; }
+  .home-main { width: min(560px, 100%); }
 }
-.home-teacher { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+.home-teacher { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.teacher-button { border: none; background: none; padding: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.teacher-button:active .teacher { transform: scale(.96); }
+.teacher-button .teacher { transition: transform .12s; width: clamp(150px, 18vw, 210px); height: auto; }
+.teacher-tag { font-size: 15px; font-weight: 800; color: var(--ink-2); background: var(--card); border: 2px solid var(--grid-strong); border-radius: 999px; padding: 3px 14px; }
 .home-bubble {
+  position: relative;
   margin: 0;
   background: var(--card);
   border: 3px solid var(--ink);
   border-radius: 24px;
-  padding: 16px 26px;
-  font-size: 26px;
+  padding: 14px 26px;
+  font-size: clamp(21px, 1.4vw + 10px, 27px);
   font-weight: 800;
   text-align: center;
   text-wrap: balance;
-  max-width: 460px;
+  max-width: 480px;
 }
+.home-bubble::before {
+  content: "";
+  position: absolute;
+  top: -13px;
+  left: calc(50% - 10px);
+  width: 20px;
+  height: 20px;
+  background: var(--card);
+  border-left: 3px solid var(--ink);
+  border-top: 3px solid var(--ink);
+  transform: rotate(45deg);
+}
+.home-main { display: flex; flex-direction: column; gap: 16px; width: 100%; }
 .home-card {
   background: var(--card);
   border-radius: 28px;
-  padding: 28px 30px 30px 44px;
+  padding: 24px 28px 28px 48px;
   box-shadow: var(--shadow);
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 18px;
   width: 100%;
   position: relative;
   overflow: hidden;
@@ -123,29 +144,103 @@ button:disabled { cursor: default; }
   position: absolute;
   top: 0;
   bottom: 0;
-  left: 24px;
+  left: 26px;
   width: 2px;
   background: var(--margin-line);
 }
-.home-teacher-name { margin: 0; font-size: 16px; font-weight: 700; color: var(--ink-2); letter-spacing: .06em; }
-.menu { display: flex; flex-direction: column; gap: 2px; }
-.menu small { font-size: 15px; color: var(--ink-2); font-weight: 700; }
-.menu b { font-size: clamp(24px, 2.4vw + 6px, 30px); font-weight: 900; line-height: 1.35; background: linear-gradient(transparent 62%, var(--marker) 62%); align-self: flex-start; padding: 0 4px; display: inline-flex; align-items: center; gap: 10px; }
+.menu { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; }
+.menu small { font-size: 15px; color: var(--ink-2); font-weight: 800; }
+.menu b { font-size: clamp(24px, 2.4vw + 6px, 30px); font-weight: 900; line-height: 1.35; background: linear-gradient(transparent 62%, var(--marker) 62%); padding: 0 4px; display: inline-flex; align-items: center; gap: 10px; }
 .menu b em { font-style: normal; font-size: 14px; font-weight: 800; color: var(--pencil-deep); background: var(--pencil-tint); border-radius: 999px; padding: 2px 10px; }
-.streak { margin: 0; font-size: 18px; font-weight: 800; color: var(--redpen); }
+.menu b.closed { background: none; color: var(--ink-3); }
 .home .btn-start { width: 100%; }
+.home-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.tile {
+  background: var(--card);
+  border: none;
+  border-radius: 22px;
+  box-shadow: var(--shadow);
+  padding: 14px 12px 12px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+  align-items: center;
+  column-gap: 12px;
+  text-align: left;
+  min-height: 88px;
+}
+.tile:active { transform: translateY(2px); }
+.tile-art { grid-row: 1 / 3; display: flex; align-items: center; min-width: 64px; }
+.tile b { font-size: clamp(16px, .9vw + 7px, 19px); font-weight: 900; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tile small { font-size: 14px; color: var(--ink-2); font-weight: 800; }
+.map-art { display: grid; grid-template-columns: repeat(3, 16px); gap: 4px; }
+.map-art i { width: 16px; height: 16px; border-radius: 50%; border: 2px dashed var(--grid-strong); }
+.map-art i.on { border: 3px solid var(--redpen); }
 .parent-link {
   position: absolute;
-  right: max(20px, env(safe-area-inset-right));
-  top: max(14px, env(safe-area-inset-top));
-  background: rgba(255, 255, 255, .8);
+  right: 0;
+  top: 0;
+  background: rgba(255, 255, 255, .85);
   border: 2px solid var(--grid-strong);
   border-radius: 999px;
   padding: 8px 16px;
   font-size: 14px;
   font-weight: 700;
   color: var(--ink-2);
+  z-index: 1;
 }
+
+/* ───────── シールちょう・マップ・先生えらび ───────── */
+.subpage { display: flex; flex-direction: column; gap: 18px; max-width: 1100px; margin: 0 auto; }
+.sub-head { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 14px; }
+.sub-head h1 { margin: 0; font-size: clamp(26px, 2vw + 14px, 34px); font-weight: 900; text-align: center; }
+.back { display: inline-flex; align-items: center; gap: 6px; background: var(--card); border: 2px solid var(--grid-strong); border-radius: 999px; padding: 8px 16px 8px 10px; font-size: 16px; font-weight: 800; color: var(--ink-2); min-height: 48px; }
+.flip { display: inline-grid; transform: scaleX(-1); }
+.count-badge { font-family: var(--num-font); font-weight: 800; font-size: 18px; background: var(--marker); border-radius: 999px; padding: 4px 14px; }
+.empty { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 40px 0; text-align: center; }
+.empty p { margin: 0; font-size: 22px; font-weight: 800; max-width: 26em; }
+.week-card { background: var(--card); border-radius: 22px; box-shadow: var(--shadow); padding: 14px 20px; display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+.week-title { margin: 0; font-size: 20px; font-weight: 900; }
+.sticker-row { display: flex; gap: 4px; flex-wrap: wrap; }
+.sticker-grid { list-style: none; margin: 0; padding: 4px; display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 16px; }
+.sticker-grid li { background: var(--card); border-radius: 20px; box-shadow: var(--shadow); padding: 14px 12px 12px; display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; }
+.sticker-grid b { font-size: 17px; font-weight: 900; }
+.sticker-grid span { font-size: 15px; font-weight: 700; color: var(--ink-2); line-height: 1.45; }
+.sticker-grid small { font-size: 13px; color: var(--ink-3); font-weight: 700; }
+
+.map-legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 22px; font-size: 16px; font-weight: 800; color: var(--ink-2); }
+.map-legend span { display: inline-flex; align-items: center; gap: 8px; }
+.badge { display: inline-block; width: 30px; height: 30px; border-radius: 50%; flex: none; }
+.badge.none { border: 3px dashed var(--grid-strong); }
+.badge.practice { border: 3px solid var(--pencil); background: linear-gradient(90deg, var(--pencil-tint) 50%, #fff 50%); }
+.badge.can { background: var(--pencil); border: 3px solid var(--pencil-deep); }
+.badge.master { background: #fff; border: 5px solid var(--redpen); border-radius: 48% 52% 50% 46%; rotate: -8deg; }
+.map-groups { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; align-items: start; }
+.map-group { background: var(--card); border-radius: 22px; box-shadow: var(--shadow); padding: 16px 18px; }
+.map-group h2 { margin: 0 0 10px; font-size: 19px; font-weight: 900; display: flex; align-items: center; gap: 8px; }
+.map-group h2 em { font-style: normal; font-size: 13px; font-weight: 800; border-radius: 999px; padding: 2px 10px; background: var(--pencil-tint); color: var(--pencil-deep); }
+.map-group.japanese h2 em { background: #FDE8EC; color: #B4284A; }
+.map-group ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.map-group li { display: grid; grid-template-columns: 30px 1fr auto; align-items: center; gap: 10px; font-size: 18px; font-weight: 800; }
+.map-group li small { font-size: 13px; color: var(--ink-3); }
+.map-group li.none span { color: var(--ink-3); }
+
+.look-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.look-card { background: var(--card); border: 4px solid transparent; border-radius: 26px; box-shadow: var(--shadow); padding: 18px 10px 14px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.look-card .teacher { width: min(150px, 100%); height: auto; }
+.look-card b { font-size: 24px; font-weight: 900; }
+.look-card.on { border-color: var(--pencil); background: var(--pencil-tint); }
+.look-note { margin: 0; text-align: center; font-size: 20px; font-weight: 800; color: var(--ink-2); }
+.look-save { align-self: center; }
+
+/* まとめ：あたらしい シール */
+.new-stickers { display: flex; flex-direction: column; gap: 8px; }
+.new-title { margin: 0; font-size: 18px; font-weight: 900; color: var(--redpen); }
+.new-stickers ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.new-stickers li { display: flex; align-items: center; gap: 14px; animation: stick .5s cubic-bezier(.2, 1.4, .4, 1) both; }
+.new-stickers li b { display: block; font-size: 18px; font-weight: 900; }
+.new-stickers li span { font-size: 18px; font-weight: 700; color: var(--ink-2); }
+@keyframes stick { from { transform: scale(.4) rotate(-20deg); opacity: 0; } }
 
 /* 今週のまる */
 .week { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
@@ -551,6 +646,30 @@ button:disabled { cursor: default; }
 .numpad .submit:disabled { background: var(--grid-strong); box-shadow: 0 5px 0 var(--ink-3); color: var(--ink-2); }
 .numpad .erase:disabled { color: var(--grid-strong); }
 
+/* 入れかたの切りかえ */
+.mode-toggle { margin-left: auto; display: inline-flex; background: var(--grid); border-radius: 999px; padding: 3px; flex: none; }
+.mode-toggle button { border: none; background: none; border-radius: 999px; padding: 6px 14px; font-size: 16px; font-weight: 800; color: var(--ink-2); min-height: 38px; }
+.mode-toggle button.on { background: var(--card); color: var(--pencil-deep); box-shadow: 0 1px 2px rgba(30, 41, 64, .15); }
+
+/* 手書き */
+.handwrite { display: flex; flex-direction: column; gap: 10px; }
+.hw-boxes { display: grid; gap: 8px; }
+.ink-box { position: relative; aspect-ratio: 3 / 4; max-height: 230px; background: var(--card); border: 3px solid var(--grid-strong); border-radius: 16px; overflow: visible;
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 50% 50%; background-position: center; }
+.ink-box.has { border-color: var(--pencil); }
+.ink-box.unsure { border-color: #d9b400; }
+.ink-box canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; border-radius: 13px; }
+.ink-read { position: absolute; right: 6px; bottom: 2px; font-family: var(--num-font); font-weight: 800; font-size: 26px; color: var(--pencil-deep); background: var(--pencil-tint); border-radius: 10px; padding: 0 8px; pointer-events: none; }
+.ink-clear { position: absolute; right: -8px; top: -8px; width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--grid-strong); background: var(--card); font-size: 18px; font-weight: 900; color: var(--ink-2); line-height: 1; }
+.ink-alt { position: absolute; left: 50%; bottom: -26px; translate: -50% 0; display: flex; gap: 4px; background: var(--marker-tint); border: 2px solid #d9b400; border-radius: 999px; padding: 3px; z-index: 2; }
+.ink-alt button { width: 38px; height: 38px; border-radius: 50%; border: none; background: var(--card); font-family: var(--num-font); font-size: 22px; font-weight: 800; }
+.hw-actions { display: grid; grid-template-columns: 1fr 1.4fr; gap: 10px; margin-top: 12px; }
+.hw-actions button { min-height: 64px; border-radius: 18px; border: none; font-size: 21px; font-weight: 800; }
+.hw-actions .erase { background: var(--card); color: var(--ink-2); box-shadow: 0 5px 0 var(--grid-strong), inset 0 0 0 2px var(--grid-strong); }
+.hw-actions .submit { background: var(--pencil); color: #fff; box-shadow: 0 5px 0 var(--pencil-deep); }
+.hw-actions button:disabled { background: var(--grid-strong); box-shadow: 0 5px 0 var(--ink-3); color: var(--ink-2); }
+
 .choicepad { display: flex; flex-direction: column; gap: 12px; }
 .choicepad button {
   min-height: 84px;
@@ -639,7 +758,7 @@ button:disabled { cursor: default; }
 @media (orientation: portrait), (max-width: 860px) {
   .panel { width: 100%; max-width: 580px; justify-self: center; display: grid; grid-template-columns: minmax(0, 1fr) 72px; grid-template-areas: "head head" "pad hint"; gap: 10px 12px; align-items: stretch; }
   .panel .step-head { grid-area: head; }
-  .panel .numpad, .panel .choicepad { grid-area: pad; }
+  .panel .numpad, .panel .choicepad, .panel .handwrite { grid-area: pad; }
   .panel .hint-btn { grid-area: hint; flex-direction: column; min-height: 0; padding: 12px 0; font-size: 19px; line-height: 1.1; }
   .panel .hint-btn span { writing-mode: vertical-rl; letter-spacing: .15em; }
   .panel .after { grid-column: 1 / -1; }

@@ -9,6 +9,8 @@ const profile: Profile = {
   name: "テスト",
   nameYomi: "てすと",
   teacherName: "ノート",
+  teacherLook: "note",
+  inputMode: "tap",
   favorites: [],
   problemsPerSession: 10,
   maxMinutes: 15,

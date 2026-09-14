@@ -2,13 +2,16 @@ import { useCallback, useEffect, useState } from "react";
 import { getProfile, requestPersistence } from "../db/db";
 import type { Profile } from "../domain/types";
 import Home from "./kid/Home";
+import KidMap from "./kid/KidMap";
+import StickerBook from "./kid/StickerBook";
+import TeacherPicker from "./kid/TeacherPicker";
 import Lesson from "./kid/Lesson";
 import Parent from "./parent/Parent";
 import PinGate from "./parent/PinGate";
 import Setup from "./parent/Setup";
 import { configureSpeech } from "./speech";
 
-type Screen = "home" | "lesson" | "pin" | "parent" | "trial";
+type Screen = "home" | "lesson" | "pin" | "parent" | "trial" | "stickers" | "map" | "teacher";
 
 export default function App() {
   const [profile, setProfile] = useState<Profile | null | undefined>(undefined);
@@ -52,7 +55,30 @@ export default function App() {
           }}
         />
       );
+    case "stickers":
+      return <StickerBook profile={profile} onBack={() => setScreen("home")} />;
+    case "map":
+      return <KidMap profile={profile} onBack={() => setScreen("home")} />;
+    case "teacher":
+      return (
+        <TeacherPicker
+          profile={profile}
+          onDone={() => {
+            reload();
+            setScreen("home");
+          }}
+        />
+      );
     default:
-      return <Home profile={profile} onStart={() => setScreen("lesson")} onParent={() => setScreen("pin")} />;
+      return (
+        <Home
+          profile={profile}
+          onStart={() => setScreen("lesson")}
+          onParent={() => setScreen("pin")}
+          onStickers={() => setScreen("stickers")}
+          onMap={() => setScreen("map")}
+          onTeacher={() => setScreen("teacher")}
+        />
+      );
   }
 }

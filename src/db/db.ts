@@ -14,6 +14,8 @@ class TutorDB extends Dexie {
   episodes!: Table<Episode, string>;
   lineUsage!: Table<{ id?: number; key: string; at: string }, number>;
   kv!: Table<{ key: string; value: unknown }, string>;
+  /** その子の手書きの字（正解で たしかめられた もの）。認識のお手本に足す */
+  ink!: Table<{ id?: number; digit: number; strokes: { x: number; y: number }[][]; at: string }, number>;
 
   constructor() {
     super("katei-kyoushi");
@@ -25,6 +27,7 @@ class TutorDB extends Dexie {
       lineUsage: "++id, at",
       kv: "key",
     });
+    this.version(2).stores({ ink: "++id, digit, at" });
   }
 }
 
@@ -34,6 +37,8 @@ export const DEFAULT_PROFILE: Profile = {
   name: "",
   nameYomi: "",
   teacherName: "ノート",
+  teacherLook: "note",
+  inputMode: "tap",
   favorites: [],
   problemsPerSession: 10,
   maxMinutes: 15,
@@ -136,4 +141,18 @@ export async function requestPersistence() {
   } catch {
     /* 対応していなければ何もしない */
   }
+}
+
+const INK_PER_DIGIT = 6;
+
+/** 正解だった手書きの字を、その子のお手本として保存（数字ごとに新しい6こまで） */
+export async function saveInk(samples: { digit: number; strokes: { x: number; y: number }[][] }[]) {
+  const at = new Date().toISOString();
+  await db.transaction("rw", db.ink, async () => {
+    for (const s of samples) {
+      await db.ink.add({ ...s, at });
+      const old = await db.ink.where("digit").equals(s.digit).sortBy("at");
+      if (old.length > INK_PER_DIGIT) await db.ink.bulkDelete(old.slice(0, old.length - INK_PER_DIGIT).map((o) => o.id!));
+    }
+  });
 }

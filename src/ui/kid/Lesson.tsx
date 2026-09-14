@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import {
+  saveInk,
+  saveProfile,
   addEvent,
   currentStreak,
   db,
@@ -30,9 +32,12 @@ import {
   startLesson,
 } from "../../engine/lesson";
 import { ArrowIcon, BulbIcon, CloseIcon, MoodFace, SpeakerIcon, StarIcon } from "../icons";
+import { StickerIcon, STICKER_NAME } from "../stickers";
 import { speak, stopSpeaking } from "../speech";
 import Teacher, { type Face } from "../Teacher";
 import ChoicePad from "./ChoicePad";
+import { makeTemplate, type Template } from "../../domain/handwriting/pdollar";
+import HandwritePad, { type Written } from "./HandwritePad";
 import NumPad from "./NumPad";
 import ProblemView, { problemSpeech } from "./ProblemView";
 import WeekStamps from "./WeekStamps";
@@ -91,6 +96,9 @@ export default function Lesson({ profile, onExit, trial }: { profile: Profile; o
   const [input, setInput] = useState("");
   const [summary, setSummary] = useState<Summary | null>(null);
   const [confirmQuit, setConfirmQuit] = useState(false);
+  const [inputMode, setInputMode] = useState<"tap" | "write">(profile.inputMode ?? "tap");
+  const [inkTemplates, setInkTemplates] = useState<Template[]>([]);
+  const written = useRef<Written | null>(null);
 
   const model = useRef<{ states: Record<string, SkillState>; stumbles: Record<string, Stumble> }>({ states: {}, stumbles: {} });
   const recent = useRef<string[]>([]);
@@ -136,6 +144,7 @@ export default function Lesson({ profile, onExit, trial }: { profile: Profile; o
       if (cancelled) return;
       model.current = m;
       recent.current = keys;
+      db.ink.toArray().then((rows) => setInkTemplates(rows.map((r) => makeTemplate(String(r.digit), r.strokes))));
       if (trial) {
         const plan = { ...planLesson({ profile, ...m, mood: "futsu", today: ymd() }), sessionId: sessionId.current };
         const trialPlan = { ...plan, items: [0, 1, 2].map(() => ({ phase: "main" as const, skillId: trial })), choiceOptions: { easy: trial, challenge: trial } };
@@ -193,10 +202,20 @@ export default function Lesson({ profile, onExit, trial }: { profile: Profile; o
 
   const submit = (given?: number) => {
     if (!lesson || lesson.stage !== "answering") return;
-    const value = given ?? (input === "" ? NaN : Number(input));
+    const handwriting = given === undefined && inputMode === "write" && currentStep(lesson)?.type === "number";
+    const typed = handwriting ? (written.current?.value ?? "") : input;
+    const value = given ?? (typed === "" ? NaN : Number(typed));
     if (Number.isNaN(value)) return;
     const { state, event } = answer(lesson, value, Date.now());
     record(event);
+    // 正解した手書きの字は、その子のお手本に加える（つぎから読みとりやすくなる）
+    if (handwriting && !trial && event.correct && written.current) {
+      const samples = written.current.boxes.filter((b) => b.digit !== null && b.strokes.length > 0).map((b) => ({ digit: b.digit!, strokes: b.strokes }));
+      if (samples.length) {
+        saveInk(samples);
+        setInkTemplates((t) => [...t, ...samples.map((x) => makeTemplate(String(x.digit), x.strokes))]);
+      }
+    }
     setInput("");
     setLesson(state);
     if (state.stage === "correct") {
@@ -354,7 +373,7 @@ export default function Lesson({ profile, onExit, trial }: { profile: Profile; o
       {confirmQuit && (
         <div className="dialog-back" role="dialog" aria-modal="true">
           <div className="dialog">
-            <Teacher face="calm" size={88} />
+            <Teacher look={profile.teacherLook} face="calm" size={88} />
             <p>きょうは ここで おわりに する？</p>
             <small>ここまでに といた ぶんは、ちゃんと のこるよ。</small>
             <div className="dialog-actions">
@@ -369,7 +388,7 @@ export default function Lesson({ profile, onExit, trial }: { profile: Profile; o
 
       <div className={`lesson-grid ${working ? "" : "wide"}`}>
         <section className="talk">
-          <Teacher face={face} size={92} />
+          <Teacher look={profile.teacherLook} face={face} size={92} />
           <div className="bubble" aria-live="polite">
             <p>{bubble}</p>
             {working && stage === "answering" && lesson?.hint && (
@@ -457,11 +476,20 @@ export default function Lesson({ profile, onExit, trial }: { profile: Profile; o
                 </div>
               </div>
               {summary.growth.length > 0 && (
-                <ul className="growth">
-                  {summary.growth.map((g) => (
-                    <li key={g.id}>{g.text}</li>
-                  ))}
-                </ul>
+                <div className="new-stickers">
+                  <p className="new-title">あたらしい シール</p>
+                  <ul>
+                    {summary.growth.map((g, i) => (
+                      <li key={g.id} style={{ animationDelay: `${0.2 + i * 0.25}s` }}>
+                        <StickerIcon kind={g.kind} size={64} />
+                        <div>
+                          <b>{STICKER_NAME[g.kind]}</b>
+                          <span>{g.text}</span>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               )}
               {!trial && <WeekStamps days={summary.days} />}
               <button className="btn-start" onClick={exit}>
@@ -486,9 +514,38 @@ export default function Lesson({ profile, onExit, trial }: { profile: Profile; o
                     </ol>
                   )}
                   <span className="step-prompt">{step.prompt}</span>
+                  {step.type === "number" && (
+                    <div className="mode-toggle" role="group" aria-label="すうじの いれかた">
+                      {(["tap", "write"] as const).map((m) => (
+                        <button
+                          key={m}
+                          className={inputMode === m ? "on" : ""}
+                          aria-pressed={inputMode === m}
+                          onClick={() => {
+                            setInputMode(m);
+                            setInput("");
+                            if (!trial) saveProfile({ ...profile, inputMode: m });
+                          }}
+                        >
+                          {m === "tap" ? "タップ" : "かく"}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 {step.type === "choice" ? (
                   <ChoicePad choices={step.choices ?? []} onPick={(i) => submit(i)} />
+                ) : inputMode === "write" ? (
+                  <HandwritePad
+                    boxes={String(step.answer).length >= 4 || (lesson.problem.unit?.total ?? 0) >= 1000 || lesson.problem.kind === "place_compose" ? 4 : 3}
+                    templates={inkTemplates}
+                    resetKey={`${lesson.problem.id}-${lesson.step}-${lesson.attemptNo}`}
+                    onChange={(w) => {
+                      written.current = w;
+                      setInput(w.value);
+                    }}
+                    onSubmit={() => submit()}
+                  />
                 ) : (
                   <NumPad value={input} onChange={setInput} onSubmit={() => submit()} />
                 )}

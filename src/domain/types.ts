@@ -211,6 +211,9 @@ export interface Profile {
   name: string; // 表示用
   nameYomi: string; // 読み上げ用（ひらがな）
   teacherName: string;
+  teacherLook: "note" | "pencil" | "eraser";
+  /** すうじの入れかた：タップ（すうじパッド）か、書く（手書き） */
+  inputMode: "tap" | "write";
   favorites: string[];
   problemsPerSession: number;
   maxMinutes: number;
