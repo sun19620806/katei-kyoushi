@@ -1,3 +1,5 @@
+import { toSpeakable } from "../domain/speechText";
+
 /** iPad 内蔵の読み上げ（Web Speech API）。無料・オフラインで動く */
 
 let voice: SpeechSynthesisVoice | null = null;
@@ -23,19 +25,6 @@ if (typeof speechSynthesis !== "undefined") {
 export function configureSpeech(opts: { enabled: boolean; rate: number }) {
   enabled = opts.enabled;
   rate = opts.rate;
-}
-
-/** 記号を読みやすい言葉にする */
-export function toSpeakable(text: string) {
-  return text
-    .replace(/(\d)\s*cm/g, "$1センチ")
-    .replace(/(\d)\s*m(?![a-z])/g, "$1メートル")
-    .replace(/□/g, " なに ")
-    .replace(/×/g, " かける ")
-    .replace(/[−-]/g, " ひく ")
-    .replace(/\+/g, " たす ")
-    .replace(/=/g, " は ")
-    .replace(/？/g, "？ ");
 }
 
 export function speak(text: string, onEnd?: () => void) {
