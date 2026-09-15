@@ -12,6 +12,7 @@ export default function Setup({ onDone }: { onDone: () => void }) {
   const [pin, setPin] = useState("");
   const [pin2, setPin2] = useState("");
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
   const [subjects, setSubjects] = useState<Profile["subjects"]>(["math", "japanese"]);
   const [offGroups, setOffGroups] = useState<string[]>([]);
   const valid = name.trim() && /^[ぁ-んー]+$/.test(yomi.trim()) && /^\d{4}$/.test(pin) && pin === pin2;
@@ -20,16 +21,21 @@ export default function Setup({ onDone }: { onDone: () => void }) {
     if (busy) return;
     setBusy(true);
     const disabledSkills = SKILLS.filter((s) => offGroups.includes(`${s.subject}:${s.group}`)).map((s) => s.id);
-    await saveProfile({
-      ...DEFAULT_PROFILE,
-      name: name.trim(),
-      nameYomi: yomi.trim(),
-      teacherName: teacher.trim() || "ノート",
-      parentPin: pin,
-      subjects,
-      disabledSkills,
-    });
-    onDone();
+    try {
+      await saveProfile({
+        ...DEFAULT_PROFILE,
+        name: name.trim(),
+        nameYomi: yomi.trim(),
+        teacherName: teacher.trim() || "ノート",
+        parentPin: pin,
+        subjects,
+        disabledSkills,
+      });
+      onDone();
+    } catch {
+      setBusy(false);
+      setError("保存できませんでした。iPad の空き容量と、Safari のプライベートブラウズでないかを確かめて、もう一度押してください。");
+    }
   };
 
   const groups = (subject: "math" | "japanese") =>
@@ -150,6 +156,7 @@ export default function Setup({ onDone }: { onDone: () => void }) {
               はじめる
             </button>
           </div>
+          {error && <p className="note">{error}</p>}
         </>
       )}
     </main>

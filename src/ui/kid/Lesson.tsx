@@ -10,14 +10,14 @@ import {
   markEpisodeUsed,
   pickEpisode,
   recentLineKeys,
-  saveSessionResult,
-  studyDays,
+  commitSession,
 } from "../../db/db";
 import { skill } from "../../domain/content";
 import { ymd } from "../../domain/dates";
-import { finalizeSession } from "../../domain/finalize";
 import { pickLine } from "../../domain/lines";
-import { planLesson } from "../../domain/planner";
+import { levelFor, planLesson } from "../../domain/planner";
+import { initialSkillState } from "../../domain/learner";
+import { withinHours } from "./Home";
 import { hintText } from "../../domain/hints";
 import { uid } from "../../domain/random";
 import type { Episode, LessonPhase, Mood, Profile, SkillState, Stumble } from "../../domain/types";
@@ -34,6 +34,7 @@ import {
 } from "../../engine/lesson";
 import { ArrowIcon, BulbIcon, CloseIcon, MoodFace, SpeakerIcon, StarIcon } from "../icons";
 import { StickerIcon, STICKER_NAME } from "../stickers";
+import { playCorrect, playSticker } from "../sound";
 import { speak, stopSpeaking } from "../speech";
 import { setUpdateSafe } from "../swUpdate";
 import Teacher, { type Face } from "../Teacher";
@@ -91,11 +92,12 @@ const THINK_CARDS: Record<string, string[]> = {
 };
 
 interface Summary {
+  retry: string[]; // もういちど チャレンジできる スキル
   count: number;
   noHint: number;
   minutes: number;
   growth: Episode[];
-  days: string[];
+  days: string[] | null;
 }
 
 /**
@@ -105,11 +107,16 @@ export default function Lesson({
   profile,
   onExit,
   trial,
+  retry,
+  onRetry,
   onProfileChange,
 }: {
   profile: Profile;
   onExit: () => void;
   trial?: string;
+  /** にがてだった スキルに もういちど チャレンジする 授業 */
+  retry?: string[];
+  onRetry?: (skills: string[]) => void;
   onProfileChange?: () => void;
 }) {
   const rng = Math.random;
@@ -141,6 +148,7 @@ export default function Lesson({
   const lastPhase = useRef("");
   const startedAt = useRef(Date.now());
   const sessionId = useRef(uid());
+  const moodRef = useRef<Mood>("futsu");
 
   const vars = { name: profile.name, teacher: profile.teacherName, favorite: profile.favorites[0] };
   const speechVars = { name: profile.nameYomi || profile.name };
@@ -170,14 +178,19 @@ export default function Lesson({
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const [m, keys, streak, sessions, episode] = await Promise.all([
+      const loaded = await Promise.all([
         loadModel(),
         recentLineKeys(),
         currentStreak(),
         db.events.where("type").equals("session").count(),
         pickEpisode(),
-      ]);
+      ]).catch(() => null);
       if (cancelled) return;
+      if (!loaded) {
+        setUi("summary");
+        return show([{ display: "きろくを よみこめなかったよ。「やめる」を おして、もういちど ひらいてね。", speech: "きろくを よみこめなかったよ。" }], "calm");
+      }
+      const [m, keys, streak, sessions, episode] = loaded;
       model.current = m;
       recent.current = keys;
       db.ink.toArray().then((rows) => setInkTemplates(rows.map((r) => makeTemplate(String(r.digit), r.strokes))));
@@ -188,6 +201,20 @@ export default function Lesson({
         setLesson(s);
         setUi("run");
         announce(s, [{ display: "おためし モード（きろくは のこりません）", speech: "" }]);
+        return;
+      }
+      if (retry?.length) {
+        const plan = { ...planLesson({ profile, ...m, mood: "futsu", today: ymd() }), sessionId: sessionId.current };
+        const items = retry.slice(0, 3).flatMap((skillId) => [0, 1].map(() => ({ phase: "review" as const, skillId })));
+        // にがてな スキルなので、やさしめの むずかしさで 出す
+        const levels = Object.fromEntries(retry.map((id) => [id, levelFor(m.states[id] ?? initialSkillState(id))]));
+        const retryPlan = { ...plan, items, levels: { ...plan.levels, ...levels }, choiceOptions: { easy: retry[0], challenge: retry[0] } };
+        record({ id: uid(), type: "session", sessionId: sessionId.current, at: new Date().toISOString(), kind: "start", mood: "futsu" });
+        const s = startLesson(retryPlan, Date.now(), rng);
+        startedAt.current = Date.now();
+        setLesson(s);
+        setUi("run");
+        announce(s, [line("retry_start")]);
         return;
       }
       if (sessions === 0) {
@@ -233,6 +260,7 @@ export default function Lesson({
   };
 
   const pickMood = (mood: Mood) => {
+    moodRef.current = mood;
     record({ id: uid(), type: "session", sessionId: sessionId.current, at: new Date().toISOString(), kind: "start", mood });
     const plan = { ...planLesson({ profile, ...model.current, mood, today: ymd() }), sessionId: sessionId.current };
     const s = startLesson(plan, Date.now(), rng);
@@ -261,6 +289,7 @@ export default function Lesson({
     setInput("");
     setLesson(state);
     if (state.stage === "correct") {
+      playCorrect();
       const o = state.outcomes.at(-1)!;
       const median = model.current.states[o.problem.skillId]?.medianMs;
       const scene =
@@ -275,8 +304,11 @@ export default function Lesson({
     } else if (state.stage === "revealed") {
       // 答えは「いまの ステップ」の答え。選ぶ問題は 選択肢の ことば（図なら「これ」）で 言う
       const st = currentStep(state)!;
+      const steps = state.problem!.steps;
       const text =
-        st.type === "choice"
+        state.problem!.layout === "clock" && steps.length === 2
+          ? `${steps[0].answer}時${steps[1].answer === 0 ? "" : `${steps[1].answer}分`}`
+          : st.type === "choice"
           ? st.choices![st.answer]
           : st.type === "clock"
             ? `${Math.floor(st.answer / 60)}時${st.answer % 60 === 0 ? "" : `${st.answer % 60}分`}`
@@ -340,13 +372,14 @@ export default function Lesson({
     setUpdateSafe(false);
     try {
       const today = ymd();
-      const firstToday = !(await studyDays()).includes(today);
       const minutes = Math.max(1, Math.round((Date.now() - startedAt.current) / 60_000));
-      await addEvent({ id: uid(), type: "session", sessionId: sessionId.current, at: new Date().toISOString(), kind: "finish", minutes, empty: outcomes.length === 0 });
-      const streak = await currentStreak(today);
-      const result = finalizeSession(model.current.states, model.current.stumbles, outcomes, today, firstToday ? streak : 0);
-      await saveSessionResult(result);
-      return { result, minutes, streak, days: await studyDays() };
+      const saved = await commitSession(
+        { id: uid(), type: "session", sessionId: sessionId.current, at: new Date().toISOString(), kind: "finish", minutes, empty: outcomes.length === 0 },
+        outcomes,
+        today,
+      );
+      if (!saved) return null;
+      return { ...saved, minutes };
     } catch {
       // 保存に しっぱい：もういちど 押せるように もどす（回答の 記録は 残って いるので、つぎに ひらいた ときに 立てなおす）
       savingRef.current = false;
@@ -360,14 +393,14 @@ export default function Lesson({
     setUi("summary");
     if (trial) {
       const main = s.outcomes.filter((o) => !o.isTwin);
-      setSummary({ count: main.length, noHint: main.filter((o) => o.firstTryCorrect).length, minutes: Math.max(1, Math.round((Date.now() - startedAt.current) / 60_000)), growth: [], days: [] });
+      setSummary({ count: main.length, noHint: main.filter((o) => o.firstTryCorrect).length, minutes: Math.max(1, Math.round((Date.now() - startedAt.current) / 60_000)), growth: [], days: [], retry: [] });
       return show([{ display: "おためし おわり。", speech: "おためし おわり。" }]);
     }
     const saved = await saveSession(s.outcomes);
     if (!mounted.current) return;
     if (!saved) {
       const main = s.outcomes.filter((o) => !o.isTwin);
-      setSummary({ count: main.length, noHint: main.filter((o) => o.firstTryCorrect).length, minutes: Math.max(1, Math.round((Date.now() - startedAt.current) / 60_000)), growth: [], days: [] });
+      setSummary({ count: main.length, noHint: main.filter((o) => o.firstTryCorrect).length, minutes: Math.max(1, Math.round((Date.now() - startedAt.current) / 60_000)), growth: [], days: null, retry: [] });
       return show([{ display: "きろくが うまく できなかったよ。つぎに ひらいた ときに もういちど ためすね。", speech: "きろくが うまく できなかったよ。" }], "calm");
     }
     const { result, minutes, streak, days } = saved;
@@ -376,19 +409,29 @@ export default function Lesson({
     const growthLines = result.episodes.slice(0, 2).map((e) =>
       line(`growth_${e.kind}`, { skill: e.skillId ? skill(e.skillId).kidLabel : undefined, streak: String(streak) }),
     );
+    // 答えを 見た・ヒントを たくさん 使った 問題の スキルは、その場で もういちど チャレンジできる
+    // （時間切れ・つかれた日・つかえる 時間の そとでは 出さない）
+    const canRetry = !retry && !s.timeUp && moodRef.current !== "tsukare" && withinHours(profile);
+    const retrySkills = canRetry ? [...new Set(s.outcomes.filter((o) => o.revealed || o.maxHintLevel >= 2).map((o) => o.problem.skillId))].slice(0, 3) : [];
     setSummary({
+      retry: retrySkills,
       count: main.length,
       noHint: main.filter((o) => o.firstTryCorrect).length,
       minutes,
       growth: result.episodes,
       days,
     });
-    show([...prefix, line("finish", { count: String(main.length) }), ...growthLines, line("goodbye")], "smile");
+    if (result.episodes.length) playSticker();
+    show([...prefix, line("finish", { count: String(main.length) }), ...growthLines, ...(retrySkills.length ? [] : [line("goodbye")])], "smile");
   }
 
   // 外付けキーボード（と開発中の Mac）でも答えられるように
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      if (confirmQuit) {
+        if (e.key === "Escape") setConfirmQuit(false);
+        return;
+      }
       if (!lesson || lesson.stage !== "answering" || currentStep(lesson)?.type !== "number") return;
       if (/^\d$/.test(e.key)) setInput((v) => (v + e.key).replace(/^0+(?=\d)/, "").slice(0, 4));
       else if (e.key === "Backspace") setInput((v) => v.slice(0, -1));
@@ -411,6 +454,9 @@ export default function Lesson({
     if (!trial && lesson && ui === "run") await saveSession(lesson.outcomes);
     onExit();
   };
+
+  // 開発中だけ：自動テストから 授業の 状態を 見られるように する
+  if (import.meta.env.DEV) (window as unknown as { __lesson?: LessonState | null }).__lesson = lesson;
 
   const stage = lesson?.stage;
   const step = lesson ? currentStep(lesson) : undefined;
@@ -449,10 +495,10 @@ export default function Lesson({
       </header>
 
       {confirmQuit && (
-        <div className="dialog-back" role="dialog" aria-modal="true">
+        <div className="dialog-back" role="dialog" aria-modal="true" aria-labelledby="quit-title">
           <div className="dialog">
             <Teacher look={profile.teacherLook} face="calm" size={88} />
-            <p>きょうは ここで おわりに する？</p>
+            <p id="quit-title">きょうは ここで おわりに する？</p>
             <small>ここまでに といた ぶんは、ちゃんと のこるよ。</small>
             <div className="dialog-actions">
               <button onClick={quitAndSave}>おわる</button>
@@ -569,7 +615,12 @@ export default function Lesson({
                   </ul>
                 </div>
               )}
-              {!trial && <WeekStamps days={summary.days} />}
+              {!trial && summary.days && <WeekStamps days={summary.days} />}
+              {!trial && !retry && onRetry && summary.retry.length > 0 && (
+                <button className="retry-btn" onClick={() => onRetry(summary.retry)}>
+                  にがてに もういちど チャレンジ（{summary.retry.length * 2}もん）
+                </button>
+              )}
               <button className="btn-start" onClick={exit} disabled={saving}>
                 {saving ? "きろくして いるよ…" : "おわる"}
               </button>

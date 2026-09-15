@@ -110,8 +110,7 @@ export function planLesson({ profile, states, stumbles, mood, today }: PlanInput
 
   const levels = Object.fromEntries(
     [...new Set(items.map((i) => i.skillId).concat([easy, challenge]))].map((id) => {
-      const s = st(id);
-      return [id, s.attempts < 4 || s.mastery < 0.35 ? 0 : s.mastery < 0.75 ? 1 : 2];
+      return [id, levelFor(st(id))];
     }),
   ) as Record<SkillId, 0 | 1 | 2>;
 
@@ -125,3 +124,6 @@ export function planLesson({ profile, states, stumbles, mood, today }: PlanInput
     choiceOptions: { easy, challenge },
   };
 }
+
+/** 問題の むずかしさ（0 やさしい・1 ふつう・2 むずかしめ）：まだ 身について いない スキルは やさしく */
+export const levelFor = (s: { attempts: number; mastery: number }): 0 | 1 | 2 => (s.attempts < 4 || s.mastery < 0.35 ? 0 : s.mastery < 0.75 ? 1 : 2);

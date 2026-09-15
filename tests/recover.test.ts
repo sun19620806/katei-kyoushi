@@ -66,7 +66,7 @@ describe("立てなおしと 授業エンジンの 結果が 同じ", () => {
   it("選ぶ問題で 答えを 見せた ときも、立てなおしで「答えを見た」に なる", () => {
     const profile = {
       name: "t", nameYomi: "t", teacherName: "n", teacherLook: "note" as const, inputMode: "tap" as const, favorites: [],
-      problemsPerSession: 10, maxMinutes: 15, allowedFrom: "06:00", allowedTo: "21:00", speech: false, speechRate: 1,
+      problemsPerSession: 10, maxMinutes: 15, allowedFrom: "06:00", allowedTo: "21:00", speech: false, speechRate: 1, sound: false,
       parentPin: "0000", disabledSkills: [], subjects: ["math" as const, "japanese" as const],
     };
     const base = planLesson({ profile, states: {}, stumbles: {}, mood: "futsu", today: "2026-09-14" });

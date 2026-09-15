@@ -18,6 +18,7 @@ const profile: Profile = {
   allowedTo: "21:00",
   speech: true,
   speechRate: 1,
+  sound: true,
   parentPin: "0000",
   disabledSkills: [],
   subjects: ["math", "japanese"],

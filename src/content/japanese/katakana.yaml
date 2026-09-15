@@ -492,3 +492,203 @@ items:
       - { text: "マランン", mc: similar_katakana }
       - { text: "マラーソン", mc: long_vowel_miss }
     hint: "「そ」と「ん」の 形を 見くらべよう。のばす 音は ないよ。"
+
+  # ───── なき声・もの音・外来語（つづき） ─────
+  - id: kk051
+    hiragana: "もーもー"
+    clue: "牛の なき声"
+    answer: "モーモー"
+    wrong:
+      - { text: "モモ", mc: long_vowel_miss }
+      - { text: "モーモ", mc: long_vowel_miss }
+    hint: "のばす 音が 2かしょ あるよ。「ー」を わすれずに。"
+
+  - id: kk052
+    hiragana: "ぶーぶー"
+    clue: "ぶたの なき声"
+    answer: "ブーブー"
+    wrong:
+      - { text: "プープー", mc: dakuten_miss }
+      - { text: "ブブ", mc: long_vowel_miss }
+      - { text: "フーフー", mc: dakuten_miss }
+    hint: "「゛」か「゜」か、声に 出して たしかめよう。のばす 音も あるよ。"
+
+  - id: kk053
+    hiragana: "ひひーん"
+    clue: "馬の なき声"
+    answer: "ヒヒーン"
+    wrong:
+      - { text: "ヒヒン", mc: long_vowel_miss }
+      - { text: "ビビーン", mc: dakuten_miss }
+      - { text: "ヒヒーソ", mc: similar_katakana }
+    hint: "さいごの「ん」の 形と、のばす 音に 気を つけよう。"
+
+  - id: kk054
+    hiragana: "くるっくー"
+    clue: "はとの なき声"
+    answer: "クルックー"
+    wrong:
+      - { text: "クルクー", mc: sokuon_miss }
+      - { text: "クルック", mc: long_vowel_miss }
+      - { text: "グルックー", mc: dakuten_miss }
+    hint: "小さい「っ」と、さいごの のばす 音が あるよ。"
+
+  - id: kk055
+    hiragana: "どんどん"
+    clue: "大きな たいこを たたく 音"
+    answer: "ドンドン"
+    wrong:
+      - { text: "トントン", mc: dakuten_miss }
+      - { text: "ドソドソ", mc: similar_katakana }
+      - { text: "ドンドーン", mc: long_vowel_miss }
+    hint: "「ど」は「゛」だよ。「ん」の 形を よく 見よう。"
+
+  - id: kk056
+    hiragana: "ざーざー"
+    clue: "雨が 強く ふる 音"
+    answer: "ザーザー"
+    wrong:
+      - { text: "サーサー", mc: dakuten_miss }
+      - { text: "ザザ", mc: long_vowel_miss }
+      - { text: "ザーサー", mc: dakuten_miss }
+    hint: "どちらの「ざ」にも「゛」が つくよ。のばす 音も あるよ。"
+
+  - id: kk057
+    hiragana: "がちゃん"
+    clue: "おさらが おちて われる 音"
+    answer: "ガチャン"
+    wrong:
+      - { text: "ガチヤン", mc: youon_miss }
+      - { text: "カチャン", mc: dakuten_miss }
+      - { text: "ガチャソ", mc: similar_katakana }
+    hint: "小さい「ゃ」と、さいごの「ん」の 形に 気を つけよう。"
+
+  - id: kk058
+    hiragana: "ちくたく"
+    clue: "時計の はりが うごく 音"
+    answer: "チクタク"
+    wrong:
+      - { text: "テクタク", mc: similar_katakana }
+      - { text: "チクダク", mc: dakuten_miss }
+      - { text: "チワタク", mc: similar_katakana }
+    hint: "「ち」と「て」、「く」と「わ」の 形を 見くらべよう。"
+
+  - id: kk059
+    hiragana: "ぱちぱち"
+    clue: "みんなで はく手を する 音"
+    answer: "パチパチ"
+    wrong:
+      - { text: "バチバチ", mc: dakuten_miss }
+      - { text: "パテパテ", mc: similar_katakana }
+      - { text: "パッチパッチ", mc: sokuon_miss }
+    hint: "「ぱ」は「゜」だよ。つまる 音は ないよ。"
+
+  - id: kk060
+    hiragana: "はんばーぐ"
+    clue: "ひき肉を まるめて やいた りょうり"
+    answer: "ハンバーグ"
+    wrong:
+      - { text: "ハンバーク", mc: dakuten_miss }
+      - { text: "ハンバグ", mc: long_vowel_miss }
+      - { text: "ハソバーグ", mc: similar_katakana }
+    hint: "「ば」の あとを のばすよ。さいごの 音にも「゛」が つくよ。"
+
+  - id: kk061
+    hiragana: "けちゃっぷ"
+    clue: "トマトで 作った 赤い たれ"
+    answer: "ケチャップ"
+    wrong:
+      - { text: "ケチャプ", mc: sokuon_miss }
+      - { text: "ケチヤップ", mc: youon_miss }
+      - { text: "ケチャッブ", mc: dakuten_miss }
+    hint: "小さい「ゃ」と 小さい「っ」が 1つずつ あるよ。"
+
+  - id: kk062
+    hiragana: "しゃんぷー"
+    clue: "かみの 毛を あらう ときに つかう"
+    answer: "シャンプー"
+    wrong:
+      - { text: "シヤンプー", mc: youon_miss }
+      - { text: "シャンプ", mc: long_vowel_miss }
+      - { text: "シャンブー", mc: dakuten_miss }
+    hint: "小さい「ゃ」と「゜」、さいごの のばす 音に 気を つけよう。"
+
+  - id: kk063
+    hiragana: "らんどせる"
+    clue: "学校へ せおって いく かばん"
+    answer: "ランドセル"
+    wrong:
+      - { text: "ランドセレ", mc: similar_katakana }
+      - { text: "ラントセル", mc: dakuten_miss }
+      - { text: "ランドーセル", mc: long_vowel_miss }
+    hint: "「る」は 2画で 書くよ。「ど」には「゛」が つくよ。"
+
+  - id: kk064
+    hiragana: "くれよん"
+    clue: "絵に 色を ぬる ときに つかう"
+    answer: "クレヨン"
+    wrong:
+      - { text: "クレヨソ", mc: similar_katakana }
+      - { text: "グレヨン", mc: dakuten_miss }
+      - { text: "クレョン", mc: youon_miss }
+    hint: "「よ」は 大きく 書くよ。「ん」の 形も 見よう。"
+
+  - id: kk065
+    hiragana: "とらんぷ"
+    clue: "数字や マークの ついた カード"
+    answer: "トランプ"
+    wrong:
+      - { text: "トランブ", mc: dakuten_miss }
+      - { text: "ドランプ", mc: dakuten_miss }
+      - { text: "トラソプ", mc: similar_katakana }
+    hint: "さいごは「゜」の 音だよ。はじめは にごらないよ。"
+
+  - id: kk066
+    hiragana: "えれべーたー"
+    clue: "ビルで 人を 上の かいへ はこぶ"
+    answer: "エレベーター"
+    wrong:
+      - { text: "エレベーダー", mc: dakuten_miss }
+      - { text: "エレベター", mc: long_vowel_miss }
+      - { text: "エレペーター", mc: dakuten_miss }
+    hint: "「べ」は「゛」、「た」は にごらないよ。のばす 音は 2かしょ。"
+
+  - id: kk067
+    hiragana: "かれんだー"
+    clue: "日づけや 曜日が 書いて ある"
+    answer: "カレンダー"
+    wrong:
+      - { text: "カレンダ", mc: long_vowel_miss }
+      - { text: "ガレンダー", mc: dakuten_miss }
+      - { text: "カレソダー", mc: similar_katakana }
+    hint: "さいごを のばすよ。はじめの 音は にごらないよ。"
+
+  - id: kk068
+    hiragana: "ばけつ"
+    clue: "水を 入れて はこぶ 入れもの"
+    answer: "バケツ"
+    wrong:
+      - { text: "バケシ", mc: similar_katakana }
+      - { text: "パケツ", mc: dakuten_miss }
+      - { text: "バケッ", mc: sokuon_miss }
+    hint: "さいごの「つ」は 大きく 書くよ。点の ならび方も 見よう。"
+
+  - id: kk069
+    hiragana: "ちゃいむ"
+    clue: "学校で 時間を 知らせる 音"
+    answer: "チャイム"
+    wrong:
+      - { text: "チヤイム", mc: youon_miss }
+      - { text: "テャイム", mc: similar_katakana }
+      - { text: "チャイヌ", mc: similar_katakana }
+    hint: "小さい「ゃ」が あるよ。「ち」と「む」の 形も 見よう。"
+
+  - id: kk070
+    hiragana: "ぴーまん"
+    clue: "みどり色で 中が からっぽの やさい"
+    answer: "ピーマン"
+    wrong:
+      - { text: "ピマン", mc: long_vowel_miss }
+      - { text: "ビーマン", mc: dakuten_miss }
+      - { text: "ピーマソ", mc: similar_katakana }
+    hint: "「ぴ」は「゜」だよ。のばす 音と「ん」の 形に 気を つけよう。"

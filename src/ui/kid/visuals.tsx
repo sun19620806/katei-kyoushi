@@ -307,9 +307,21 @@ export function ClockInput({ value, onChange, size = 300 }: { value: number; onC
       height={size}
       viewBox="0 0 200 200"
       role="slider"
-      aria-label={`${h}時${m}分`}
-      aria-valuenow={value}
+      tabIndex={0}
+      aria-label="とけいの はり"
+      aria-valuemin={60}
+      aria-valuemax={775}
+      aria-valuenow={h * 60 + m}
+      aria-valuetext={`${h}時${m}分`}
       style={{ touchAction: "none" }}
+      onKeyDown={(e) => {
+        // キーボード：←→ で 5分、↑↓ で 1時間
+        const delta = { ArrowRight: 5, ArrowLeft: -5, ArrowUp: 60, ArrowDown: -60 }[e.key];
+        if (!delta) return;
+        e.preventDefault();
+        const next = (((h % 12) * 60 + m + delta) % 720 + 720) % 720;
+        onChange((Math.floor(next / 60) || 12) * 60 + (next % 60));
+      }}
       onPointerDown={(e) => {
         const svg = e.currentTarget;
         const g = geometry(e, svg);

@@ -251,6 +251,8 @@ export interface Profile {
   allowedTo: string; // "20:30"
   speech: boolean;
   speechRate: number;
+  /** 正解の ときの 効果音 */
+  sound: boolean;
   parentPin: string;
   /** 出さないスキル（学校でまだ習っていない単元など）。新しいスキルは自動で出る */
   disabledSkills: SkillId[];

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const LOCK_KEY = "pin-forgot-lock";
 const makeQuestion = () => {
@@ -24,7 +24,18 @@ export default function PinGate({ pin, onOk, onCancel }: { pin: string; onOk: ()
   const [forgot, setForgot] = useState(false);
   const [question, setQuestion] = useState(makeQuestion);
   const [misses, setMisses] = useState(0);
+  const [, setTick] = useState(0);
   const locked = forgot && lockedUntil() > Date.now();
+  // まつ 時間が おわったら 押せるように もどす（つぎの 3回を また かぞえる）
+  useEffect(() => {
+    if (!locked) return;
+    const t = setTimeout(() => {
+      setMisses(0);
+      setMiss(false);
+      setTick((n) => n + 1);
+    }, Math.max(0, lockedUntil() - Date.now()) + 200);
+    return () => clearTimeout(t);
+  }, [locked]);
 
   const target = forgot ? String(question.answer) : pin;
   const length = target.length;
@@ -42,6 +53,7 @@ export default function PinGate({ pin, onOk, onCancel }: { pin: string; onOk: ()
           setMisses(m);
           setQuestion(makeQuestion());
           if (m >= 3) {
+            setMisses(0);
             try {
               localStorage.setItem(LOCK_KEY, String(Date.now() + 5 * 60 * 1000));
             } catch {

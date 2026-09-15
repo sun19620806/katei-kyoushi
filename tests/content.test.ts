@@ -114,7 +114,7 @@ describe("教材ファイル", () => {
       "greet_first", "greet", "mood_question", "mood_genki", "mood_futsu", "mood_tsukare",
       "phase_warmup", "phase_review", "phase_main", "phase_choice", "phase_finale",
       "correct", "step_ok", "correct_fast", "correct_after_hint", "correct_after_struggle", "wrong_nudge",
-      "reveal", "twin", "think_question", "think_thanks", "think_unknown", "time_up", "finish", "goodbye",
+      "reveal", "reveal_choice", "retry_start", "twin", "think_question", "think_thanks", "think_unknown", "time_up", "finish", "goodbye",
       "growth_first_no_hint", "growth_faster", "growth_mastered", "growth_persisted", "growth_streak",
     ];
     for (const r of required) expect(scenes.has(r), r).toBe(true);

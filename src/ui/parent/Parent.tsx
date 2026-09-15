@@ -6,7 +6,7 @@ import { activeStumbles, masterySymbol } from "../../domain/learner";
 import { planLesson } from "../../domain/planner";
 import { uid } from "../../domain/random";
 import type { AnswerEvent, Episode, Profile, SessionEvent, SkillState, Stumble } from "../../domain/types";
-import { speak, unlockSpeech } from "../speech";
+import { configureSpeech, speak, unlockSpeech } from "../speech";
 
 type Tab = "today" | "map" | "log" | "settings";
 
@@ -61,7 +61,7 @@ export default function Parent({ profile, onProfileChange, onExit, onTrial }: Pa
           子どもの画面へ
         </button>
       </header>
-      <nav className="tabs">
+      <nav className="tabs" role="tablist">
         {(
           [
             ["today", "今日と今週"],
@@ -70,7 +70,7 @@ export default function Parent({ profile, onProfileChange, onExit, onTrial }: Pa
             ["settings", "設定"],
           ] as [Tab, string][]
         ).map(([t, label]) => (
-          <button key={t} className={tab === t ? "on" : ""} onClick={() => setTab(t)}>
+          <button key={t} role="tab" aria-selected={tab === t} className={tab === t ? "on" : ""} onClick={() => setTab(t)}>
             {label}
           </button>
         ))}
@@ -164,7 +164,7 @@ function Today({ data, profile }: { data: Data; profile: Profile }) {
   const counts = problemsOn(data.answers, today);
   const todays = { length: counts.total };
   const minutes = data.sessions
-    .filter((s) => s.kind === "finish" && localDay(s.at) === today)
+    .filter((s) => s.kind === "finish" && !s.empty && localDay(s.at) === today)
     .reduce((sum, s) => sum + (s.minutes ?? 0), 0);
   const noHint = counts.ok;
   const hinted = counts.hinted;
@@ -237,7 +237,13 @@ function Today({ data, profile }: { data: Data; profile: Profile }) {
               <li key={s.key}>
                 <span className={`chip ${s.status}`}>{s.status === "confirmed" ? "くり返し" : "1回"}</span>
                 {misconceptionLabel(s.misconception)}
-                <small>{skill(s.skillId).label}</small>
+                <small>
+                  {skill(s.skillId).label}
+                  {(() => {
+                    const ex = data.answers.find((a) => a.id === s.evidence.at(-1));
+                    return ex ? ` ／ 例：${problemText(ex)} → ${givenText(ex)}` : "";
+                  })()}
+                </small>
               </li>
             ))}
           </ul>
@@ -309,7 +315,7 @@ function SkillMap({ data, profile, onProfileChange, onTrial }: { data: Data; pro
                     {s?.nextReview && <small>復習 {s.nextReview.slice(5).replace("-", "/")}</small>}
                   </span>
                   <label className="toggle">
-                    <input type="checkbox" checked={on} onChange={() => toggle(id)} />
+                    <input type="checkbox" checked={on} onChange={() => toggle(id)} aria-label={`${skill(id).label}を出す`} />
                     <span className="toggle-track" aria-hidden="true" />
                     <span className="toggle-label">{on ? "出す" : "出さない"}</span>
                   </label>
@@ -329,6 +335,49 @@ function SkillMap({ data, profile, onProfileChange, onTrial }: { data: Data; pro
   );
 }
 
+/** 記録の 問題の 書きかた（おうちの人向け） */
+function problemText(a: AnswerEvent) {
+  const p = a.problem;
+  switch (p.kind) {
+    case "add": return `${p.a} + ${p.b}`;
+    case "sub": return `${p.a} − ${p.b}`;
+    case "mul": return `${p.a} × ${p.b}`;
+    case "mul_missing": return `${p.a} × □ = ${p.product}`;
+    case "mul_word": return a.step === 0 ? "文章題（式）" : `文章題 ${p.a} × ${p.b}`;
+    case "len_to_cm": return `${p.a}m${p.b}cm = □cm`;
+    case "len_to_mcm": return `${p.cm}cm = ${p.a}m□cm`;
+    case "unit_to_small": return `${p.a}${p.unit?.big}${p.b}${p.unit?.small} = □${p.unit?.small}`;
+    case "unit_to_mixed": return `${p.unit?.total}${p.unit?.small} = ${p.a}${p.unit?.big}□${p.unit?.small}`;
+    case "clock_read": return `とけい ${p.clock?.h}時${p.clock?.m}分（${a.step === 0 ? "時" : "分"}）`;
+    case "clock_shift": return `${p.clock?.h}時${p.clock?.m}分の${p.clock?.shift}分${p.clock?.dir === "before" ? "前" : "後"}（${a.step === 0 ? "時" : "分"}）`;
+    case "fraction_of": return `${p.a}この1/${p.b}`;
+    case "fraction_shape": return `1/${p.a}の図`;
+    case "place_compose": return `4けたの数 ${p.b}`;
+    case "shape_pick": return p.steps[0]?.prompt ?? "形";
+    case "mul_rule": return p.rule === "step" ? `${p.a}×${p.b + 1}は${p.a}×${p.b}より□大きい` : `□×${p.a}=${p.a}×${p.b}`;
+    case "compare": return `${p.a} □ ${p.b}`;
+    case "graph_read": return `グラフ：${p.steps[0]?.prompt ?? ""}`;
+    case "number_line": return `数直線（${p.numberLine?.start}から 1めもり${p.numberLine?.unit}、${p.numberLine?.pos}めもり目）`;
+    case "clock_duration": return `${p.duration?.h1}時${p.duration?.m1}分→${p.duration?.h2}時${p.duration?.m2}分`;
+    case "clock_set": return `とけいを ${p.clock?.h}時${p.clock?.m ? `${p.clock.m}分` : ""}に`;
+    case "addsub_word": return a.step === 0 ? "文章題（式）" : `文章題 ${p.a} ${p.addsub?.op === "add" ? "+" : "−"} ${p.b}`;
+    case "jp_choice": {
+      const label = hasSkill(p.skillId) ? skill(p.skillId).label : "国語";
+      const sentence = p.jp?.sentence?.replace(/\{word\}/g, p.jp?.word ?? "").replace(/\{blank\}/g, "□");
+      return `${label}：${p.jp?.word ?? p.jp?.reading ?? p.jp?.title ?? sentence ?? p.steps?.[0]?.prompt ?? ""}`;
+    }
+    default: return "";
+  }
+}
+
+function givenText(a: AnswerEvent) {
+  const st = a.problem.steps?.[a.step ?? 0];
+  if (st?.type === "clock") return `${Math.floor(a.given / 60)}時${a.given % 60 ? `${a.given % 60}分` : ""}`;
+  if (st?.type !== "choice") return String(a.given);
+  const c = st.choices?.[a.given] ?? "";
+  return c.startsWith("shape:") || c.startsWith("frac:") ? `${a.given + 1}ばんの図` : c;
+}
+
 function Log({ data }: { data: Data }) {
   const bySession = new Map<string, AnswerEvent[]>();
   for (const a of [...data.answers].reverse()) {
@@ -337,42 +386,6 @@ function Log({ data }: { data: Data }) {
     bySession.set(a.sessionId, list);
   }
   const sessions = [...bySession.entries()].slice(0, 10);
-  const problemText = (a: AnswerEvent) => {
-    const p = a.problem;
-    switch (p.kind) {
-      case "add": return `${p.a} + ${p.b}`;
-      case "sub": return `${p.a} − ${p.b}`;
-      case "mul": return `${p.a} × ${p.b}`;
-      case "mul_missing": return `${p.a} × □ = ${p.product}`;
-      case "mul_word": return a.step === 0 ? "文章題（式）" : `文章題 ${p.a} × ${p.b}`;
-      case "len_to_cm": return `${p.a}m${p.b}cm = □cm`;
-      case "len_to_mcm": return `${p.cm}cm = ${p.a}m□cm`;
-      case "unit_to_small": return `${p.a}${p.unit?.big}${p.b}${p.unit?.small} = □${p.unit?.small}`;
-      case "unit_to_mixed": return `${p.unit?.total}${p.unit?.small} = ${p.a}${p.unit?.big}□${p.unit?.small}`;
-      case "clock_read": return `とけい ${p.clock?.h}時${p.clock?.m}分（${a.step === 0 ? "時" : "分"}）`;
-      case "clock_shift": return `${p.clock?.h}時${p.clock?.m}分の${p.clock?.shift}分${p.clock?.dir === "before" ? "前" : "後"}（${a.step === 0 ? "時" : "分"}）`;
-      case "fraction_of": return `${p.a}この1/${p.b}`;
-      case "fraction_shape": return `1/${p.a}の図`;
-      case "place_compose": return `4けたの数 ${p.b}`;
-      case "shape_pick": return p.steps[0]?.prompt ?? "形";
-      case "mul_rule": return p.rule === "step" ? `${p.a}×${p.b + 1}は${p.a}×${p.b}より□大きい` : `□×${p.a}=${p.a}×${p.b}`;
-      case "compare": return `${p.a} □ ${p.b}`;
-      case "graph_read": return `グラフ：${p.steps[0]?.prompt ?? ""}`;
-      case "number_line": return `数直線（${p.numberLine?.start}から 1めもり${p.numberLine?.unit}、${p.numberLine?.pos}めもり目）`;
-      case "clock_duration": return `${p.duration?.h1}時${p.duration?.m1}分→${p.duration?.h2}時${p.duration?.m2}分`;
-      case "clock_set": return `とけいを ${p.clock?.h}時${p.clock?.m ? `${p.clock.m}分` : ""}に`;
-      case "addsub_word": return a.step === 0 ? "文章題（式）" : `文章題 ${p.a} ${p.addsub?.op === "add" ? "+" : "−"} ${p.b}`;
-      case "jp_choice": return `${skill(p.skillId).label}：${p.jp?.word ?? p.jp?.reading ?? p.jp?.title ?? ""}`;
-      default: return "";
-    }
-  };
-  const givenText = (a: AnswerEvent) => {
-    const st = a.problem.steps?.[a.step ?? 0];
-    if (st?.type === "clock") return `${Math.floor(a.given / 60)}時${a.given % 60 ? `${a.given % 60}分` : ""}`;
-    if (st?.type !== "choice") return String(a.given);
-    const c = st.choices?.[a.given] ?? "";
-    return c.startsWith("shape:") || c.startsWith("frac:") ? `${a.given + 1}ばんの図` : c;
-  };
   return (
     <div className="panel-grid">
       {sessions.length === 0 && <p className="muted">まだ記録がありません。</p>}
@@ -422,6 +435,9 @@ function Settings({ profile, onProfileChange, onDataChange }: { profile: Profile
     const time = (v: string, d: string) => (/^\d{2}:\d{2}$/.test(v) ? v : d);
     const fixed: Profile = {
       ...p,
+      name: p.name.trim(),
+      nameYomi: p.nameYomi.trim(),
+      teacherName: p.teacherName.trim() || DEFAULT_PROFILE.teacherName,
       problemsPerSession: clamp(p.problemsPerSession, 5, 20, DEFAULT_PROFILE.problemsPerSession),
       maxMinutes: clamp(p.maxMinutes, 5, 40, DEFAULT_PROFILE.maxMinutes),
       allowedFrom: time(p.allowedFrom, DEFAULT_PROFILE.allowedFrom),
@@ -438,16 +454,19 @@ function Settings({ profile, onProfileChange, onDataChange }: { profile: Profile
     await db.episodes.put({ id: uid(), date: ymd(), kind: "parent", text: episode.trim() });
     setEpisode("");
     onDataChange();
+    prepareExport();
     setSaved("思い出を追加しました。先生があいさつで話します。");
   };
 
   // 書き出す ファイルは 先に 作っておく（iPad の「共有」は タップの すぐ あとで ないと ひらかないため）
   const [exportFile, setExportFile] = useState<File | null>(null);
-  useEffect(() => {
+  const prepareExport = () => {
+    setExportFile(null);
     exportData()
       .then((data) => setExportFile(new File([JSON.stringify(data, null, 2)], `katei-kyoushi-${ymd()}.json`, { type: "application/json" })))
       .catch(() => setSaved("記録を準備できませんでした。ページを開き直してください。"));
-  }, []);
+  };
+  useEffect(prepareExport, []);
 
   const download = () => {
     if (!exportFile) return;
@@ -471,6 +490,7 @@ function Settings({ profile, onProfileChange, onDataChange }: { profile: Profile
       await Promise.all([db.events.clear(), db.skillStates.clear(), db.stumbles.clear(), db.episodes.clear(), db.lineUsage.clear(), db.ink.clear()]);
     });
     onDataChange();
+    prepareExport();
     setSaved("記録を消しました。");
   };
 
@@ -489,8 +509,8 @@ function Settings({ profile, onProfileChange, onDataChange }: { profile: Profile
 
       <section className="box">
         <h2>授業</h2>
-        <label>1回の問題数<input type="number" min={5} max={20} value={p.problemsPerSession} onChange={(e) => set("problemsPerSession", Number(e.target.value) || DEFAULT_PROFILE.problemsPerSession)} /></label>
-        <label>1回の上限（分）<input type="number" min={5} max={30} value={p.maxMinutes} onChange={(e) => set("maxMinutes", Number(e.target.value) || DEFAULT_PROFILE.maxMinutes)} /></label>
+        <label>1回の問題数<input type="number" min={5} max={20} value={Number.isNaN(p.problemsPerSession) ? "" : p.problemsPerSession} onChange={(e) => set("problemsPerSession", e.target.value === "" ? NaN : Number(e.target.value))} /></label>
+        <label>1回の上限（分）<input type="number" min={5} max={40} value={Number.isNaN(p.maxMinutes) ? "" : p.maxMinutes} onChange={(e) => set("maxMinutes", e.target.value === "" ? NaN : Number(e.target.value))} /></label>
         <div className="row">
           <label>使える時間（から）<input type="time" value={p.allowedFrom} onChange={(e) => set("allowedFrom", e.target.value)} /></label>
           <label>（まで）<input type="time" value={p.allowedTo} onChange={(e) => set("allowedTo", e.target.value)} /></label>
@@ -511,10 +531,17 @@ function Settings({ profile, onProfileChange, onDataChange }: { profile: Profile
           ))}
         </div>
         <label className="switch"><input type="checkbox" checked={p.speech} onChange={(e) => set("speech", e.target.checked)} />先生の声で読み上げる</label>
+        <label className="switch"><input type="checkbox" checked={p.sound} onChange={(e) => set("sound", e.target.checked)} />正解の効果音を鳴らす</label>
         <label>読み上げの速さ<input type="range" min={0.7} max={1.3} step={0.05} value={p.speechRate} onChange={(e) => set("speechRate", Number(e.target.value))} /></label>
-        <button className="btn ghost" onClick={() => speak(`${p.nameYomi || p.name}、こんにちは。ぼくは ${p.teacherName}。`)}>声を試す</button>
+        <button className="btn ghost" onClick={() => {
+            // まだ 保存して いない 速さで 試す
+            configureSpeech({ enabled: true, rate: p.speechRate });
+            speak(`${p.nameYomi || p.name}、こんにちは。ぼくは ${p.teacherName}。`);
+            configureSpeech({ enabled: profile.speech, rate: profile.speechRate });
+          }}>声を試す</button>
         <label>暗証番号（4けた）<input inputMode="numeric" value={p.parentPin} onChange={(e) => set("parentPin", e.target.value.replace(/\D/g, "").slice(0, 4))} /></label>
-        <button className="btn primary" onClick={save} disabled={!/^\d{4}$/.test(p.parentPin)}>設定を保存</button>
+        <button className="btn primary" onClick={save} disabled={!/^\d{4}$/.test(p.parentPin) || !p.name.trim()}>設定を保存</button>
+        {!p.name.trim() && <p className="note">呼び名を入れてください。</p>}
       </section>
 
       <section className="box">

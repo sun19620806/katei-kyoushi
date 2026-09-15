@@ -6,13 +6,15 @@ import KidMap from "./kid/KidMap";
 import StickerBook from "./kid/StickerBook";
 import TeacherPicker from "./kid/TeacherPicker";
 import Lesson from "./kid/Lesson";
-import Parent from "./parent/Parent";
+import { lazy, Suspense } from "react";
+const Parent = lazy(() => import("./parent/Parent"));
 import PinGate from "./parent/PinGate";
 import Setup from "./parent/Setup";
+import { configureSound } from "./sound";
 import { configureSpeech } from "./speech";
 import { setUpdateSafe } from "./swUpdate";
 
-type Screen = "home" | "lesson" | "pin" | "parent" | "trial" | "stickers" | "map" | "teacher";
+type Screen = "home" | "lesson" | "pin" | "parent" | "trial" | "stickers" | "map" | "teacher" | "retry";
 
 /** 思わぬ エラーで 画面が まっ白に ならないように */
 class ErrorBoundary extends Component<{ children: ReactNode }, { error: Error | null }> {
@@ -48,11 +50,15 @@ function Main() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [screen, setScreen] = useState<Screen>("home");
   const [trialSkill, setTrialSkill] = useState<string | null>(null);
+  const [retrySkills, setRetrySkills] = useState<string[]>([]);
 
   const reload = useCallback(async () => {
     try {
       const p = await getProfile();
-      if (p) configureSpeech({ enabled: p.speech, rate: p.speechRate });
+      if (p) {
+        configureSpeech({ enabled: p.speech, rate: p.speechRate });
+        configureSound(p.sound);
+      }
       setProfile(p);
     } catch (e) {
       setLoadError(e instanceof Error ? e.message : String(e));
@@ -97,13 +103,26 @@ function Main() {
 
   switch (screen) {
     case "lesson":
-      return <Lesson profile={profile} onExit={() => setScreen("home")} onProfileChange={reload} />;
+      return (
+        <Lesson
+          profile={profile}
+          onExit={() => setScreen("home")}
+          onProfileChange={reload}
+          onRetry={(skills) => {
+            setRetrySkills(skills);
+            setScreen("retry");
+          }}
+        />
+      );
+    case "retry":
+      return <Lesson key={retrySkills.join()} profile={profile} retry={retrySkills} onExit={() => setScreen("home")} onProfileChange={reload} />;
     case "trial":
       return <Lesson key={trialSkill} profile={profile} trial={trialSkill ?? undefined} onExit={() => setScreen("parent")} />;
     case "pin":
       return <PinGate pin={profile.parentPin} onOk={() => setScreen("parent")} onCancel={() => setScreen("home")} />;
     case "parent":
       return (
+        <Suspense fallback={<main className="parent"><p className="lead">よみこみ中…</p></main>}>
         <Parent
           profile={profile}
           onProfileChange={reload}
@@ -113,6 +132,7 @@ function Main() {
             setScreen("trial");
           }}
         />
+        </Suspense>
       );
     case "stickers":
       return <StickerBook profile={profile} onBack={() => setScreen("home")} />;

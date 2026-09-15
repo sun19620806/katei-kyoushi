@@ -550,3 +550,275 @@ items:
       - { text: "力", mc: similar_kanji }
       - { text: "刃", mc: similar_kanji }
     hint: "たての 線が 上に 出ず、点も ない 字だよ。"
+
+  # ───── 2年の 漢字（まだ 答えに 出て いない 字を 中心に） ─────
+  - id: kw061
+    reading: "とうざいなんぼく"
+    answer: "東西南北"
+    sentence: "地図の すみに {blank}を 書きこんだ。"
+    wrong:
+      - { text: "当西南北", mc: homophone }
+      - { text: "東四南北", mc: similar_kanji }
+      - { text: "東西南比", mc: similar_kanji }
+    hint: "「とう」は お日さまが のぼる ほう。「ざい」の 中の 形も 見よう。"
+
+  - id: kw062
+    reading: "ごぜん"
+    answer: "午前"
+    sentence: "{blank}中に 花の 水やりを すませた。"
+    wrong:
+      - { text: "五前", mc: homophone }
+      - { text: "牛前", mc: similar_kanji }
+    hint: "時間を あらわす「ご」は、たての 線が 上に 出ない 字だよ。"
+
+  - id: kw063
+    reading: "ぎゅうにく"
+    answer: "牛肉"
+    sentence: "カレーに {blank}を 入れた。"
+    wrong:
+      - { text: "午肉", mc: similar_kanji }
+      - { text: "牛内", mc: similar_kanji }
+    hint: "「ぎゅう」は たて線が 上に 出る 字。「にく」は 中に「人」が 2つ。"
+
+  - id: kw064
+    reading: "むぎちゃ"
+    answer: "麦茶"
+    sentence: "つめたい {blank}を ごくごく のんだ。"
+    wrong:
+      - { text: "表茶", mc: similar_kanji }
+      - { text: "麦草", mc: similar_kanji }
+    hint: "「むぎ」の 下は「夕」に にた 形。「ちゃ」は 中に「人」が あるよ。"
+
+  - id: kw065
+    reading: "きいろ"
+    answer: "黄色"
+    sentence: "{blank}の ぼうしを かぶって 歩いた。"
+    wrong:
+      - { text: "木色", mc: homophone }
+      - { text: "黄色い", mc: okurigana }
+    hint: "「き」は 色の 名前に つかう 字。あとに「い」は つけないよ。"
+
+  - id: kw066
+    reading: "きょうだい"
+    answer: "兄弟"
+    sentence: "ぼくの {blank}は 三人とも 元気だ。"
+    wrong:
+      - { text: "兄第", mc: similar_kanji }
+      - { text: "京弟", mc: homophone }
+    hint: "「きょう」は「お兄さん」の 字。「だい」は 竹かんむりが ない 字。"
+
+  - id: kw067
+    reading: "こくご"
+    answer: "国語"
+    sentence: "{blank}の 時間に 音読を した。"
+    wrong:
+      - { text: "黒語", mc: homophone }
+      - { text: "国話", mc: similar_kanji }
+    hint: "「こく」は 口の 形で かこむ 字。「ご」は 右に「五」が あるよ。"
+
+  - id: kw068
+    reading: "のはら"
+    answer: "野原"
+    sentence: "{blank}で ちょうを おいかけた。"
+    wrong:
+      - { text: "野源", mc: similar_kanji }
+      - { text: "予原", mc: similar_kanji }
+    hint: "「の」は 左に「里」が ある 字。「はら」に さんずいは つかないよ。"
+
+  - id: kw069
+    reading: "がようし"
+    answer: "画用紙"
+    sentence: "{blank}に 大きく 絵を かいた。"
+    wrong:
+      - { text: "画曜紙", mc: homophone }
+      - { text: "面用紙", mc: similar_kanji }
+    hint: "「よう」は「つかう」と いう いみの 字。「が」の 形も よく 見よう。"
+
+  - id: kw070
+    reading: "りか"
+    answer: "理科"
+    sentence: "兄は {blank}の じっけんが 大すきだ。"
+    wrong:
+      - { text: "里科", mc: homophone }
+      - { text: "理料", mc: similar_kanji }
+    hint: "「り」は 左に「王」が つく 字。「か」の 右がわも 見よう。"
+
+  - id: kw071
+    reading: "たいふう"
+    answer: "台風"
+    sentence: "{blank}が 来て 木が たおれた。"
+    wrong:
+      - { text: "太風", mc: homophone }
+      - { text: "合風", mc: similar_kanji }
+    hint: "「たい」は 上が「ム」、下が「口」の 字だよ。"
+
+  - id: kw072
+    reading: "こんや"
+    answer: "今夜"
+    sentence: "{blank}は 月が きれいに 見える。"
+    wrong:
+      - { text: "金夜", mc: homophone }
+      - { text: "令夜", mc: similar_kanji }
+    hint: "「こん」は「いま」とも 読む 字。「や」は「よる」とも 読むよ。"
+
+  - id: kw073
+    reading: "ちゅうしょく"
+    answer: "昼食"
+    sentence: "{blank}に サンドイッチを 食べた。"
+    wrong:
+      - { text: "星食", mc: similar_kanji }
+      - { text: "昼色", mc: homophone }
+    hint: "「ちゅう」は「ひる」とも 読む 字。「しょく」は「食べる」の 字だよ。"
+
+  - id: kw074
+    reading: "せんちょう"
+    answer: "船長"
+    sentence: "{blank}が 大きな ふねを うごかす。"
+    wrong:
+      - { text: "船町", mc: homophone }
+      - { text: "般長", mc: similar_kanji }
+    hint: "「ちょう」は「ながい」とも 読む 字だよ。「せん」の 左も 見よう。"
+
+  - id: kw075
+    reading: "てんない"
+    answer: "店内"
+    sentence: "{blank}では しずかに 歩こう。"
+    wrong:
+      - { text: "点内", mc: homophone }
+      - { text: "店肉", mc: similar_kanji }
+    hint: "「てん」は「みせ」とも 読む 字。「ない」は「うち」とも 読むよ。"
+
+  - id: kw076
+    reading: "うたごえ"
+    answer: "歌声"
+    sentence: "音楽室から きれいな {blank}が 聞こえた。"
+    wrong:
+      - { text: "歌売", mc: similar_kanji }
+      - { text: "欧声", mc: similar_kanji }
+    hint: "「うた」は「歌う」の 字だよ。「こえ」の 下の 形も よく 見よう。"
+
+  - id: kw077
+    reading: "しんゆう"
+    answer: "親友"
+    sentence: "{blank}と 同じ はんに なった。"
+    wrong:
+      - { text: "新友", mc: homophone }
+      - { text: "親反", mc: similar_kanji }
+    hint: "「しん」は 右に「見」が ある 字。「ゆう」は「友だち」の 字。"
+
+  - id: kw078
+    reading: "ゆみや"
+    answer: "弓矢"
+    sentence: "むかしの 人は {blank}で えものを とった。"
+    wrong:
+      - { text: "引矢", mc: similar_kanji }
+      - { text: "弓失", mc: similar_kanji }
+    hint: "「ゆみ」は 右に たて線が ない 字。「や」は 上に つき出ない 字だよ。"
+
+  - id: kw079
+    reading: "うもう"
+    answer: "羽毛"
+    sentence: "{blank}の ふとんは ふわふわだ。"
+    wrong:
+      - { text: "羽手", mc: similar_kanji }
+      - { text: "習毛", mc: similar_kanji }
+    hint: "「う」は「はね」とも 読む 字。「もう」は「け」とも 読むよ。"
+
+  - id: kw080
+    reading: "とおい"
+    answer: "遠い"
+    sentence: "海までは まだ {blank}。"
+    wrong:
+      - { text: "遠おい", mc: okurigana }
+      - { text: "園い", mc: similar_kanji }
+    hint: "おくりがなは 1もじ。しんにょうが つく 字だよ。"
+
+  - id: kw081
+    reading: "くろい"
+    answer: "黒い"
+    sentence: "{blank} ねこが へいの 上に いた。"
+    wrong:
+      - { text: "黒ろい", mc: okurigana }
+      - { text: "里い", mc: similar_kanji }
+    hint: "おくりがなは 1もじ。下に 点が 4つ ある 字だよ。"
+
+  - id: kw082
+    reading: "うしろ"
+    answer: "後ろ"
+    sentence: "{blank}の 人に プリントを 回した。"
+    wrong:
+      - { text: "後しろ", mc: okurigana }
+      - { text: "役ろ", mc: similar_kanji }
+    hint: "おくりがなは 1もじ。「午後」の「ご」と 同じ 字だよ。"
+
+  - id: kw083
+    reading: "かう"
+    answer: "買う"
+    sentence: "お店で ノートを 一さつ {blank}。"
+    wrong:
+      - { text: "買かう", mc: okurigana }
+      - { text: "貝う", mc: similar_kanji }
+    hint: "おくりがなは 1もじ。上に「四」のような 形が つく 字だよ。"
+
+  - id: kw084
+    reading: "なおす"
+    answer: "直す"
+    sentence: "こわれた いすを {blank}。"
+    wrong:
+      - { text: "直おす", mc: okurigana }
+      - { text: "真す", mc: similar_kanji }
+    hint: "おくりがなは 1もじ。「直線」の「ちょく」と 同じ 字だよ。"
+
+  - id: kw085
+    reading: "しらせる"
+    answer: "知らせる"
+    sentence: "けがを したら 先生に {blank}。"
+    wrong:
+      - { text: "知せる", mc: okurigana }
+      - { text: "短らせる", mc: similar_kanji }
+    hint: "おくりがなは 3もじ。右がわが「口」の 字だよ。"
+
+  - id: kw086
+    reading: "ひかる"
+    answer: "光る"
+    sentence: "夜空で 星が きらきら {blank}。"
+    wrong:
+      - { text: "光かる", mc: okurigana }
+      - { text: "元る", mc: similar_kanji }
+    hint: "おくりがなは 1もじ。上に みじかい 線が 3本 ある 字だよ。"
+
+  - id: kw087
+    reading: "ひろい"
+    answer: "広い"
+    sentence: "この 公園は とても {blank}。"
+    wrong:
+      - { text: "広ろい", mc: okurigana }
+      - { text: "応い", mc: similar_kanji }
+    hint: "おくりがなは 1もじ。中に「ム」が ある 字だよ。"
+
+  - id: kw088
+    reading: "なつやすみ"
+    answer: "夏休み"
+    sentence: "{blank}に 家ぞくで キャンプを した。"
+    wrong:
+      - { text: "夏体み", mc: similar_kanji }
+      - { text: "夏休すみ", mc: okurigana }
+    hint: "「やすみ」は 人が 木の そばに いる 形。おくりがなは 1もじ。"
+
+  - id: kw089
+    reading: "ゆき"
+    answer: "雪"
+    sentence: "{blank}が つもって 町が まっ白だ。"
+    wrong:
+      - { text: "行き", mc: homophone }
+      - { text: "雷", mc: similar_kanji }
+    hint: "空から ふる ものだから 雨かんむり。下は「ヨ」の 形だよ。"
+
+  - id: kw090
+    reading: "でんわ"
+    answer: "電話"
+    sentence: "友だちに {blank}を かけた。"
+    wrong:
+      - { text: "雷話", mc: similar_kanji }
+      - { text: "電語", mc: similar_kanji }
+    hint: "「でん」は 下に しっぽが ある 字。「わ」は「話す」の 字だよ。"

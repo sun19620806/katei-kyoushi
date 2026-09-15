@@ -229,3 +229,158 @@ stories:
     key: "少ない"
     text: "本だなの 上の だんに 本が {a}さつ、下の だんに {b}さつ あります。下の だんは 上の だんより なんさつ 少ないですか。"
     unit: さつ
+
+  # --- 追加（as037〜as060）---
+  # --- join（あわせて）---
+  - id: as037
+    kind: join
+    op: add
+    key: "みんなで"
+    text: "教室に 男の子が {a}人、女の子が {b}人 います。みんなで なん人 ですか。"
+    unit: 人
+  - id: as038
+    kind: join
+    op: add
+    key: "ぜんぶで"
+    text: "青い ビーズ {a}こと、白い ビーズ {b}こを 一つの はこに 入れました。ビーズは ぜんぶで なんこ ですか。"
+    unit: こ
+  - id: as039
+    kind: join
+    op: add
+    key: "ぜんぶで"
+    text: "こうえんで、すなばで {a}人、のこりの {b}人は ブランコで あそんで います。子どもは ぜんぶで なん人 ですか。"
+    unit: 人
+  - id: as040
+    kind: join
+    op: add
+    key: "あわせて"
+    text: "水ぞくかんで、大人の きっぷが {a}まい、子どもの きっぷが {b}まい 売れました。売れた きっぷは あわせて なんまい ですか。"
+    unit: まい
+
+  # --- increase（ふえると）---
+  - id: as041
+    kind: increase
+    op: add
+    key: "のびました"
+    text: "ひまわりの せの 高さは {a}cm でした。それから {b}cm のびました。いま なんcm ですか。"
+    unit: cm
+  - id: as042
+    kind: increase
+    op: add
+    key: "くれると"
+    text: "ぼくは おはじきを {a}こ もって います。兄が ぼくに {b}こ くれると、ぼくの おはじきは なんこに なりますか。"
+    unit: こ
+  - id: as043
+    kind: increase
+    op: add
+    key: "ふえました"
+    text: "水そうに めだかが {a}ひき います。たまごから かえって、{b}ひき ふえました。めだかは なんびきに なりましたか。"
+    unit: ひき
+  - id: as044
+    kind: increase
+    op: add
+    key: "やけました"
+    text: "パンやさんに のこって いる パンは {a}こ です。そこへ 新しく {b}こ やけました。パンは なんこに なりましたか。"
+    unit: こ
+  - id: as045
+    kind: increase
+    op: add
+    key: "もらえると"
+    text: "クイズで {a}点 とりました。ボーナスで {b}点 もらえると、とくてんは なん点に なりますか。"
+    unit: 点
+
+  # --- separate（のこりは）---
+  - id: as046
+    kind: separate
+    op: sub
+    key: "のこりは"
+    text: "紙コップが {a}こ あります。お楽しみ会で {b}こ つかうと、のこりは なんこ ですか。"
+    unit: こ
+  - id: as047
+    kind: separate
+    op: sub
+    key: "あげました"
+    text: "カードを ぜんぶで {a}まい もって います。そのうち {b}まいを 弟に あげました。のこりは なんまい ですか。"
+    unit: まい
+  - id: as048
+    kind: separate
+    op: sub
+    key: "出て いきました"
+    text: "ちゅうりんじょうに 自てん車が {a}台 とまって います。{b}台 出て いきました。のこって いるのは なん台 ですか。"
+    unit: 台
+  - id: as049
+    kind: separate
+    op: sub
+    key: "売れました"
+    text: "やおやさんに たまごが {a}こ あります。きょう {b}こ 売れました。のこりは なんこ ですか。"
+    unit: こ
+  - id: as050
+    kind: separate
+    op: sub
+    key: "のこって いる"
+    text: "おばあちゃんの 家に みかんが {a}こ ありました。ぼくが {b}こ もらって 帰りました。家に のこって いる みかんは なんこ？"
+    unit: こ
+
+  # --- decrease（へると）---
+  - id: as051
+    kind: decrease
+    op: sub
+    key: "切ると"
+    text: "リボンが {a}cm あります。かざりを 作るのに {b}cm 切ると、のこりの リボンは なんcmに なりますか。"
+    unit: cm
+  - id: as052
+    kind: decrease
+    op: sub
+    key: "おりると"
+    text: "バスに {a}人 のって います。バスていで {b}人 おりると、バスに のって いるのは なん人に なりますか。"
+    unit: 人
+  - id: as053
+    kind: decrease
+    op: sub
+    key: "食べたら"
+    text: "ぶどうが {a}つぶ ありました。みんなで {b}つぶ 食べたら、のこりは ぜんぶで なんつぶに なりますか。"
+    unit: つぶ
+  - id: as054
+    kind: decrease
+    op: sub
+    key: "のこって"
+    text: "学校の かいだんは {a}だん あります。{b}だん のぼると、あと なんだん のこって いますか。"
+    unit: だん
+  - id: as055
+    kind: decrease
+    op: sub
+    key: "買うと"
+    text: "おこづかいが {a}円 あります。{b}円の ノートを 買うと、なん円に なりますか。"
+    unit: 円
+
+  # --- compare（ちがいは・多い・少ない）---
+  - id: as056
+    kind: compare
+    op: sub
+    key: "多く"
+    text: "なわとびで、りくさんは {a}回、そらさんは {b}回 とびました。りくさんは そらさんより なん回 多く とびましたか。"
+    unit: 回
+  - id: as057
+    kind: compare
+    op: sub
+    key: "ちがいは"
+    text: "玉入れで、赤ぐみは {a}こ、白ぐみは {b}こ 入れました。入った 玉の かずの ちがいは なんこ ですか。"
+    unit: こ
+  - id: as058
+    kind: compare
+    op: sub
+    key: "長い"
+    text: "赤い テープは {a}cm、青い テープは {b}cm です。赤い テープは 青い テープより なんcm 長いですか。"
+    unit: cm
+  - id: as059
+    kind: compare
+    op: sub
+    key: "少ない"
+    text: "兄は {a}円、ぼくは {b}円 もって います。ぼくは 兄より なん円 少ないですか。"
+    unit: 円
+  - id: as060
+    kind: compare
+    op: sub
+    key: "多く"
+    text: "妹は どんぐりを {b}こ ひろいました。姉は {a}こ ひろいました。姉は 妹より なんこ 多く ひろいましたか。"
+    unit: こ

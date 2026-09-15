@@ -65,9 +65,9 @@ items:
   # ───── 生きもの ─────
   - id: ys008
     sentence: "ひよこが 小さな 声で {blank} 鳴いて いる。"
-    answer: "ぴよぴよ"
+    answer: "ピヨピヨ"
     wrong:
-      - { text: "もうもう", mc: sound_mismatch }
+      - { text: "モウモウ", mc: sound_mismatch }
       - { text: "ケロケロ", mc: sound_mismatch }
     hint: "生まれて まもない 小さな 鳥の 鳴き声だよ。"
 
@@ -75,9 +75,9 @@ items:
     sentence: "大きな 犬が 強い 声で {blank} ほえた。"
     answer: "ワンワン"
     wrong:
-      - { text: "キャンキャン", mc: intensity_mismatch }
+      - { text: "クンクン", mc: intensity_mismatch }
       - { text: "チュンチュン", mc: sound_mismatch }
-    hint: "犬が 元気よく ほえる ときの 声だよ。高く 小さな 声では ないよ。"
+    hint: "犬が 大きな 声で 元気よく ほえる ときの 声だよ。"
 
   - id: ys010
     sentence: "池で かえるが {blank} 鳴いて いる。"
@@ -202,7 +202,7 @@ items:
     hint: "そっと かるく たたく 音だよ。"
 
   - id: ys025
-    sentence: "手を {blank} たたいて、はく手を おくった。"
+    sentence: "はっぴょうが おわると、みんなが 手を {blank} たたいた。"
     answer: "ぱちぱち"
     wrong:
       - { text: "ぽたぽた", mc: sound_mismatch }

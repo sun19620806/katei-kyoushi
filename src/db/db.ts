@@ -1,8 +1,9 @@
 import Dexie, { type Table } from "dexie";
 import { localDay, ymd, streakDays } from "../domain/dates";
-import { finalizeSession, type SessionResult } from "../domain/finalize";
+import { hasSkill } from "../domain/content";
+import { finalizeSession } from "../domain/finalize";
 import { rebuildOutcomes } from "../domain/recover";
-import type { AnswerEvent, Episode, LearnEvent, Profile, SessionEvent, SkillId, SkillState, Stumble } from "../domain/types";
+import type { AnswerEvent, Episode, LearnEvent, ProblemOutcome, Profile, SessionEvent, SkillId, SkillState, Stumble } from "../domain/types";
 
 type SessionEventRow = SessionEvent;
 type AnswerEventRow = AnswerEvent;
@@ -50,6 +51,7 @@ export const DEFAULT_PROFILE: Profile = {
   allowedTo: "20:30",
   speech: true,
   speechRate: 1,
+  sound: true,
   parentPin: "",
   disabledSkills: [],
   subjects: ["math", "japanese"],
@@ -98,11 +100,31 @@ export const logLine = (key: string) => db.lineUsage.add({ key, at: new Date().t
 
 export const addEvent = (e: LearnEvent) => db.events.put(e);
 
-export async function saveSessionResult(r: SessionResult) {
-  await db.transaction("rw", db.skillStates, db.stumbles, db.episodes, async () => {
-    await db.skillStates.bulkPut(r.changedSkills.map((id) => r.states[id]));
-    await db.stumbles.bulkPut(Object.values(r.stumbles));
-    await db.episodes.bulkPut(r.episodes);
+/**
+ * 授業の おわりを 1つの まとまりで 書く（おわりの記録だけ のこって 学習の記録が ぬける、を ふせぐ）。
+ * すでに おわっている セッションなら 何もしない（null）。
+ * れんぞくの シールは、その日 はじめて 問題を といた ときだけ（やめる だけ・2回目の 授業では 出さない）。
+ */
+export async function commitSession(finish: SessionEvent & { kind: "finish" }, outcomes: ProblemOutcome[], day: string) {
+  return db.transaction("rw", [db.events, db.skillStates, db.stumbles, db.episodes], async () => {
+    const already = await db.events
+      .where("sessionId")
+      .equals(finish.sessionId)
+      .filter((e) => e.type === "session" && e.kind === "finish")
+      .count();
+    if (already) return null;
+    const daysBefore = await studyDays();
+    await db.events.put(finish);
+    const known = outcomes.filter((o) => hasSkill(o.problem.skillId)); // 教材から 消えた スキルの 記録で 止まらないように
+    const firstToday = known.length > 0 && !daysBefore.includes(day);
+    const days = known.length > 0 ? [...new Set([...daysBefore, day])] : daysBefore;
+    const streak = streakDays(days, day);
+    const model = await loadModel();
+    const result = finalizeSession(model.states, model.stumbles, known, day, firstToday ? streak : 0);
+    await db.skillStates.bulkPut(result.changedSkills.map((id) => result.states[id]));
+    await db.stumbles.bulkPut(Object.values(result.stumbles));
+    await db.episodes.bulkPut(result.episodes);
+    return { result, streak, days };
   });
 }
 
@@ -177,21 +199,19 @@ export function recoverUnfinishedSessions(minAgeMs = 0): Promise<void> {
       .filter((e) => e.kind === "start" && !finished.has(e.sessionId) && Date.now() - Date.parse(e.at) >= minAgeMs)
       .sort((a, b) => a.at.localeCompare(b.at));
     for (const start of open) {
-      await db.transaction("rw", [db.events, db.skillStates, db.stumbles, db.episodes], async () => {
-        const already = await db.events.where("sessionId").equals(start.sessionId).filter((e) => e.type === "session" && e.kind === "finish").count();
-        if (already) return;
+      try {
         const answers = (await db.events.where("sessionId").equals(start.sessionId).toArray()).filter((e): e is AnswerEventRow => e.type === "answer");
         const outcomes = rebuildOutcomes(answers);
         const last = answers.map((a) => a.at).sort().at(-1) ?? start.at;
         const minutes = Math.max(1, Math.round((Date.parse(last) - Date.parse(start.at)) / 60000));
-        await db.events.put({ id: `${start.sessionId}-recovered`, type: "session", sessionId: start.sessionId, at: last, kind: "finish", minutes, recovered: true, empty: outcomes.length === 0 });
-        if (outcomes.length === 0) return;
-        const model = await loadModel();
-        const r = finalizeSession(model.states, model.stumbles, outcomes, localDay(last), 0);
-        await db.skillStates.bulkPut(r.changedSkills.map((id) => r.states[id]));
-        await db.stumbles.bulkPut(Object.values(r.stumbles));
-        await db.episodes.bulkPut(r.episodes);
-      });
+        await commitSession(
+          { id: `${start.sessionId}-recovered`, type: "session", sessionId: start.sessionId, at: last, kind: "finish", minutes, recovered: true, empty: outcomes.length === 0 },
+          outcomes,
+          localDay(last),
+        );
+      } catch {
+        // 1つの セッションが こわれていても、ほかの セッションは しめくくる
+      }
     }
   })().finally(() => {
     recovering = null;

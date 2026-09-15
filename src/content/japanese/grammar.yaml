@@ -405,3 +405,202 @@ items:
       - { text: "すきな", mc: modifier_chosen }
       - { text: "わたしの", mc: modifier_chosen }
     hint: "「なには なんだ」の「なんだ」を、文の おわりから さがそう。"
+
+  # ───── 主語（だれが・なにが）すこし むずかしい 文 ─────
+  - id: gr041
+    sentence: "姉が そだてた 花が きれいに さいた。"
+    ask: subject
+    answer: "花が"
+    wrong:
+      - { text: "姉が", mc: modifier_chosen }
+      - { text: "さいた", mc: predicate_for_subject }
+      - { text: "きれいに", mc: modifier_chosen }
+    hint: "「〜が」は 2つ あるよ。文の おわりの ことばと つながるのは どちらかな。"
+
+  - id: gr042
+    sentence: "風が はこんだ はっぱが 池に おちた。"
+    ask: subject
+    answer: "はっぱが"
+    wrong:
+      - { text: "風が", mc: modifier_chosen }
+      - { text: "おちた", mc: predicate_for_subject }
+      - { text: "池に", mc: modifier_chosen }
+    hint: "「〜が」は 2つ。文の いちばん おわりの うごきを したのは どちらかな。"
+
+  - id: gr043
+    sentence: "ゆうべ、父も 早く 帰ってきた。"
+    ask: subject
+    answer: "父も"
+    wrong:
+      - { text: "帰ってきた", mc: predicate_for_subject }
+      - { text: "早く", mc: modifier_chosen }
+      - { text: "ゆうべ", mc: modifier_chosen }
+    hint: "「〜も」が ついた ことばも「だれが」に なるよ。人を あらわす ことばは どれ？"
+
+  - id: gr044
+    sentence: "きのうの 夜、ぼくの 家に おじさんが 来た。"
+    ask: subject
+    answer: "おじさんが"
+    wrong:
+      - { text: "来た", mc: predicate_for_subject }
+      - { text: "家に", mc: modifier_chosen }
+      - { text: "ぼくの", mc: modifier_chosen }
+    hint: "「ぼく」が 出て きても、「〜の」は くわしく する ことばだよ。"
+
+  - id: gr045
+    sentence: "この 町の 空気は とても きれいだ。"
+    ask: subject
+    answer: "空気は"
+    wrong:
+      - { text: "きれいだ", mc: predicate_for_subject }
+      - { text: "町の", mc: modifier_chosen }
+      - { text: "とても", mc: modifier_chosen }
+    hint: "「〜は」の 形の ことばを さがそう。「〜の」は くわしく する ことばだよ。"
+
+  - id: gr046
+    sentence: "公園の 池では、大きな こいも およいでいる。"
+    ask: subject
+    answer: "こいも"
+    wrong:
+      - { text: "およいでいる", mc: predicate_for_subject }
+      - { text: "池では", mc: modifier_chosen }
+      - { text: "大きな", mc: modifier_chosen }
+    hint: "「〜では」は ばしょを あらわすよ。「〜も」の 形の ことばを 見よう。"
+
+  - id: gr047
+    sentence: "毎朝、校門の 前で 先生が 子どもたちを むかえる。"
+    ask: subject
+    answer: "先生が"
+    wrong:
+      - { text: "むかえる", mc: predicate_for_subject }
+      - { text: "子どもたちを", mc: modifier_chosen }
+      - { text: "前で", mc: modifier_chosen }
+    hint: "「〜を」は「なにを」の ことば。「〜が」の 形の ことばを 見つけよう。"
+
+  - id: gr048
+    sentence: "外では 雨が しとしと ふっている。"
+    ask: subject
+    answer: "雨が"
+    wrong:
+      - { text: "ふっている", mc: predicate_for_subject }
+      - { text: "しとしと", mc: modifier_chosen }
+      - { text: "外では", mc: modifier_chosen }
+    hint: "ようすや ばしょを あらわす ことばでは なく、「なにが」を さがそう。"
+
+  - id: gr049
+    sentence: "父が つった 魚が バケツの 中で はねた。"
+    ask: subject
+    answer: "魚が"
+    wrong:
+      - { text: "父が", mc: modifier_chosen }
+      - { text: "はねた", mc: predicate_for_subject }
+      - { text: "中で", mc: modifier_chosen }
+    hint: "「〜が」は 2つ。文の おわりの うごきを したのは 人かな、生きものかな。"
+
+  - id: gr050
+    sentence: "夏の 夜空に、白い 月が ぽっかり うかんだ。"
+    ask: subject
+    answer: "月が"
+    wrong:
+      - { text: "うかんだ", mc: predicate_for_subject }
+      - { text: "夜空に", mc: modifier_chosen }
+      - { text: "白い", mc: modifier_chosen }
+    hint: "「〜に」は ばしょを あらわすよ。「〜が」の 形の ことばを 見つけよう。"
+
+  # ───── 述語（どうする・どんなだ・なんだ）すこし むずかしい 文 ─────
+  - id: gr051
+    sentence: "兄が 作った カレーは とても からかった。"
+    ask: predicate
+    answer: "からかった"
+    wrong:
+      - { text: "カレーは", mc: subject_for_predicate }
+      - { text: "作った", mc: modifier_chosen }
+      - { text: "とても", mc: modifier_chosen }
+    hint: "カレーの あじが どうだったかを あらわす、文の おわりの ことばだよ。"
+
+  - id: gr052
+    sentence: "ぼくの ゆめは パンやさんだ。"
+    ask: predicate
+    answer: "パンやさんだ"
+    wrong:
+      - { text: "ゆめは", mc: subject_for_predicate }
+      - { text: "ぼくの", mc: modifier_chosen }
+    hint: "「なには なんだ」の「なんだ」に あたる ことばを さがそう。"
+
+  - id: gr053
+    sentence: "くじらの 赤ちゃんも とても 大きい。"
+    ask: predicate
+    answer: "大きい"
+    wrong:
+      - { text: "赤ちゃんも", mc: subject_for_predicate }
+      - { text: "くじらの", mc: modifier_chosen }
+      - { text: "とても", mc: modifier_chosen }
+    hint: "「〜も」は「なにが」の ことば。「どんなだ」に あたる ことばは どれかな。"
+
+  - id: gr054
+    sentence: "森の 中は ひんやりと すずしい。"
+    ask: predicate
+    answer: "すずしい"
+    wrong:
+      - { text: "中は", mc: subject_for_predicate }
+      - { text: "ひんやりと", mc: modifier_chosen }
+      - { text: "森の", mc: modifier_chosen }
+    hint: "ようすを くわしく する ことばと、文の おわりの ことばを 分けて 考えよう。"
+
+  - id: gr055
+    sentence: "この 赤い 花の 名前は チューリップだ。"
+    ask: predicate
+    answer: "チューリップだ"
+    wrong:
+      - { text: "名前は", mc: subject_for_predicate }
+      - { text: "花の", mc: modifier_chosen }
+      - { text: "赤い", mc: modifier_chosen }
+    hint: "「なには なんだ」の「なんだ」を、文の おわりで 見つけよう。"
+
+  - id: gr056
+    sentence: "弟も あしたから 一年生だ。"
+    ask: predicate
+    answer: "一年生だ"
+    wrong:
+      - { text: "弟も", mc: subject_for_predicate }
+      - { text: "あしたから", mc: modifier_chosen }
+    hint: "「いつから」を あらわす ことばでは なく、「なんだ」に あたる ことばだよ。"
+
+  - id: gr057
+    sentence: "友だちが かして くれた 本は おもしろかった。"
+    ask: predicate
+    answer: "おもしろかった"
+    wrong:
+      - { text: "本は", mc: subject_for_predicate }
+      - { text: "友だちが", mc: subject_for_predicate }
+      - { text: "かして", mc: modifier_chosen }
+    hint: "本が どんなだったかを あらわす、文の いちばん おわりの ことばだよ。"
+
+  - id: gr058
+    sentence: "ねこが おいかけた ねずみが あなに にげこんだ。"
+    ask: predicate
+    answer: "にげこんだ"
+    wrong:
+      - { text: "おいかけた", mc: modifier_chosen }
+      - { text: "ねずみが", mc: subject_for_predicate }
+      - { text: "ねこが", mc: subject_for_predicate }
+    hint: "うごきの ことばは 2つ。文の いちばん おわりに ある ほうを えらぼう。"
+
+  - id: gr059
+    sentence: "きのうの きゅうしょくは やきそばだった。"
+    ask: predicate
+    answer: "やきそばだった"
+    wrong:
+      - { text: "きゅうしょくは", mc: subject_for_predicate }
+      - { text: "きのうの", mc: modifier_chosen }
+    hint: "「なには なんだった」の「なんだった」に あたる ことばだよ。"
+
+  - id: gr060
+    sentence: "教室の 中で、みんなが 楽しそうに わらった。"
+    ask: predicate
+    answer: "わらった"
+    wrong:
+      - { text: "みんなが", mc: subject_for_predicate }
+      - { text: "楽しそうに", mc: modifier_chosen }
+      - { text: "中で", mc: modifier_chosen }
+    hint: "ようすを くわしく する ことばの あと、文の おわりに ある ことばだよ。"

@@ -15,6 +15,7 @@ import particlesRaw from "../content/japanese/particles.yaml?raw";
 import punctuationRaw from "../content/japanese/punctuation.yaml?raw";
 import yousuRaw from "../content/japanese/yousu.yaml?raw";
 import reading2Raw from "../content/japanese/reading2.yaml?raw";
+import reading3Raw from "../content/japanese/reading3.yaml?raw";
 import type { HintDef, LineDef, MisconceptionDef, SkillDef, SkillId } from "./types";
 
 interface SkillsFile {
@@ -58,7 +59,7 @@ export const JP = {
   kanjiWrite: (load(kanjiWriteRaw) as { items: JpKanjiWrite[] }).items,
   katakana: (load(katakanaRaw) as { items: JpKatakana[] }).items,
   grammar: (load(grammarRaw) as { items: JpGrammar[] }).items,
-  reading: [...(load(readingRaw) as { passages: JpPassage[] }).passages, ...(load(reading2Raw) as { passages: JpPassage[] }).passages],
+  reading: [...(load(readingRaw) as { passages: JpPassage[] }).passages, ...(load(reading2Raw) as { passages: JpPassage[] }).passages, ...(load(reading3Raw) as { passages: JpPassage[] }).passages],
   vocab: (load(vocabRaw) as { items: JpVocab[] }).items,
   particles: (load(particlesRaw) as { items: JpParticle[] }).items,
   punctuation: (load(punctuationRaw) as { items: JpPunctuation[] }).items,

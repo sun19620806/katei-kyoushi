@@ -955,3 +955,5 @@ button:disabled { cursor: default; }
 .setup-guide { padding-left: 1.4em; display: flex; flex-direction: column; gap: 12px; max-width: 60ch; }
 .setup .row .btn { flex: 1; }
 .btn-next:disabled { background: var(--grid-strong); box-shadow: 0 6px 0 var(--ink-3); color: var(--ink-2); }
+
+.retry-btn { align-self: stretch; min-height: 60px; border-radius: 18px; border: 3px solid var(--orange); background: var(--orange-tint); color: var(--orange); font-size: 20px; font-weight: 900; }

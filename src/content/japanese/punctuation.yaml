@@ -92,12 +92,12 @@ items:
 
   - id: pu010
     type: mark
-    sentence: "きょうは いい 天気です{blank}空が 青いです。"
+    sentence: "きのうは 雨でした{blank}でも、きょうは よく 晴れて います。"
     answer: "。"
     wrong:
       - { text: "、", mc: period_comma }
       - { text: "「", mc: quote_misplaced }
-    hint: "です で 文が 一つ おわって いるよ。"
+    hint: "でした で 文が 一つ おわって いるよ。でも から 新しい 文だよ。"
 
   - id: pu011
     type: mark
@@ -115,7 +115,7 @@ items:
     wrong:
       - { text: "」。", mc: mark_position }
       - { text: "。", mc: quote_missing }
-    hint: "丸を 書いてから、話した ことばを とじよう。"
+    hint: "ここには しるしが 二つ 入るよ。丸は かぎの 中かな、外かな。"
 
   - id: pu013
     type: mark
@@ -128,12 +128,12 @@ items:
 
   - id: pu014
     type: mark
-    sentence: "学校から 帰りました{blank}すぐに しゅくだいを しました。"
+    sentence: "学校から 帰りました{blank}それから、しゅくだいを しました。"
     answer: "。"
     wrong:
       - { text: "、", mc: period_comma }
       - { text: "」", mc: quote_misplaced }
-    hint: "ました で 文が 一つ おわって いるよ。"
+    hint: "ました で 文が 一つ おわって いるよ。それから は つぎの 文だよ。"
 
   - id: pu015
     type: mark
@@ -263,4 +263,4 @@ items:
     wrong:
       - { text: "「もう すぐ 冬だね」。と 兄が 言った。", mc: mark_position }
       - { text: "もう すぐ 冬だね。と 兄が 言った。", mc: quote_missing }
-    hint: "話した ことばの 丸は、かぎを とじる 前に 書くよ。"
+    hint: "話した ことばの おわりで、丸と かぎの じゅんばんを よく 見よう。"
