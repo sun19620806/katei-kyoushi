@@ -4,6 +4,9 @@ export function ymd(d: Date = new Date()): string {
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
 }
 
+/** 保存した時刻（ISO・UTC）を、その端末の日付 YYYY-MM-DD にする（日本の朝9時前が前の日にならないように） */
+export const localDay = (iso: string) => ymd(new Date(iso));
+
 export function addDays(day: string, n: number): string {
   const [y, m, d] = day.split("-").map(Number);
   return ymd(new Date(y, m - 1, d + n));

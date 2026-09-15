@@ -27,6 +27,17 @@ export function configureSpeech(opts: { enabled: boolean; rate: number }) {
   rate = opts.rate;
 }
 
+let unlocked = false;
+
+/** iPad の Safari は、さいしょの読み上げを タップの 中で しないと 声が 出ないので、タップの ときに よぶ */
+export function unlockSpeech() {
+  if (unlocked || typeof speechSynthesis === "undefined") return;
+  unlocked = true;
+  const u = new SpeechSynthesisUtterance(" ");
+  u.volume = 0;
+  speechSynthesis.speak(u);
+}
+
 export function speak(text: string, onEnd?: () => void) {
   if (!enabled || typeof speechSynthesis === "undefined" || !text) {
     onEnd?.();

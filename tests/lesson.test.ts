@@ -35,6 +35,23 @@ describe("授業の計画", () => {
     expect(plan.items).toHaveLength(10);
   });
 
+  it("問題数は設定を こえない（5問・つかれた日）", () => {
+    for (const mood of ["futsu", "tsukare"] as const) {
+      for (const n of [5, 8, 10, 15]) {
+        const plan = planLesson({ profile: { ...profile, problemsPerSession: n }, states: {}, stumbles: {}, mood, today: "2026-09-14" });
+        expect(plan.items.length, `${mood} ${n}`).toBeLessThanOrEqual(n);
+        expect(plan.choiceOptions.easy).not.toBe(plan.choiceOptions.challenge);
+      }
+    }
+  });
+
+  it("「出す」を ぜんぶ外しても 授業が 作れる", () => {
+    const off = { ...profile, subjects: ["japanese" as const], disabledSkills: ["jp.katakana", "jp.kanji.read", "jp.kanji.write", "jp.grammar.subject", "jp.reading.story", "jp.reading.explain", "jp.vocab.opposite", "jp.vocab.group", "jp.particles"] };
+    const plan = planLesson({ profile: off, states: {}, stumbles: {}, mood: "futsu", today: "2026-09-14" });
+    expect(plan.items.length).toBeGreaterThan(0);
+    expect(plan.choiceOptions.challenge).toBeTruthy();
+  });
+
   it("つかれた日は問題が少ない", () => {
     const plan = planLesson({ profile, states: {}, stumbles: {}, mood: "tsukare", today: "2026-09-14" });
     expect(plan.items.length).toBeLessThan(10);
@@ -67,7 +84,7 @@ describe("授業の計画", () => {
   it("「出さない」にしたスキルは出ない。前提が出さないスキルでも先に進める", () => {
     const off = { ...profile, disabledSkills: ["math.add.2d2d_to3d", "math.sub.3d2d_borrow"] };
     const plan = planLesson({ profile: off, states: {}, stumbles: {}, mood: "futsu", today: "2026-09-14" });
-    expect(plan.focusSkill).toBe("math.time.shift");
+    expect(plan.focusSkill).toBe("math.add.3d2d");
     expect(plan.items.map((i) => i.skillId)).not.toContain("math.add.2d2d_to3d");
   });
 });

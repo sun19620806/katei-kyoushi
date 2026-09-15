@@ -56,3 +56,26 @@ hints:
   - { skillId: jp.reading.explain, misconception: wrong_part, level: 1, text: "きかれて いる ところを、もう いちど さがそう。" }
   - { skillId: jp.reading.explain, misconception: word_match, level: 1, text: "おなじ ことばが 入って いるだけかも。いみを たしかめよう。" }
   - { skillId: jp.reading.explain, misconception: who_confused, level: 1, text: "なんの ことを 書いて いるか、ぶんしょうで たしかめよう。" }
+
+  # ───── はんたいの ことば ─────
+  - { skillId: jp.vocab.opposite, misconception: "*", level: 1, text: "「{jp_word}」と ぎゃくの ようすを 思いうかべよう。" }
+  - { skillId: jp.vocab.opposite, misconception: "*", level: 2, text: "にて いる いみの ことばは えらばないよ。はんたいの いみを さがそう。" }
+  - { skillId: jp.vocab.opposite, misconception: "*", level: 3, text: "{item_hint}" }
+  - { skillId: jp.vocab.opposite, misconception: similar_meaning, level: 1, text: "それは にて いる いみの ことばだね。ぎゃくは どれかな？" }
+  - { skillId: jp.vocab.opposite, misconception: related_not_opposite, level: 1, text: "かんけいは あるけれど、はんたいの いみでは ないよ。" }
+
+  # ───── なかまの ことば ─────
+  - { skillId: jp.vocab.group, misconception: "*", level: 1, text: "「{jp_word}」の なかまに 入る ものを さがそう。" }
+  - { skillId: jp.vocab.group, misconception: "*", level: 2, text: "1つずつ「これは {jp_word}かな？」と たしかめよう。" }
+  - { skillId: jp.vocab.group, misconception: "*", level: 3, text: "{item_hint}" }
+  - { skillId: jp.vocab.group, misconception: group_other, level: 1, text: "それは べつの なかまの ことばだよ。" }
+  - { skillId: jp.vocab.group, misconception: group_name, level: 1, text: "それは なかまの 名前だね。なかまに 入る ものを えらぼう。" }
+
+  # ───── 「は・を・へ」 ─────
+  - { skillId: jp.particles, misconception: "*", level: 1, text: "こえに 出すと 同じ 音でも、書く 字が かわる ことが あるよ。" }
+  - { skillId: jp.particles, misconception: "*", level: 2, text: "ことばの うしろに つく ときと、ことばの 一ぶの ときで 書きかたが かわるよ。" }
+  - { skillId: jp.particles, misconception: "*", level: 3, text: "{item_hint}" }
+  - { skillId: jp.particles, misconception: particle_sound, level: 1, text: "音の とおりに 書いたね。ことばの うしろに つく ときは 書きかたが かわるよ。" }
+  - { skillId: jp.particles, misconception: particle_overuse, level: 1, text: "ことばの 一ぶの ときは、音の とおりに 書くよ。" }
+  - { skillId: jp.particles, misconception: particle_other, level: 1, text: "文の いみに 合うかな？ もう いちど 読んでみよう。" }
+

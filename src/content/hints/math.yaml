@@ -54,7 +54,7 @@ hints:
   - { skillId: math.add.2d2d_to3d, misconception: "*", level: 2, text: "10を こえたら、となりの くらいに 1 くりあがるよ。", visual: carry_mark }
   - { skillId: math.add.2d2d_to3d, misconception: "*", level: 3, text: "十のくらいが 10を こえたら、百のくらいに 1を かこう。", visual: hundreds_highlight }
   - { skillId: math.add.2d2d_to3d, misconception: no_carry, level: 1, text: "くりあがった 1を たしたかな？", visual: carry_mark }
-  - { skillId: math.add.2d2d_to3d, misconception: no_carry, level: 2, text: "十のくらいは {a10}+{b10}に、くりあがりの 1も たすよ。", visual: tens_highlight }
+  - { skillId: math.add.2d2d_to3d, misconception: no_carry, level: 2, text: "くりあがりが ある くらいを 見つけて、1を たすのを わすれないでね。", visual: carry_mark }
   - { skillId: math.add.2d2d_to3d, misconception: no_carry, level: 3, text: "十のくらいの こたえが 10を こえたら、百のくらいに 1を かこう。", visual: hundreds_highlight }
   - { skillId: math.add.2d2d_to3d, misconception: concat_ones, level: 1, text: "一のくらいには、すうじを 1つだけ かくよ。", visual: ones_highlight }
   - { skillId: math.add.2d2d_to3d, misconception: concat_ones, level: 2, text: "{ones_sum}の 1は 十のくらいへ おひっこし。", visual: carry_mark }
@@ -94,10 +94,10 @@ hints:
   # ───── □を使った九九 ─────
   - { skillId: math.mul.missing, misconception: "*", level: 1, text: "{n}の だんで、こたえが {product}に なるのは どれかな？", visual: none }
   - { skillId: math.mul.missing, misconception: "*", level: 2, text: "{n}の だんを {n}×2から となえて、{product}を さがそう。", visual: none }
-  - { skillId: math.mul.missing, misconception: "*", level: 3, text: "{n}×{m_minus1}は {prev}。{product}までは あと {n}。", visual: array }
+  - { skillId: math.mul.missing, misconception: "*", level: 3, text: "{n}×{m_minus1}は {prev}。{product}までは あと {n}。", visual: none }
   - { skillId: math.mul.missing, misconception: product_minus, level: 1, text: "□は「{n}が なんこ分」の かずだよ。", visual: none }
   - { skillId: math.mul.missing, misconception: product_minus, level: 2, text: "{n}の だんを となえて、{product}に なる ところを さがそう。", visual: none }
-  - { skillId: math.mul.missing, misconception: product_minus, level: 3, text: "{n}×{m_minus1}は {prev}。{product}までは あと {n}。", visual: array }
+  - { skillId: math.mul.missing, misconception: product_minus, level: 3, text: "{n}×{m_minus1}は {prev}。{product}までは あと {n}。", visual: none }
   - { skillId: math.mul.missing, misconception: neighbor_fact, level: 1, text: "おしい！ {n}× □ を けいさんして、{product}に なるか たしかめよう。", visual: none }
 
   # ───── かけ算の文章題 ─────
@@ -125,7 +125,7 @@ hints:
 
   # ───── とけいを読む ─────
   - { skillId: math.time.read, misconception: "*", step: 0, level: 1, text: "みじかい はりを 見よう。みじかい はりが「時」だよ。", visual: hour_hand }
-  - { skillId: math.time.read, misconception: "*", step: 0, level: 2, text: "みじかい はりが すうじの あいだに あるときは、小さい ほうの すうじ。", visual: hour_hand }
+  - { skillId: math.time.read, misconception: "*", step: 0, level: 2, text: "みじかい はりが すうじの あいだに あるときは、すぎた ほうの すうじだよ。", visual: hour_hand }
   - { skillId: math.time.read, misconception: "*", step: 0, level: 3, text: "みじかい はりが さいごに すぎた すうじを 読もう。", visual: hour_hand }
   - { skillId: math.time.read, misconception: hands_swapped, step: 0, level: 1, text: "ながい はりは「分」、みじかい はりが「時」だよ。", visual: hour_hand }
   - { skillId: math.time.read, misconception: hour_ahead, step: 0, level: 1, text: "みじかい はりは、まだ つぎの すうじに とどいて いないよ。", visual: hour_hand }
@@ -142,8 +142,8 @@ hints:
   - { skillId: math.time.shift, misconception: before_after_mix, step: 0, level: 1, text: "「{dir_label}」だから、とけいの はりを {dir_verb}よ。", visual: minute_hand }
   - { skillId: math.time.shift, misconception: no_hour_carry, step: 0, level: 1, text: "12を こえると、時も かわるよ。", visual: hour_hand }
   - { skillId: math.time.shift, misconception: "*", step: 1, level: 1, text: "12を こえてから、なん分 {dir_verb}かな？", visual: minute_hand }
-  - { skillId: math.time.shift, misconception: "*", step: 1, level: 2, text: "12まで {to_hour}分。のこりは {rest}分だよ。", visual: minute_hand }
-  - { skillId: math.time.shift, misconception: "*", step: 1, level: 3, text: "12から {rest}分 {dir_verb}と、なん分かな？", visual: minute_hand }
+  - { skillId: math.time.shift, misconception: "*", step: 1, level: 2, text: "12まで {to_hour}分。のこりの 分を かんがえよう。", visual: minute_hand }
+  - { skillId: math.time.shift, misconception: "*", step: 1, level: 3, text: "{shift}分から {to_hour}分を ひいた のこりだけ、12から {dir_verb}よ。", visual: minute_hand }
   - { skillId: math.time.shift, misconception: hour_as_100, step: 1, level: 1, text: "1時間は 60分。100分では ないよ。", visual: minute_hand }
   - { skillId: math.time.shift, misconception: no_hour_carry, step: 1, level: 1, text: "60分に なったら、1時間に くりあがるよ。", visual: minute_hand }
   - { skillId: math.time.shift, misconception: before_after_mix, step: 1, level: 1, text: "「{dir_label}」だから、はりを {dir_verb}よ。", visual: minute_hand }
@@ -177,3 +177,55 @@ hints:
   - { skillId: math.shape.basic, misconception: side_count, level: 1, text: "へんは なん本 あるかな？ かぞえてみよう。", visual: none }
   - { skillId: math.shape.basic, misconception: no_right_angle, level: 1, text: "かどが 直角か、三角じょうぎの かどで たしかめよう。", visual: none }
   - { skillId: math.shape.basic, misconception: unequal_sides, level: 1, text: "へんの 長さが みんな おなじか、くらべてみよう。", visual: none }
+
+  # ───── 3けた＋2けた ─────
+  - { skillId: math.add.3d2d, misconception: "*", level: 1, text: "くらいを そろえて、一のくらいから けいさんしよう。", visual: ones_highlight }
+  - { skillId: math.add.3d2d, misconception: "*", level: 2, text: "{a1}+{b1}は 10いじょう。十のくらいに 1 くりあがるよ。", visual: carry_mark }
+  - { skillId: math.add.3d2d, misconception: "*", level: 3, text: "百のくらいは、十のくらいから くりあがりが あれば 1を たして おろそう。", visual: hundreds_highlight }
+  - { skillId: math.add.3d2d, misconception: place_misalign, level: 1, text: "{b}は 2けた。一のくらいの ばしょに {b1}が くるように そろえよう。", visual: ones_highlight }
+  - { skillId: math.add.3d2d, misconception: place_misalign, level: 2, text: "{b10}は 十のくらい。百のくらいには なにも たさないよ。", visual: tens_highlight }
+  - { skillId: math.add.3d2d, misconception: no_carry, level: 1, text: "くりあがった 1を たしたかな？", visual: carry_mark }
+  - { skillId: math.add.3d2d, misconception: calc_slip, level: 1, text: "やりかたは あっているよ。どこか 1つだけ ずれたかも。", visual: none }
+
+  # ───── 十の位が0の ひき算 ─────
+  - { skillId: math.sub.from_zero, misconception: "*", level: 1, text: "一のくらいから。{a1}から {b1}は ひけるかな？", visual: ones_highlight }
+  - { skillId: math.sub.from_zero, misconception: "*", level: 2, text: "十のくらいが 0だから、百のくらいから 10を かりて、十のくらいを 10に しよう。", visual: borrow_mark }
+  - { skillId: math.sub.from_zero, misconception: "*", level: 3, text: "十のくらいの 10から、一のくらいに 10を かすと、十のくらいは 9に なるよ。", visual: borrow_mark }
+  - { skillId: math.sub.from_zero, misconception: smaller_from_larger, level: 1, text: "ひきざんは 上の かずから 下の かずを ひくよ。", visual: ones_highlight }
+  - { skillId: math.sub.from_zero, misconception: borrow_no_decrement, level: 1, text: "かした くらいは 1 へるよ。百のくらいと 十のくらいを 見なおそう。", visual: borrow_mark }
+  - { skillId: math.sub.from_zero, misconception: calc_slip, level: 1, text: "こたえに 下の かずを たすと、上の かずに なるか たしかめよう。", visual: none }
+
+  # ───── 九九のきまり ─────
+  - { skillId: math.mul.rule, misconception: "*", level: 1, text: "{rule_l1}", visual: none }
+  - { skillId: math.mul.rule, misconception: "*", level: 2, text: "{rule_l2}", visual: none }
+  - { skillId: math.mul.rule, misconception: "*", level: 3, text: "{rule_l3}", visual: none }
+  - { skillId: math.mul.rule, misconception: one_more, level: 1, text: "かける かずが 1 ふえると、かけられる かずの かたまりが 1つ ふえるよ。", visual: none }
+  - { skillId: math.mul.rule, misconception: gave_product, level: 1, text: "きかれて いるのは 九九の こたえ ではないよ。もんだいを もう いちど 読もう。", visual: none }
+  - { skillId: math.mul.rule, misconception: same_number, level: 1, text: "左と 右で、かずの ばしょが 入れかわって いるよ。", visual: none }
+
+  # ───── 大きい数の くらべっこ ─────
+  - { skillId: math.number.compare, misconception: "*", level: 1, text: "いちばん 上の くらいから じゅんに くらべよう。", visual: none }
+  - { skillId: math.number.compare, misconception: "*", level: 2, text: "おなじ くらいの かずが おなじなら、つぎの くらいを くらべるよ。", visual: none }
+  - { skillId: math.number.compare, misconception: "*", level: 3, text: "＞は 左が 大きい、＜は 右が 大きい。口が ひらいて いる ほうが 大きいよ。", visual: none }
+  - { skillId: math.number.compare, misconception: ones_first, level: 1, text: "一のくらいでは なく、上の くらいから くらべるよ。", visual: none }
+  - { skillId: math.number.compare, misconception: sign_reversed, level: 1, text: "口が ひらいて いる ほうが 大きい かずだよ。", visual: none }
+
+  # ───── 1の段（かける数と答えが同じなので、数字を書かないヒント） ─────
+  - { skillId: math.mul.dan1, misconception: "*", level: 1, text: "1の だんは、1が なんこ分 あるかを かんがえるよ。", visual: none }
+  - { skillId: math.mul.dan1, misconception: "*", level: 2, text: "1が 1こずつ ふえて いくよ。いち いちが いち、いん にが に…", visual: none }
+  - { skillId: math.mul.dan1, misconception: "*", level: 3, text: "1の だんの こたえは、かける かずと おなじに なるよ。", visual: none }
+
+  # ───── たし算・ひき算の文章題 ─────
+  - { skillId: math.addsub.word, misconception: "*", step: 0, level: 1, text: "ぶんしょうの「{key}」に 目を つけよう。", visual: none }
+  - { skillId: math.addsub.word, misconception: "*", step: 0, level: 2, text: "あわせる・ふえる ときは たしざん。のこり・へる・ちがい は ひきざん。", visual: none }
+  - { skillId: math.addsub.word, misconception: "*", step: 0, level: 3, text: "「{key}」だから、{op_word}の しきに なるよ。", visual: none }
+  - { skillId: math.addsub.word, misconception: op_reversed, step: 0, level: 1, text: "「{key}」は、ふえる ことかな？ へる ことかな？", visual: none }
+  - { skillId: math.addsub.word, misconception: "*", step: 1, level: 1, text: "ひっさんに して、一のくらいから けいさんしよう。", visual: none }
+  - { skillId: math.addsub.word, misconception: "*", step: 1, level: 2, text: "くりあがりや くりさがりが あるか、一のくらいを 見よう。", visual: none }
+  - { skillId: math.addsub.word, misconception: "*", step: 1, level: 3, text: "たしざんは ひきざんで、ひきざんは たしざんで たしかめられるよ。", visual: none }
+  - { skillId: math.addsub.word, misconception: op_reversed, step: 1, level: 1, text: "えらんだ しきは {op_word}だよ。その しきで けいさんしよう。", visual: none }
+  - { skillId: math.addsub.word, misconception: no_carry, step: 1, level: 1, text: "くりあがった 1を たしたかな？", visual: none }
+  - { skillId: math.addsub.word, misconception: smaller_from_larger, step: 1, level: 1, text: "一のくらいが ひけない ときは、十のくらいから 10を かりよう。", visual: none }
+  - { skillId: math.addsub.word, misconception: borrow_no_decrement, step: 1, level: 1, text: "10を かした 十のくらいは、1 へるよ。", visual: none }
+  - { skillId: math.addsub.word, misconception: calc_slip, step: 1, level: 1, text: "おしい！ 1だけ ずれて いるかも。もう いちど たしかめよう。", visual: none }
+

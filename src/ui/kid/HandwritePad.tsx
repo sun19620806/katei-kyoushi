@@ -17,11 +17,18 @@ interface Props {
   resetKey: string; // 問題が かわったら マスを 空に する
 }
 
+/** いちど ペンが つかわれたら、その あとは ゆび（手のひら）を むしする（マスや 問題が かわっても おぼえておく） */
+let penSeen = false;
+
+type Cell = { digit: number | null; strokes: XY[][]; alternatives: number[]; unsure: boolean };
+type Flush = () => Cell | null;
+
 const RECOGNIZE_DELAY = 700; // ペンを はなしてから 読むまで（4・5・7 など 2画の 字を 待つ）
 
 /** Apple Pencil・ゆびで すうじを 書く。1マスに 1もじ */
 export default function HandwritePad({ boxes, templates, onChange, onSubmit, resetKey }: Props) {
-  const [cells, setCells] = useState<{ digit: number | null; strokes: XY[][]; alternatives: number[]; unsure: boolean }[]>(() =>
+  const flushers = useRef<(Flush | null)[]>([]);
+  const [cells, setCells] = useState<Cell[]>(() =>
     Array.from({ length: boxes }, () => ({ digit: null, strokes: [], alternatives: [], unsure: false })),
   );
 
@@ -37,8 +44,27 @@ export default function HandwritePad({ boxes, templates, onChange, onSubmit, res
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cells]);
 
-  const update = (i: number, patch: Partial<(typeof cells)[number]>) =>
-    setCells((cs) => cs.map((c, k) => (k === i ? { ...c, ...patch } : c)));
+  const update = (i: number, patch: Partial<Cell>) => setCells((cs) => cs.map((c, k) => (k === i ? { ...c, ...patch } : c)));
+
+  const readCell = (strokes: XY[][]): Cell => {
+    const r = recognizeDigit(strokes, templates);
+    const unsure = r.digit !== null && (r.score < 0.35 || isConfusable(r.digit, r.alternatives[0]));
+    return { strokes, digit: r.digit, alternatives: r.alternatives, unsure };
+  };
+
+  /** まだ 読みとって いない 字（書いた すぐ あと）も 読んでから 答える */
+  const submit = () => {
+    let next = cells;
+    flushers.current.forEach((flush, i) => {
+      const c = flush?.();
+      if (c) next = next.map((old, k) => (k === i ? c : old));
+    });
+    if (next !== cells) {
+      setCells(next);
+      onChange({ value: next.map((c) => (c.digit === null ? "" : String(c.digit))).join(""), boxes: next.map(({ digit, strokes }) => ({ digit, strokes })) });
+    }
+    if (next.some((c) => c.digit !== null)) onSubmit();
+  };
 
   const [generation, setGeneration] = useState(0);
   const filled = cells.some((c) => c.digit !== null);
@@ -52,11 +78,8 @@ export default function HandwritePad({ boxes, templates, onChange, onSubmit, res
             digit={c.digit}
             unsure={c.unsure}
             alternatives={c.alternatives}
-            onStrokes={(strokes) => {
-              const r = recognizeDigit(strokes, templates);
-              const unsure = r.digit !== null && (r.score < 0.35 || isConfusable(r.digit, r.alternatives[0]));
-              update(i, { strokes, digit: r.digit, alternatives: r.alternatives, unsure });
-            }}
+            onStrokes={(strokes) => update(i, readCell(strokes))}
+            register={(flush) => (flushers.current[i] = flush ? () => { const s = flush(); return s ? readCell(s) : null; } : null)}
             onPick={(d) => update(i, { digit: d, unsure: false, alternatives: [] })}
             onClear={() => update(i, { digit: null, strokes: [], alternatives: [], unsure: false })}
           />
@@ -73,7 +96,7 @@ export default function HandwritePad({ boxes, templates, onChange, onSubmit, res
         >
           ぜんぶ けす
         </button>
-        <button className="submit" disabled={!filled} onClick={onSubmit}>
+        <button className="submit" onClick={submit}>
           こたえる
         </button>
       </div>
@@ -95,13 +118,14 @@ interface InkBoxProps {
   onStrokes: (s: XY[][]) => void;
   onPick: (d: number) => void;
   onClear: () => void;
+  /** 読みとり待ちの 字を すぐ 読む 関数を わたす（なければ null） */
+  register: (flush: (() => XY[][] | null) | null) => void;
 }
 
-function InkBox({ digit, unsure, alternatives, onStrokes, onPick, onClear }: InkBoxProps) {
+function InkBox({ digit, unsure, alternatives, onStrokes, onPick, onClear, register }: InkBoxProps) {
   const canvas = useRef<HTMLCanvasElement>(null);
   const strokes = useRef<XY[][]>([]);
   const drawing = useRef(false);
-  const penSeen = useRef(false);
   const timer = useRef<number | undefined>(undefined);
 
   // 高解像度の画面に合わせる
@@ -119,9 +143,16 @@ function InkBox({ digit, unsure, alternatives, onStrokes, onPick, onClear }: Ink
     resize();
     const ro = new ResizeObserver(resize);
     ro.observe(c);
+    register(() => {
+      if (timer.current === undefined) return null;
+      window.clearTimeout(timer.current);
+      timer.current = undefined;
+      return strokes.current.map((s) => [...s]);
+    });
     return () => {
       ro.disconnect();
       window.clearTimeout(timer.current);
+      register(null);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -149,8 +180,8 @@ function InkBox({ digit, unsure, alternatives, onStrokes, onPick, onClear }: Ink
   };
 
   const down = (e: React.PointerEvent) => {
-    if (e.pointerType === "pen") penSeen.current = true;
-    if (penSeen.current && e.pointerType === "touch") return; // ペンを つかって いるときは 手のひらを むし
+    if (e.pointerType === "pen") penSeen = true;
+    if (penSeen && e.pointerType === "touch") return; // ペンを つかって いるときは 手のひらを むし
     e.preventDefault();
     window.clearTimeout(timer.current);
     canvas.current!.setPointerCapture(e.pointerId);
@@ -172,7 +203,10 @@ function InkBox({ digit, unsure, alternatives, onStrokes, onPick, onClear }: Ink
   const up = () => {
     if (!drawing.current) return;
     drawing.current = false;
-    timer.current = window.setTimeout(() => onStrokes(strokes.current.map((s) => [...s])), RECOGNIZE_DELAY);
+    timer.current = window.setTimeout(() => {
+      timer.current = undefined;
+      onStrokes(strokes.current.map((s) => [...s]));
+    }, RECOGNIZE_DELAY);
   };
 
   const clear = () => {

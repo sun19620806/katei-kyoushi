@@ -1,0 +1,231 @@
+# たし算・ひき算の文章題。{a} > {b}（どちらも 2けた）。
+# op: add = {a}+{b} / sub = {a}−{b}
+# kind: join（あわせて）/ increase（ふえると）/ separate（のこりは）/ decrease（へると）/ compare（ちがいは・どちらが なん こ 多い）
+# key: 式を きめる 手がかりの ことば（ヒントで 使う。本文に そのまま ある ことば）
+# unit: 答えの 単位
+stories:
+  # --- join（あわせて）---
+  - id: as001
+    kind: join
+    op: add
+    key: "あわせて"
+    text: "あかい 花が {a}本、しろい 花が {b}本 さいて います。あわせて なん本 ですか。"
+    unit: 本
+  - id: as002
+    kind: join
+    op: add
+    key: "ぜんぶで"
+    text: "赤い 金魚が {a}ひき、黒い 金魚が {b}ひき います。金魚は ぜんぶで なんびき いますか。"
+    unit: ひき
+  - id: as003
+    kind: join
+    op: add
+    key: "あわせて"
+    text: "おにぎりを お父さんが {a}こ、お母さんが {b}こ 作りました。あわせて なんこ ですか。"
+    unit: こ
+  - id: as004
+    kind: join
+    op: add
+    key: "あわせて"
+    text: "水ぞくかんの ショーを 大人が {a}人、子どもが {b}人 見て います。あわせて なん人 ですか。"
+    unit: 人
+  - id: as005
+    kind: join
+    op: add
+    key: "ぜんぶで"
+    text: "本だなに 絵本が {a}さつ、ずかんが {b}さつ あります。本は ぜんぶで なんさつ ありますか。"
+    unit: さつ
+  - id: as006
+    kind: join
+    op: add
+    key: "あわせて"
+    text: "サッカーの しあいに、赤チームの おうえんが {a}人、白チームの おうえんが {b}人 来ました。あわせて なん人 ですか。"
+    unit: 人
+  - id: as007
+    kind: join
+    op: add
+    key: "あわせて"
+    text: "クッキーを きのう {a}まい、きょう {b}まい やきました。あわせて なんまい ですか。"
+    unit: まい
+
+  # --- increase（ふえると）---
+  - id: as008
+    kind: increase
+    op: add
+    key: "もらいました"
+    text: "シールを {a}まい もって います。{b}まい もらいました。シールは なんまいに なりましたか。"
+    unit: まい
+  - id: as009
+    kind: increase
+    op: add
+    key: "のって きました"
+    text: "電車に {a}人 のって います。えきで {b}人 のって きました。いま なん人 のって いますか。"
+    unit: 人
+  - id: as010
+    kind: increase
+    op: add
+    key: "ふえると"
+    text: "水そうに 金魚が {a}ひき います。{b}ひき ふえると、なんびきに なりますか。"
+    unit: ひき
+  - id: as011
+    kind: increase
+    op: add
+    key: "ぜんぶで"
+    text: "花だんに チューリップが {a}本 さいて います。きょう また {b}本 さきました。ぜんぶで なん本に なりましたか。"
+    unit: 本
+  - id: as012
+    kind: increase
+    op: add
+    key: "ぜんぶで"
+    text: "本を {a}ページ よみました。つづけて {b}ページ よみました。ぜんぶで なんページ よみましたか。"
+    unit: ページ
+  - id: as013
+    kind: increase
+    op: add
+    key: "来ました"
+    text: "こうえんで 子どもが {a}人 あそんで います。そこへ {b}人 来ました。みんなで なん人に なりましたか。"
+    unit: 人
+  - id: as014
+    kind: increase
+    op: add
+    key: "入れると"
+    text: "ちょ金ばこに {a}円 入って います。おこづかいの {b}円を 入れると、なん円に なりますか。"
+    unit: 円
+
+  # --- separate（のこりは）---
+  - id: as015
+    kind: separate
+    op: sub
+    key: "のこりは"
+    text: "あめが {a}こ あります。{b}こ 食べると、のこりは なんこ ですか。"
+    unit: こ
+  - id: as016
+    kind: separate
+    op: sub
+    key: "あげました"
+    text: "おりがみが {a}まい あります。友だちに {b}まい あげました。なんまい のこって いますか。"
+    unit: まい
+  - id: as017
+    kind: separate
+    op: sub
+    key: "おりました"
+    text: "電車に {a}人 のって います。えきで {b}人 おりました。いま なん人 のって いますか。"
+    unit: 人
+  - id: as018
+    kind: separate
+    op: sub
+    key: "のこりは"
+    text: "クッキーが {a}まい ありました。みんなで {b}まい 食べました。のこりは なんまい ですか。"
+    unit: まい
+  - id: as019
+    kind: separate
+    op: sub
+    key: "帰りました"
+    text: "水ぞくかんに {a}人 来ました。そのうち {b}人が 先に 帰りました。のこって いるのは なん人 ですか。"
+    unit: 人
+  - id: as020
+    kind: separate
+    op: sub
+    key: "かりて いきました"
+    text: "本だなに 本が {a}さつ あります。{b}さつ かりて いきました。本だなに のこって いるのは なんさつ ですか。"
+    unit: さつ
+  - id: as021
+    kind: separate
+    op: sub
+    key: "食べました"
+    text: "遠足に おにぎりを {a}こ もって いきました。お昼に {b}こ 食べました。なんこ のこって いますか。"
+    unit: こ
+
+  # --- decrease（へると）---
+  - id: as022
+    kind: decrease
+    op: sub
+    key: "つかうと"
+    text: "シールが {a}まい ありました。{b}まい つかうと、なんまいに なりますか。"
+    unit: まい
+  - id: as023
+    kind: decrease
+    op: sub
+    key: "つかいました"
+    text: "ちょ金ばこに {a}円 ありました。{b}円 つかいました。なん円に なりましたか。"
+    unit: 円
+  - id: as024
+    kind: decrease
+    op: sub
+    key: "とんで いくと"
+    text: "木に 鳥が {a}わ とまって います。{b}わ とんで いくと、なんわに なりますか。"
+    unit: わ
+  - id: as025
+    kind: decrease
+    op: sub
+    key: "へると"
+    text: "クッキーが {a}まい あります。{b}まい へると、なんまいに なりますか。"
+    unit: まい
+  - id: as026
+    kind: decrease
+    op: sub
+    key: "なくなると"
+    text: "ボールが {a}こ あります。サッカーの れんしゅうで {b}こ なくなると、なんこに なりますか。"
+    unit: こ
+  - id: as027
+    kind: decrease
+    op: sub
+    key: "おわると"
+    text: "ドリルが {a}ページ あります。{b}ページ おわると、あと なんページ ですか。"
+    unit: ページ
+  - id: as028
+    kind: decrease
+    op: sub
+    key: "かれて しまうと"
+    text: "花だんに 花が {a}本 ありました。{b}本 かれて しまうと、なん本に へりますか。"
+    unit: 本
+
+  # --- compare（ちがいは・多い・少ない）---
+  - id: as029
+    kind: compare
+    op: sub
+    key: "多い"
+    text: "赤ぐみは {a}人、白ぐみは {b}人 います。どちらが なん人 多いですか。"
+    unit: 人
+  - id: as030
+    kind: compare
+    op: sub
+    key: "ちがいは"
+    text: "赤い はこに カードが {a}まい、青い はこに {b}まい 入って います。まいすうの ちがいは なんまい ですか。"
+    unit: まい
+  - id: as031
+    kind: compare
+    op: sub
+    key: "少ない"
+    text: "金魚が {a}ひき、めだかが {b}ひき います。めだかは 金魚より なんびき 少ないですか。"
+    unit: ひき
+  - id: as032
+    kind: compare
+    op: sub
+    key: "多い"
+    text: "おにぎりが {a}こ、パンが {b}こ あります。おにぎりは パンより なんこ 多いですか。"
+    unit: こ
+  - id: as033
+    kind: compare
+    op: sub
+    key: "ちがいは"
+    text: "サッカーボールが {a}こ、バスケットボールが {b}こ あります。かずの ちがいは なんこ ですか。"
+    unit: こ
+  - id: as034
+    kind: compare
+    op: sub
+    key: "少ない"
+    text: "赤い 花が {a}本、白い 花が {b}本 さいて います。白い 花は 赤い 花より なん本 少ないですか。"
+    unit: 本
+  - id: as035
+    kind: compare
+    op: sub
+    key: "多い"
+    text: "電車に 大人が {a}人、子どもが {b}人 のって います。大人は 子どもより なん人 多いですか。"
+    unit: 人
+  - id: as036
+    kind: compare
+    op: sub
+    key: "少ない"
+    text: "本だなの 上の だんに 本が {a}さつ、下の だんに {b}さつ あります。下の だんは 上の だんより なんさつ 少ないですか。"
+    unit: さつ

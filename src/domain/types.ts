@@ -39,6 +39,9 @@ export type ProblemKind =
   | "fraction_shape" // 1/4 に色をぬった図をえらぶ
   | "place_compose" // 1000を3こ、100を0こ… → 3052
   | "shape_pick" // 三角形・四角形などをえらぶ
+  | "mul_rule" // 九九のきまり（7×6は7×5よりいくつ大きい、□×8=8×6）
+  | "compare" // 大きい数のくらべ（＞・＜）
+  | "addsub_word" // たし算・ひき算の文章題（式を選ぶ → 答え）
   | "jp_choice"; // 国語（えらぶ問題）
 
 /** 1問の中の1つの答え（文章題は「式を選ぶ」→「答えを入れる」の2ステップ） */
@@ -73,11 +76,15 @@ export interface Problem {
     | "fraction"
     | "place"
     | "shape"
+    | "rule"
+    | "compare"
     | "kanji_read"
     | "kanji_write"
     | "katakana"
     | "grammar"
-    | "reading";
+    | "reading"
+    | "vocab"
+    | "particle";
   steps: Step[];
   story?: string; // 文章題の本文
   product?: number; // mul_missing の積
@@ -86,6 +93,8 @@ export interface Problem {
   clock?: { h: number; m: number; shift?: number; dir?: "after" | "before" };
   place?: { thousands: number; hundreds: number; tens: number; ones: number };
   shape?: { target: string };
+  rule?: "step" | "commute";
+  addsub?: { op: "add" | "sub"; key: string };
   /** 国語の問題の中身 */
   jp?: {
     itemId: string;
@@ -94,6 +103,7 @@ export interface Problem {
     reading?: string; // 書きの問題のひらがな
     clue?: string; // かたかなの手がかり
     ask?: "subject" | "predicate";
+    vocabType?: "opposite" | "group";
     title?: string;
     passage?: string;
     questions?: string[]; // 読みとりの各ステップの問い
@@ -192,6 +202,10 @@ export interface SessionEvent {
   minutes?: number;
   choice?: string;
   thinkCard?: string;
+  /** とちゅうで とじられた 授業を、あとから しめくくった とき */
+  recovered?: boolean;
+  /** 1問も 答え終わらずに とじられた 授業（連続日数に 数えない） */
+  empty?: boolean;
 }
 
 export type LearnEvent = AnswerEvent | SessionEvent;
@@ -238,6 +252,7 @@ export interface ProblemOutcome {
   firstMs: number; // すべてのステップをはじめて答え終わるまでの時間
   misconceptions: string[]; // 間違えた回答それぞれの推定原因
   answerEventIds: string[];
+  wrongEventIds?: string[]; // まちがえた回答のイベントID（misconceptions と同じ順）
   isTwin: boolean;
 }
 
@@ -251,6 +266,8 @@ export interface LessonPlan {
   focusSkill: SkillId;
   /** 教科ごとの重点スキル（算数・国語） */
   focusSkills: SkillId[];
+  /** スキルごとの むずかしさ（0 = やさしめ、1 = ふつう、2 = むずかしめ）。習熟度から決める */
+  levels?: Record<SkillId, 0 | 1 | 2>;
   warmupIsStrong: boolean; // ウォームアップが本当に得意なスキルか（初日は false）
   items: PlannedItem[];
   choiceOptions: { easy: SkillId; challenge: SkillId };

@@ -17,7 +17,9 @@ const isMastered = isSolidForNow;
 export function planLesson({ profile, states, stumbles, mood, today }: PlanInput): LessonPlan {
   const disabled = new Set(profile.disabledSkills);
   const subjects = profile.subjects?.length ? profile.subjects : ["math", "japanese"];
-  const enabled = SKILLS.filter((s) => !disabled.has(s.id) && subjects.includes(s.subject));
+  const inSubjects = SKILLS.filter((s) => subjects.includes(s.subject));
+  // 教科の中で ぜんぶ「出さない」に なって いたら、出さない設定を むしする（授業が 止まらないように）
+  const enabled = inSubjects.some((s) => !disabled.has(s.id)) ? inSubjects.filter((s) => !disabled.has(s.id)) : inSubjects;
   const st = (id: SkillId) => states[id] ?? initialSkillState(id);
   // 前提スキルが「出さない」か「1学期のふくしゅう」なら、できているものとして扱う
   const ready = (p: SkillId) => disabled.has(p) || skill(p).review || st(p).mastery >= UNLOCK_THRESHOLD;
@@ -40,32 +42,38 @@ export function planLesson({ profile, states, stumbles, mood, today }: PlanInput
   const focusSkills = [mathFocus, jpFocus].filter((x): x is SkillId => !!x);
   const focus = focusSkills[0] ?? SKILLS[0].id;
 
-  // ウォームアップ：いちばん得意なスキル。記録がなければ、まだやっていない1学期のふくしゅう
-  const strong = [...enabled]
-    .filter((s) => !focusSkills.includes(s.id) && st(s.id).attempts > 0 && st(s.id).mastery >= UNLOCK_THRESHOLD && (s.weight ?? 1) === 1)
+  // ウォームアップ：いちばん得意なスキル → 1学期のふくしゅう → いちばん やさしい（地図の はじめの）スキル
+  const light = enabled.filter((s) => (s.weight ?? 1) === 1 && !focusSkills.includes(s.id));
+  const strong = [...light]
+    .filter((s) => st(s.id).attempts > 0 && st(s.id).mastery >= UNLOCK_THRESHOLD)
     .sort((a, b) => st(b.id).mastery - st(a.id).mastery)[0]?.id;
-  const firstReview = enabled.find((s) => s.review && !focusSkills.includes(s.id) && st(s.id).attempts === 0)?.id;
-  const warm = strong ?? firstReview ?? focus;
+  const firstReview = light.find((s) => s.review && st(s.id).attempts === 0)?.id ?? light.find((s) => s.review)?.id;
+  const easiest = [...light].sort((a, b) => st(b.id).mastery - st(a.id).mastery)[0]?.id;
+  const warm = strong ?? firstReview ?? easiest ?? focus;
 
-  const due = enabled
-    .filter((s) => !focusSkills.includes(s.id) && s.id !== warm && (s.weight ?? 1) === 1 && st(s.id).nextReview && st(s.id).nextReview! <= today)
+  const due = light
+    .filter((s) => s.id !== warm && st(s.id).nextReview && st(s.id).nextReview! <= today)
     .sort((a, b) => st(a.id).nextReview!.localeCompare(st(b.id).nextReview!))
     .map((s) => s.id);
 
-  const total = mood === "tsukare" ? Math.max(5, profile.problemsPerSession - 4) : profile.problemsPerSession;
-  const review = due.slice(0, mood === "tsukare" ? 1 : 2);
-  const slots = Math.max(3, total - 2 /* warmup */ - review.length - 1 /* choice */ - 1 /* finale */);
+  // 問題数：設定の数を こえないように、きまった部分（ウォームアップ・えらぶ・さいご）を先に とる
+  const setting = Math.max(4, profile.problemsPerSession);
+  const total = mood === "tsukare" ? Math.max(4, setting - 3) : setting;
+  const warmCount = total <= 6 ? 1 : 2;
+  const fixed = warmCount + 2; /* choice + finale */
+  const review = due.slice(0, Math.max(0, Math.min(mood === "tsukare" ? 1 : 2, total - fixed - 2)));
+  const slots = Math.max(1, total - fixed - review.length);
 
-  // 教科の配分。読みとり（重さ3）は1問で3問ぶん
+  // 教科の配分。読みとり（重さ3）は1問で 2わく ぶんとして数える
   let mathCount = mathFocus ? slots : 0;
   let jpCount = 0;
   if (mathFocus && jpFocus) {
     const heavy = (skill(jpFocus).weight ?? 1) >= 3;
-    jpCount = heavy ? 1 : Math.max(2, Math.round(slots * 0.4));
-    mathCount = Math.max(2, slots - (heavy ? 3 : jpCount));
+    jpCount = heavy ? 1 : Math.max(1, Math.round(slots * 0.4));
+    mathCount = Math.max(1, slots - (heavy ? 2 : jpCount));
   } else if (jpFocus) {
     const heavy = (skill(jpFocus).weight ?? 1) >= 3;
-    jpCount = heavy ? Math.max(1, Math.floor(slots / 3)) : slots;
+    jpCount = heavy ? Math.max(1, Math.floor(slots / 2)) : slots;
   }
   const mathItems = Array.from({ length: mathCount }, (): PlannedItem => ({ phase: "main", skillId: mathFocus! }));
   const jpItems = Array.from({ length: jpCount }, (): PlannedItem => ({ phase: "main", skillId: jpFocus! }));
@@ -73,30 +81,38 @@ export function planLesson({ profile, states, stumbles, mood, today }: PlanInput
   const mathFirst = Number(today.slice(-2)) % 2 === 0;
   const mains = mathFirst ? [...mathItems, ...jpItems] : [...jpItems, ...mathItems];
 
-  // チャレンジの選択肢：算数の重点より後ろにある、まだ身についていないスキル
+  // チャレンジの選択肢：重点より後ろにある、まだ身についていないスキル（とくいな もんだいと ちがうもの）
   const base = mathFocus ?? jpFocus!;
   const list = enabled.filter((s) => s.subject === skill(base).subject);
   const baseIndex = list.findIndex((s) => s.id === base);
   const next = list.find(
-    (s, i) => i > baseIndex && !s.review && (s.weight ?? 1) === 1 && !isMastered(st(s.id)) && s.prereqs.every((p) => p === base || ready(p)),
+    (s, i) => i > baseIndex && !s.review && (s.weight ?? 1) === 1 && s.id !== warm && !isMastered(st(s.id)) && s.prereqs.every((p) => p === base || ready(p)),
   )?.id;
   const easy = warm;
+  const challenge = [next, base, jpFocus, mathFocus].find((x): x is SkillId => !!x && x !== easy) ?? base;
 
   const items: PlannedItem[] = [
-    { phase: "warmup", skillId: warm },
-    { phase: "warmup", skillId: warm },
+    ...Array.from({ length: warmCount }, (): PlannedItem => ({ phase: "warmup", skillId: warm })),
     ...review.map((skillId): PlannedItem => ({ phase: "review", skillId })),
     ...mains,
     { phase: "choice", skillId: base }, // 実際のスキルは子どもの選択で決まる
     { phase: "finale", skillId: warm },
   ];
 
+  const levels = Object.fromEntries(
+    [...new Set(items.map((i) => i.skillId).concat([easy, challenge]))].map((id) => {
+      const s = st(id);
+      return [id, s.attempts < 4 || s.mastery < 0.35 ? 0 : s.mastery < 0.75 ? 1 : 2];
+    }),
+  ) as Record<SkillId, 0 | 1 | 2>;
+
   return {
     sessionId: uid(),
     focusSkill: focus,
+    levels,
     focusSkills,
     warmupIsStrong: !!strong,
     items,
-    choiceOptions: { easy, challenge: next ?? base },
+    choiceOptions: { easy, challenge },
   };
 }

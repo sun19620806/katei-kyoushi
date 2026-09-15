@@ -2,6 +2,7 @@ import { load } from "js-yaml";
 import skillsRaw from "../content/skills.yaml?raw";
 import linesRaw from "../content/lines.yaml?raw";
 import storiesRaw from "../content/stories.yaml?raw";
+import addSubRaw from "../content/add_sub_stories.yaml?raw";
 import mathHintsRaw from "../content/hints/math.yaml?raw";
 import jpHintsRaw from "../content/hints/japanese.yaml?raw";
 import kanjiReadRaw from "../content/japanese/kanji_read.yaml?raw";
@@ -9,6 +10,8 @@ import kanjiWriteRaw from "../content/japanese/kanji_write.yaml?raw";
 import katakanaRaw from "../content/japanese/katakana.yaml?raw";
 import grammarRaw from "../content/japanese/grammar.yaml?raw";
 import readingRaw from "../content/japanese/reading.yaml?raw";
+import vocabRaw from "../content/japanese/vocab.yaml?raw";
+import particlesRaw from "../content/japanese/particles.yaml?raw";
 import type { HintDef, LineDef, MisconceptionDef, SkillDef, SkillId } from "./types";
 
 interface SkillsFile {
@@ -28,6 +31,8 @@ export const HINTS: HintDef[] = [
 ];
 export const LINES: LineDef[] = (load(linesRaw) as { lines: LineDef[] }).lines;
 export const STORIES: { text: string; unit: string }[] = (load(storiesRaw) as { stories: { text: string; unit: string }[] }).stories;
+export interface AddSubStory { id: string; kind: string; op: "add" | "sub"; key: string; text: string; unit: string }
+export const ADD_SUB_STORIES: AddSubStory[] = (load(addSubRaw) as { stories: AddSubStory[] }).stories;
 
 /** 国語の問題のもと */
 export interface JpWrong {
@@ -39,6 +44,8 @@ export interface JpKanjiWrite { id: string; reading: string; answer: string; sen
 export interface JpKatakana { id: string; hiragana: string; clue: string; answer: string; wrong: JpWrong[]; hint?: string }
 export interface JpGrammar { id: string; sentence: string; ask: "subject" | "predicate"; answer: string; wrong: JpWrong[]; hint?: string }
 export interface JpQuestion { ask: string; answer: string; wrong: JpWrong[]; hint?: string }
+export interface JpVocab { id: string; type: "opposite" | "group"; word: string; answer: string; wrong: JpWrong[]; hint?: string }
+export interface JpParticle { id: string; sentence: string; answer: string; wrong: JpWrong[]; hint?: string }
 export interface JpPassage { id: string; genre: "story" | "explain"; title: string; text: string; questions: JpQuestion[] }
 
 export const JP = {
@@ -47,6 +54,8 @@ export const JP = {
   katakana: (load(katakanaRaw) as { items: JpKatakana[] }).items,
   grammar: (load(grammarRaw) as { items: JpGrammar[] }).items,
   reading: (load(readingRaw) as { passages: JpPassage[] }).passages,
+  vocab: (load(vocabRaw) as { items: JpVocab[] }).items,
+  particles: (load(particlesRaw) as { items: JpParticle[] }).items,
 };
 
 const skillMap = new Map(SKILLS.map((s) => [s.id, s]));

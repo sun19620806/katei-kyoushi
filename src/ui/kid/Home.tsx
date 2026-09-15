@@ -6,13 +6,15 @@ import { UNLOCK_THRESHOLD } from "../../domain/learner";
 import { planLesson } from "../../domain/planner";
 import type { Episode, Profile } from "../../domain/types";
 import { ArrowIcon } from "../icons";
+import { unlockSpeech } from "../speech";
 import { StickerIcon } from "../stickers";
 import Teacher from "../Teacher";
 import WeekStamps from "./WeekStamps";
 
 export function withinHours(p: Profile, now = new Date()) {
   const hm = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
-  return hm >= p.allowedFrom && hm <= p.allowedTo;
+  // 夜をまたぐ設定（例 21:00〜06:00）にも対応
+  return p.allowedFrom <= p.allowedTo ? hm >= p.allowedFrom && hm <= p.allowedTo : hm >= p.allowedFrom || hm <= p.allowedTo;
 }
 
 interface Props {
@@ -31,8 +33,19 @@ export default function Home({ profile, onStart, onParent, onStickers, onMap, on
   const [focus, setFocus] = useState<string[]>([]);
   const [stickers, setStickers] = useState<Episode[]>([]);
   const [canCount, setCanCount] = useState(0);
-  const open = withinHours(profile);
-  const doneToday = days.includes(ymd());
+  // 開いたままでも 時間に なったら 切りかわるように、ときどき たしかめる
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const tick = () => setNow(new Date());
+    const id = setInterval(tick, 30_000);
+    document.addEventListener("visibilitychange", tick);
+    return () => {
+      clearInterval(id);
+      document.removeEventListener("visibilitychange", tick);
+    };
+  }, []);
+  const open = withinHours(profile, now);
+  const doneToday = days.includes(ymd(now));
 
   useEffect(() => {
     (async () => {
@@ -47,7 +60,9 @@ export default function Home({ profile, onStart, onParent, onStickers, onMap, on
       setDays(d);
       setFirst(count === 0);
       setStickers(eps);
-      setCanCount(SKILLS.filter((k) => (model.states[k.id]?.mastery ?? 0) >= UNLOCK_THRESHOLD).length);
+      setCanCount(
+        SKILLS.filter((k) => profile.subjects.includes(k.subject) && !profile.disabledSkills.includes(k.id) && (model.states[k.id]?.mastery ?? 0) >= UNLOCK_THRESHOLD).length,
+      );
       setFocus(planLesson({ profile, ...model, mood: "futsu", today: ymd() }).focusSkills);
     })();
   }, [profile]);
@@ -69,7 +84,7 @@ export default function Home({ profile, onStart, onParent, onStickers, onMap, on
       </button>
 
       <section className="home-teacher">
-        <button className="teacher-button" onClick={onTeacher} aria-label="せんせいを えらぶ">
+        <button className="teacher-button" onClick={() => { unlockSpeech(); onTeacher(); }} aria-label="せんせいを えらぶ">
           <Teacher look={profile.teacherLook} face={open ? "smile" : "calm"} size={200} />
           <span className="teacher-tag">{profile.teacherName} せんせい</span>
         </button>
@@ -92,7 +107,7 @@ export default function Home({ profile, onStart, onParent, onStickers, onMap, on
             )}
           </div>
           <WeekStamps days={days} />
-          <button className="btn-start" onClick={onStart} disabled={!open}>
+          <button className="btn-start" onClick={() => { unlockSpeech(); onStart(); }} disabled={!open}>
             {doneToday ? "もういちど やる" : "はじめる"}
             <ArrowIcon size={34} />
           </button>

@@ -46,7 +46,16 @@ export function problemVars(p: Problem): Record<string, string> {
     });
   }
   if (p.shape) text.target_def = SHAPE_DEFS[p.shape.target] ?? "";
-  if (p.jp) text.item_hint = "";
+  if (p.jp) Object.assign(text, { item_hint: "", jp_word: p.jp.word ?? "" });
+  if (p.rule) {
+    const step = p.rule === "step";
+    Object.assign(text, {
+      rule_l1: step ? "かける かずが 1 ふえると、こたえは いくつ ふえるかな？" : "かける じゅんばんを 入れかえても、こたえは おなじ だよ。",
+      rule_l2: step ? "その だんを となえて、となりどうしの こたえを くらべよう。" : "左と 右の しきを くらべて、入れかわって いる かずを 見つけよう。",
+      rule_l3: step ? "九九の ひょうで、となりの こたえとの ちがいを 見よう。" : "□に 入るのは、右の しきに ある かずの どちらかだよ。",
+    });
+  }
+  if (p.addsub) Object.assign(text, { key: p.addsub.key, op_word: p.addsub.op === "add" ? "たしざん" : "ひきざん" });
   return { ...Object.fromEntries(Object.entries(vars).map(([k, v]) => [k, String(v)])), ...text };
 }
 

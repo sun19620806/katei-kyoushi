@@ -1,7 +1,11 @@
 import Dexie, { type Table } from "dexie";
-import { ymd, streakDays } from "../domain/dates";
-import type { SessionResult } from "../domain/finalize";
-import type { Episode, LearnEvent, Profile, SkillId, SkillState, Stumble } from "../domain/types";
+import { localDay, ymd, streakDays } from "../domain/dates";
+import { finalizeSession, type SessionResult } from "../domain/finalize";
+import { rebuildOutcomes } from "../domain/recover";
+import type { AnswerEvent, Episode, LearnEvent, Profile, SessionEvent, SkillId, SkillState, Stumble } from "../domain/types";
+
+type SessionEventRow = SessionEvent;
+type AnswerEventRow = AnswerEvent;
 
 /**
  * iPad の中（IndexedDB）に保存する。
@@ -79,7 +83,7 @@ export async function loadModel() {
 
 export async function studyDays(): Promise<string[]> {
   const starts = await db.events.where("type").equals("session").toArray();
-  return [...new Set(starts.filter((e) => e.type === "session" && e.kind === "finish").map((e) => e.at.slice(0, 10)))];
+  return [...new Set(starts.filter((e) => e.type === "session" && e.kind === "finish" && !e.empty).map((e) => localDay(e.at)))];
 }
 
 export async function currentStreak(today = ymd()) {
@@ -156,3 +160,24 @@ export async function saveInk(samples: { digit: number; strokes: { x: number; y:
     }
   });
 }
+
+/**
+ * とちゅうで とじられた 授業（はじまりの記録は あるのに おわりの記録が ない）を しめくくる。
+ * 答え終わった 問題の ぶんを 学習の記録に 反映する。アプリを 開いた ときに よぶ。
+ */
+export async function recoverUnfinishedSessions(now = Date.now()) {
+  const sessionEvents = (await db.events.where("type").equals("session").toArray()) as SessionEventRow[];
+  const finished = new Set(sessionEvents.filter((e) => e.kind === "finish").map((e) => e.sessionId));
+  const open = sessionEvents.filter((e) => e.kind === "start" && !finished.has(e.sessionId) && now - Date.parse(e.at) > 30 * 60 * 1000);
+  for (const start of open) {
+    const answers = (await db.events.where("sessionId").equals(start.sessionId).toArray()).filter((e): e is AnswerEventRow => e.type === "answer");
+    const outcomes = rebuildOutcomes(answers);
+    const last = answers.map((a) => a.at).sort().at(-1) ?? start.at;
+    const minutes = Math.max(1, Math.round((Date.parse(last) - Date.parse(start.at)) / 60000));
+    await db.events.put({ id: crypto.randomUUID?.() ?? `${start.sessionId}-finish`, type: "session", sessionId: start.sessionId, at: last, kind: "finish", minutes, recovered: true, empty: outcomes.length === 0 });
+    if (outcomes.length === 0) continue;
+    const model = await loadModel();
+    await saveSessionResult(finalizeSession(model.states, model.stumbles, outcomes, localDay(last), 0));
+  }
+}
+

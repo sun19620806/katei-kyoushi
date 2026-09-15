@@ -94,7 +94,7 @@ export function updateStumbles(prev: Record<string, Stumble>, o: ProblemOutcome,
     const key = `${skillId}|${mc}`;
     const old = next[key];
     const fresh = old && daysBetween(old.lastSeen, today) <= STUMBLE_WINDOW_DAYS && old.status !== "resolved";
-    const evidence = [...(fresh ? old.evidence : []), o.answerEventIds[i] ?? ""];
+    const evidence = [...(fresh ? old.evidence : []), o.wrongEventIds?.[i] ?? o.answerEventIds[i] ?? ""];
     next[key] = {
       key,
       skillId,
@@ -107,12 +107,11 @@ export function updateStumbles(prev: Record<string, Stumble>, o: ProblemOutcome,
     };
   });
 
-  if (o.firstTryCorrect) {
-    for (const st of Object.values(next)) {
-      if (st.skillId !== skillId || st.status !== "confirmed") continue;
-      const n = st.noHintStreakSinceConfirmed + 1;
-      next[st.key] = { ...st, noHintStreakSinceConfirmed: n, status: n >= 3 ? "resolved" : "confirmed" };
-    }
+  // 確認済みのつまずき：ヒントなし正解で 連続回数+1、ヒントを使った・答えを見た ときは 0に もどす
+  for (const st of Object.values(next)) {
+    if (st.skillId !== skillId || st.status !== "confirmed" || seen.has(st.misconception)) continue;
+    const n = o.firstTryCorrect ? st.noHintStreakSinceConfirmed + 1 : 0;
+    next[st.key] = { ...st, noHintStreakSinceConfirmed: n, status: n >= 3 ? "resolved" : "confirmed" };
   }
   return next;
 }

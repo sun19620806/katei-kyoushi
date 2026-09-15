@@ -1,0 +1,257 @@
+# 助詞「は・を・へ」（文に 合う 字を えらぶ）。小2 2学期。
+# sentence: {blank} を 1回だけ ふくむ 文（30文字以内、分かち書き）
+# answer: 正しい 字（は / を / へ、または わ / お / え が 正しい ことばの 一ぶの とき）
+# wrong: まちがいの せんたくし。mc は下の いずれか
+#   particle_sound: 音の とおりに 書いて しまう（「は」を「わ」、「を」を「お」、「へ」を「え」）
+#   particle_overuse: ことばの 一ぶなのに「は・を・へ」を 使って しまう（例：「おかあさん」を「をかあさん」と 書く）
+#   particle_other: ちがう じょし（が・に・で など）を 選ぶ（文に 合わない ものだけ）
+# hint: 3だんめの ヒント（45文字以内、答えの 字を かぎかっこで そのまま 書かない）
+# 「こんにちは」の「は」も、もとは じょしなので「は」と 書く。
+
+items:
+  # --- じょしの「は」 ---
+  - id: pt001
+    sentence: "ぼく{blank} こうえんへ 行きます。"
+    answer: "は"
+    wrong:
+      - { text: "わ", mc: particle_sound }
+      - { text: "を", mc: particle_other }
+    hint: "「だれが」を あらわす ときの 字だよ。"
+
+  - id: pt002
+    sentence: "わたし{blank} 二年生です。"
+    answer: "は"
+    wrong:
+      - { text: "わ", mc: particle_sound }
+      - { text: "を", mc: particle_other }
+    hint: "ことばの 後ろに つける 字。読む 音と 書く 字が ずれるよ。"
+
+  - id: pt003
+    sentence: "きょう{blank} 雨が ふっている。"
+    answer: "は"
+    wrong:
+      - { text: "わ", mc: particle_sound }
+      - { text: "を", mc: particle_other }
+    hint: "何の 話か しめす 字だよ。音の とおりに 書かない 字。"
+
+  - id: pt004
+    sentence: "この 花{blank} とても きれいだ。"
+    answer: "は"
+    wrong:
+      - { text: "わ", mc: particle_sound }
+      - { text: "を", mc: particle_other }
+    hint: "「花」の 後ろに つく 字。かたかなの「ハ」と 同じ 行の 字だよ。"
+
+  - id: pt005
+    sentence: "ねこ{blank} 小さな こえで ないた。"
+    answer: "は"
+    wrong:
+      - { text: "わ", mc: particle_sound }
+      - { text: "を", mc: particle_other }
+    hint: "「ねこ」の 話の 目じるしの 字。音と 書き方が ずれるよ。"
+
+  - id: pt006
+    sentence: "きょうの 空{blank} 青い。"
+    answer: "は"
+    wrong:
+      - { text: "わ", mc: particle_sound }
+      - { text: "を", mc: particle_other }
+      - { text: "へ", mc: particle_other }
+    hint: "何に ついての 話か しめす 字。音の まま 書かない 字だよ。"
+
+  - id: pt007
+    sentence: "こんにち{blank}、先生。"
+    answer: "は"
+    wrong:
+      - { text: "わ", mc: particle_sound }
+      - { text: "を", mc: particle_other }
+    hint: "あいさつの さいごの 字も、音の とおりに 書かないよ。"
+
+  # --- じょしの「を」 ---
+  - id: pt008
+    sentence: "ぼくは パン{blank} 食べた。"
+    answer: "を"
+    wrong:
+      - { text: "お", mc: particle_sound }
+      - { text: "に", mc: particle_other }
+    hint: "食べた ものの 後ろに つく 字。わ行の おわりの 字だよ。"
+
+  - id: pt009
+    sentence: "ねる 前に 本{blank} 読む。"
+    answer: "を"
+    wrong:
+      - { text: "お", mc: particle_sound }
+      - { text: "が", mc: particle_other }
+    hint: "読む ものの 後ろに つく 字。音の とおりには 書かないよ。"
+
+  - id: pt010
+    sentence: "ごはんの 前に 手{blank} あらう。"
+    answer: "を"
+    wrong:
+      - { text: "お", mc: particle_sound }
+      - { text: "が", mc: particle_other }
+    hint: "あらう ものの 後ろに つく 字。ことばの 中では つかわない 字。"
+
+  - id: pt011
+    sentence: "こうえんで ボール{blank} けった。"
+    answer: "を"
+    wrong:
+      - { text: "お", mc: particle_sound }
+      - { text: "が", mc: particle_other }
+    hint: "けった ものの 後ろに つく 字。わ行の 字だよ。"
+
+  - id: pt012
+    sentence: "クレヨンで 絵{blank} かいた。"
+    answer: "を"
+    wrong:
+      - { text: "お", mc: particle_sound }
+      - { text: "が", mc: particle_other }
+    hint: "かいた ものの 後ろに つく 字だよ。読む 音と 書く 字が ずれるよ。"
+
+  - id: pt013
+    sentence: "コップの 水{blank} のんだ。"
+    answer: "を"
+    wrong:
+      - { text: "お", mc: particle_sound }
+      - { text: "が", mc: particle_other }
+      - { text: "へ", mc: particle_other }
+    hint: "のんだ ものの 後ろに つく 字。音の まま 書く 字では ないよ。"
+
+  # --- じょしの「へ」 ---
+  - id: pt014
+    sentence: "あさ 八時に 学校{blank} 行く。"
+    answer: "へ"
+    wrong:
+      - { text: "え", mc: particle_sound }
+      - { text: "を", mc: particle_other }
+    hint: "行く 先を しめす 字だよ。かたかなの「ハ」と 同じ 行の 字。"
+
+  - id: pt015
+    sentence: "山{blank} むかって 歩いた。"
+    answer: "へ"
+    wrong:
+      - { text: "え", mc: particle_sound }
+      - { text: "が", mc: particle_other }
+    hint: "むかう 先を しめす 字。音の とおりには 書かないよ。"
+
+  - id: pt016
+    sentence: "おばあちゃんの 家{blank} 行きます。"
+    answer: "へ"
+    wrong:
+      - { text: "え", mc: particle_sound }
+      - { text: "を", mc: particle_other }
+    hint: "どこに 行くかを しめす 字だよ。読む 音と 書く 字が ずれるよ。"
+
+  - id: pt017
+    sentence: "夏休みに 海{blank} 出かけた。"
+    answer: "へ"
+    wrong:
+      - { text: "え", mc: particle_sound }
+      - { text: "が", mc: particle_other }
+      - { text: "は", mc: particle_other }
+    hint: "出かける 先を しめす 字。は行で「ほ」の 一つ 前の 字だよ。"
+
+  - id: pt018
+    sentence: "かどを 右{blank} まがって ください。"
+    answer: "へ"
+    wrong:
+      - { text: "え", mc: particle_sound }
+      - { text: "が", mc: particle_other }
+    hint: "すすむ むきを しめす 字だよ。音の まま 書く 字では ないよ。"
+
+  - id: pt019
+    sentence: "とおくの 友だち{blank} 手紙を 書いた。"
+    answer: "へ"
+    wrong:
+      - { text: "え", mc: particle_sound }
+      - { text: "を", mc: particle_other }
+    hint: "手紙を とどける 先を しめす 字だよ。"
+
+  # --- ことばの 一ぶの「わ・お・え」 ---
+  - id: pt020
+    sentence: "{blank}たしは 本が すきです。"
+    answer: "わ"
+    wrong:
+      - { text: "は", mc: particle_overuse }
+      - { text: "を", mc: particle_overuse }
+    hint: "自分の ことを いう ことばだよ。ことばの 中の 字は 音の まま 書くよ。"
+
+  - id: pt021
+    sentence: "川で 大きな {blank}にを 見た。"
+    answer: "わ"
+    wrong:
+      - { text: "は", mc: particle_overuse }
+      - { text: "へ", mc: particle_overuse }
+    hint: "口の 大きな 生きもの。名前の 中の 字は 音の まま 書くよ。"
+
+  - id: pt022
+    sentence: "に{blank}とりが コケコッコーと ないた。"
+    answer: "わ"
+    wrong:
+      - { text: "は", mc: particle_overuse }
+      - { text: "を", mc: particle_overuse }
+    hint: "鳥の 名前の まん中の 字。ことばの 一ぶだから 音の まま 書くよ。"
+
+  - id: pt023
+    sentence: "{blank}にぎりを 二つ 食べた。"
+    answer: "お"
+    wrong:
+      - { text: "を", mc: particle_overuse }
+      - { text: "へ", mc: particle_overuse }
+    hint: "ごはんを にぎった 食べもの。ことばの 中の 字は 音の まま 書くよ。"
+
+  - id: pt024
+    sentence: "{blank}かあさんと 買いものに 行った。"
+    answer: "お"
+    wrong:
+      - { text: "を", mc: particle_overuse }
+      - { text: "は", mc: particle_overuse }
+    hint: "家の 人の よび名だよ。ことばの 一ぶは 音の まま 書くよ。"
+
+  - id: pt025
+    sentence: "森で お{blank}かみが ほえた。"
+    answer: "お"
+    wrong:
+      - { text: "を", mc: particle_overuse }
+      - { text: "は", mc: particle_overuse }
+    hint: "犬の なかまの 生きもの。のばす 音も 音の まま 書くよ。"
+
+  - id: pt026
+    sentence: "赤い {blank}りがみで つるを 作った。"
+    answer: "お"
+    wrong:
+      - { text: "を", mc: particle_overuse }
+      - { text: "へ", mc: particle_overuse }
+    hint: "紙で つるなどを 作る あそび。ことばの 一ぶだよ。"
+
+  - id: pt027
+    sentence: "{blank}きの ホームで 電車を まつ。"
+    answer: "え"
+    wrong:
+      - { text: "へ", mc: particle_overuse }
+      - { text: "は", mc: particle_overuse }
+    hint: "電車に のる ところ。ことばの 中の 字は 音の まま 書くよ。"
+
+  - id: pt028
+    sentence: "{blank}んぴつで 字を 書く。"
+    answer: "え"
+    wrong:
+      - { text: "へ", mc: particle_overuse }
+      - { text: "を", mc: particle_overuse }
+    hint: "字を 書く ときに つかう もの。ことばの 一ぶだから 音の まま。"
+
+  - id: pt029
+    sentence: "{blank}がおで 手を ふった。"
+    answer: "え"
+    wrong:
+      - { text: "へ", mc: particle_overuse }
+      - { text: "は", mc: particle_overuse }
+    hint: "にこにこした 顔の こと。ことばの 中の 字は 音の まま 書くよ。"
+
+  - id: pt030
+    sentence: "大きな こ{blank}で 歌った。"
+    answer: "え"
+    wrong:
+      - { text: "へ", mc: particle_overuse }
+      - { text: "は", mc: particle_overuse }
+    hint: "口から 出す 音の こと。ことばの 一ぶだから 音の まま 書くよ。"

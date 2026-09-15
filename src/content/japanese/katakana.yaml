@@ -294,3 +294,201 @@ items:
       - { text: "ラパ", mc: sokuon_miss }
       - { text: "ラッバ", mc: dakuten_miss }
     hint: "「ら」の あとで 音が つまるよ。「ぱ」は「゜」だよ。"
+
+  - id: kk031
+    hiragana: "よっと"
+    clue: "風を うけて 走る 小さな ふね"
+    answer: "ヨット"
+    wrong:
+      - { text: "ヨト", mc: sokuon_miss }
+      - { text: "ヨツト", mc: sokuon_miss }
+      - { text: "ヨッド", mc: dakuten_miss }
+    hint: "「よ」の あとで 音が つまるよ。さいごの 音は にごらないよ。"
+
+  - id: kk032
+    hiragana: "ばす"
+    clue: "おおぜいの 人が のれる 車"
+    answer: "バス"
+    wrong:
+      - { text: "パス", mc: dakuten_miss }
+      - { text: "バヌ", mc: similar_katakana }
+    hint: "「ば」は「゛」だよ。「す」と「ぬ」の 形を 見くらべよう。"
+
+  - id: kk033
+    hiragana: "とまと"
+    clue: "赤くて まるい やさい"
+    answer: "トマト"
+    wrong:
+      - { text: "ドマト", mc: dakuten_miss }
+      - { text: "トアト", mc: similar_katakana }
+      - { text: "トマトー", mc: long_vowel_miss }
+    hint: "「ま」と「あ」の 形を 見くらべよう。のばす 音は ないよ。"
+
+  - id: kk034
+    hiragana: "ぴあの"
+    clue: "白と 黒の けんばんを ひく がっき"
+    answer: "ピアノ"
+    wrong:
+      - { text: "ビアノ", mc: dakuten_miss }
+      - { text: "ピアメ", mc: similar_katakana }
+      - { text: "ピアーノ", mc: long_vowel_miss }
+    hint: "「ぴ」は「゜」だよ。「の」は ななめの 線 1本で 書くよ。"
+
+  - id: kk035
+    hiragana: "たおる"
+    clue: "おふろの あとで 体を ふく ぬの"
+    answer: "タオル"
+    wrong:
+      - { text: "タオレ", mc: similar_katakana }
+      - { text: "ダオル", mc: dakuten_miss }
+      - { text: "タオール", mc: long_vowel_miss }
+    hint: "「る」は 2画で 書くよ。のばす 音は ないよ。"
+
+  - id: kk036
+    hiragana: "ぼーる"
+    clue: "なげたり けったり する まるい もの"
+    answer: "ボール"
+    wrong:
+      - { text: "ボル", mc: long_vowel_miss }
+      - { text: "ポール", mc: dakuten_miss }
+      - { text: "ボーレ", mc: similar_katakana }
+    hint: "「ぼ」は「゛」だよ。のばす 音も わすれずに。"
+
+  - id: kk037
+    hiragana: "ごりら"
+    clue: "むねを たたく 大きな どうぶつ"
+    answer: "ゴリラ"
+    wrong:
+      - { text: "コリラ", mc: dakuten_miss }
+      - { text: "ゴリフ", mc: similar_katakana }
+      - { text: "ゴーリラ", mc: long_vowel_miss }
+    hint: "「ご」は「゛」だよ。「ら」は 上に みじかい よこ線が あるよ。"
+
+  - id: kk038
+    hiragana: "ぺんぎん"
+    clue: "さむい ところに すむ とべない 鳥"
+    answer: "ペンギン"
+    wrong:
+      - { text: "ベンギン", mc: dakuten_miss }
+      - { text: "ペソギン", mc: similar_katakana }
+      - { text: "ペンギソ", mc: similar_katakana }
+    hint: "「ぺ」は「゜」だよ。「ん」の 形を 2かしょ よく 見よう。"
+
+  - id: kk039
+    hiragana: "しゃべる"
+    clue: "すなばで あなを ほる もの"
+    answer: "シャベル"
+    wrong:
+      - { text: "シヤベル", mc: youon_miss }
+      - { text: "シャペル", mc: dakuten_miss }
+      - { text: "ツャベル", mc: similar_katakana }
+    hint: "小さい「ゃ」と、「べ」の「゛」に 気を つけよう。"
+
+  - id: kk040
+    hiragana: "きゃべつ"
+    clue: "はが まるく かさなった やさい"
+    answer: "キャベツ"
+    wrong:
+      - { text: "キヤベツ", mc: youon_miss }
+      - { text: "キャペツ", mc: dakuten_miss }
+      - { text: "キャベシ", mc: similar_katakana }
+    hint: "小さい「ゃ」が あるよ。「つ」の 点は 上に ならぶよ。"
+
+  - id: kk041
+    hiragana: "じゃむ"
+    clue: "パンに ぬる あまい もの"
+    answer: "ジャム"
+    wrong:
+      - { text: "ジヤム", mc: youon_miss }
+      - { text: "シャム", mc: dakuten_miss }
+    hint: "小さい「ゃ」と、はじめの「゛」に 気を つけよう。"
+
+  - id: kk042
+    hiragana: "にゅーす"
+    clue: "テレビで 知る きょうの できごと"
+    answer: "ニュース"
+    wrong:
+      - { text: "ニユース", mc: youon_miss }
+      - { text: "ニュス", mc: long_vowel_miss }
+      - { text: "ニューヌ", mc: similar_katakana }
+    hint: "小さい「ゅ」と のばす 音が あるよ。「す」の 形も 見よう。"
+
+  - id: kk043
+    hiragana: "へりこぷたー"
+    clue: "くるくる 回る はねで とぶ のりもの"
+    answer: "ヘリコプター"
+    wrong:
+      - { text: "ベリコプター", mc: dakuten_miss }
+      - { text: "ヘリコブター", mc: dakuten_miss }
+      - { text: "ヘリコプタ", mc: long_vowel_miss }
+    hint: "「ぷ」は「゜」、はじめの 音は にごらないよ。さいごは のばすよ。"
+
+  - id: kk044
+    hiragana: "どっじぼーる"
+    clue: "二つの チームで 当てあう 玉あそび"
+    answer: "ドッジボール"
+    wrong:
+      - { text: "ドジボール", mc: sokuon_miss }
+      - { text: "ドッジボル", mc: long_vowel_miss }
+      - { text: "トッジボール", mc: dakuten_miss }
+    hint: "「ど」の あとで 音が つまるよ。のばす 音も 1つ あるよ。"
+
+  - id: kk045
+    hiragana: "かっぷ"
+    clue: "とっての ついた のみものの 入れもの"
+    answer: "カップ"
+    wrong:
+      - { text: "カプ", mc: sokuon_miss }
+      - { text: "カッブ", mc: dakuten_miss }
+      - { text: "ガップ", mc: dakuten_miss }
+    hint: "「か」の あとで 音が つまるよ。「ぷ」は「゜」だよ。"
+
+  - id: kk046
+    hiragana: "すきっぷ"
+    clue: "かた足ずつ はずんで すすむ 歩き方"
+    answer: "スキップ"
+    wrong:
+      - { text: "スキプ", mc: sokuon_miss }
+      - { text: "スキッブ", mc: dakuten_miss }
+      - { text: "ヌキップ", mc: similar_katakana }
+    hint: "「き」の あとで 音が つまるよ。「す」の 形も 見よう。"
+
+  - id: kk047
+    hiragana: "めにゅー"
+    clue: "お店で 食べものを えらぶ ときに 見る"
+    answer: "メニュー"
+    wrong:
+      - { text: "メニユー", mc: youon_miss }
+      - { text: "メニュ", mc: long_vowel_miss }
+      - { text: "ヌニュー", mc: similar_katakana }
+    hint: "小さい「ゅ」と、さいごの のばす 音に 気を つけよう。"
+
+  - id: kk048
+    hiragana: "そーす"
+    clue: "フライに かける 茶色の たれ"
+    answer: "ソース"
+    wrong:
+      - { text: "ソス", mc: long_vowel_miss }
+      - { text: "ンース", mc: similar_katakana }
+      - { text: "ゾース", mc: dakuten_miss }
+    hint: "「そ」は 上から 下へ はらうよ。のばす 音も あるよ。"
+
+  - id: kk049
+    hiragana: "はんかち"
+    clue: "手を ふく 小さな ぬの"
+    answer: "ハンカチ"
+    wrong:
+      - { text: "ハソカチ", mc: similar_katakana }
+      - { text: "バンカチ", mc: dakuten_miss }
+      - { text: "ハンカテ", mc: similar_katakana }
+    hint: "「ん」と「ち」の 形を よく 見よう。「゛」は つかないよ。"
+
+  - id: kk050
+    hiragana: "まらそん"
+    clue: "長い きょりを 走る きょうそう"
+    answer: "マラソン"
+    wrong:
+      - { text: "マラソソ", mc: similar_katakana }
+      - { text: "マランン", mc: similar_katakana }
+      - { text: "マラーソン", mc: long_vowel_miss }
+    hint: "「そ」と「ん」の 形を 見くらべよう。のばす 音は ないよ。"

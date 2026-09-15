@@ -1,0 +1,379 @@
+# ことばの いみ（はんたいの ことば・なかまの ことば）。小2 2学期。
+# type: opposite = 「word」の はんたいの いみの ことばを えらぶ / group = 「word」の なかまに 入る ことばを えらぶ（word は なかまの 名前）
+# answer: 正しい ことば / wrong: まちがいの せんたくし。mc は下の いずれか
+#   similar_meaning: にた いみの ことばを 選ぶ（opposite で）
+#   related_not_opposite: かんけいは あるが はんたいでは ない ことばを 選ぶ（opposite で）
+#   group_other: ちがう なかまの ことばを 選ぶ（group で）
+#   group_name: なかまの 名前そのものや、もっと 大きい なかまを 選ぶ（group で）
+# hint: 3だんめの ヒント（45文字以内。答えを そのまま 書かない）
+items:
+  # ───── はんたいの いみの ことば ─────
+  - id: vo001
+    type: opposite
+    word: "大きい"
+    answer: "小さい"
+    wrong:
+      - { text: "でっかい", mc: similar_meaning }
+      - { text: "ながい", mc: related_not_opposite }
+    hint: "ありと ぞうを くらべて みよう。"
+
+  - id: vo002
+    type: opposite
+    word: "あつい"
+    answer: "さむい"
+    wrong:
+      - { text: "あたたかい", mc: similar_meaning }
+      - { text: "なつ", mc: related_not_opposite }
+    hint: "夏の 日と 冬の 日の 天気を くらべて みよう。"
+
+  - id: vo003
+    type: opposite
+    word: "おもい"
+    answer: "かるい"
+    wrong:
+      - { text: "ずっしり", mc: similar_meaning }
+      - { text: "大きい", mc: related_not_opposite }
+    hint: "石と 鳥の はねを もち上げて くらべて みよう。"
+
+  - id: vo004
+    type: opposite
+    word: "ふかい"
+    answer: "あさい"
+    wrong:
+      - { text: "ひろい", mc: related_not_opposite }
+      - { text: "たかい", mc: related_not_opposite }
+    hint: "足が とどく くらいの 水の ようすを 考えよう。"
+
+  - id: vo005
+    type: opposite
+    word: "ながい"
+    answer: "みじかい"
+    wrong:
+      - { text: "ほそながい", mc: similar_meaning }
+      - { text: "ひくい", mc: related_not_opposite }
+    hint: "たくさん つかった えんぴつは どう なるかな？"
+
+  - id: vo006
+    type: opposite
+    word: "はやい"
+    answer: "おそい"
+    wrong:
+      - { text: "すばやい", mc: similar_meaning }
+      - { text: "とまる", mc: related_not_opposite }
+    hint: "じてん車と、ゆっくり 歩く かめを くらべて みよう。"
+
+  - id: vo007
+    type: opposite
+    word: "あかるい"
+    answer: "くらい"
+    wrong:
+      - { text: "まぶしい", mc: similar_meaning }
+      - { text: "しろい", mc: related_not_opposite }
+    hint: "電気を けした 夜の へやを 考えよう。"
+
+  - id: vo008
+    type: opposite
+    word: "あたらしい"
+    answer: "ふるい"
+    wrong:
+      - { text: "まあたらしい", mc: similar_meaning }
+      - { text: "きれい", mc: related_not_opposite }
+    hint: "何年も つかって きた かばんの ようすを 考えよう。"
+
+  - id: vo009
+    type: opposite
+    word: "つよい"
+    answer: "よわい"
+    wrong:
+      - { text: "力もち", mc: similar_meaning }
+      - { text: "大きい", mc: related_not_opposite }
+    hint: "つなひきで、ずるずる ひっぱられる ほうの ようすだよ。"
+
+  - id: vo010
+    type: opposite
+    word: "たかい"
+    answer: "ひくい"
+    wrong:
+      - { text: "のっぽ", mc: similar_meaning }
+      - { text: "ながい", mc: related_not_opposite }
+    hint: "大きな 山と 小さな おかを くらべて みよう。"
+
+  - id: vo011
+    type: opposite
+    word: "あける"
+    answer: "しめる"
+    wrong:
+      - { text: "ひらく", mc: similar_meaning }
+      - { text: "入る", mc: related_not_opposite }
+    hint: "へやを 出た あと、ドアを どう するかな？"
+
+  - id: vo012
+    type: opposite
+    word: "のぼる"
+    answer: "おりる"
+    wrong:
+      - { text: "あがる", mc: similar_meaning }
+      - { text: "すべる", mc: related_not_opposite }
+    hint: "かいだんの 上から 下へ 行く ときの ことばだよ。"
+
+  - id: vo013
+    type: opposite
+    word: "入る"
+    answer: "出る"
+    wrong:
+      - { text: "はいりこむ", mc: similar_meaning }
+      - { text: "あける", mc: related_not_opposite }
+    hint: "へやの 中から 外へ 行く ときの ことばだよ。"
+
+  - id: vo014
+    type: opposite
+    word: "立つ"
+    answer: "すわる"
+    wrong:
+      - { text: "おき上がる", mc: similar_meaning }
+      - { text: "歩く", mc: related_not_opposite }
+    hint: "いすに こしを おろす ときの ことばだよ。"
+
+  - id: vo015
+    type: opposite
+    word: "ねる"
+    answer: "おきる"
+    wrong:
+      - { text: "ねむる", mc: similar_meaning }
+      - { text: "ふとん", mc: related_not_opposite }
+    hint: "朝、目が さめて ねどこから 出る ときの ことばだよ。"
+
+  - id: vo016
+    type: opposite
+    word: "わらう"
+    answer: "なく"
+    wrong:
+      - { text: "にこにこする", mc: similar_meaning }
+      - { text: "うたう", mc: related_not_opposite }
+    hint: "かなしい とき、目から なみだが 出るね。"
+
+  - id: vo017
+    type: opposite
+    word: "上"
+    answer: "下"
+    wrong:
+      - { text: "うえ", mc: similar_meaning }
+      - { text: "右", mc: related_not_opposite }
+    hint: "空と 地めんの うち、地めんの ほうを あらわす 字だよ。"
+
+  - id: vo018
+    type: opposite
+    word: "右"
+    answer: "左"
+    wrong:
+      - { text: "みぎがわ", mc: similar_meaning }
+      - { text: "前", mc: related_not_opposite }
+    hint: "体の まん中から 見て、みぎと はんたいの がわだよ。"
+
+  - id: vo019
+    type: opposite
+    word: "朝"
+    answer: "夜"
+    wrong:
+      - { text: "あさがた", mc: similar_meaning }
+      - { text: "昼", mc: related_not_opposite }
+    hint: "お月さまや 星が 見える 時間だよ。"
+
+  - id: vo020
+    type: opposite
+    word: "前"
+    answer: "後ろ"
+    wrong:
+      - { text: "まえがわ", mc: similar_meaning }
+      - { text: "よこ", mc: related_not_opposite }
+    hint: "せなかが ある ほうを あらわす ことばだよ。"
+
+  # ───── なかまの ことば ─────
+  - id: vo021
+    type: group
+    word: "くだもの"
+    answer: "みかん"
+    wrong:
+      - { text: "にんじん", mc: group_other }
+      - { text: "たべもの", mc: group_name }
+    hint: "木に なる あまい ものは どれかな？"
+
+  - id: vo022
+    type: group
+    word: "どうぶつ"
+    answer: "きりん"
+    wrong:
+      - { text: "たんぽぽ", mc: group_other }
+      - { text: "でんしゃ", mc: group_other }
+      - { text: "いきもの", mc: group_name }
+    hint: "足で 歩いて、耳や しっぽが ある ものは どれかな？"
+
+  - id: vo023
+    type: group
+    word: "虫"
+    answer: "とんぼ"
+    wrong:
+      - { text: "すずめ", mc: group_other }
+      - { text: "かえる", mc: group_other }
+    hint: "足が 6本 ある 生きものを さがそう。"
+
+  - id: vo024
+    type: group
+    word: "花"
+    answer: "あさがお"
+    wrong:
+      - { text: "ピーマン", mc: group_other }
+      - { text: "どんぐり", mc: group_other }
+      - { text: "しょくぶつ", mc: group_name }
+    hint: "夏の 朝に きれいに さく ものは どれかな？"
+
+  - id: vo025
+    type: group
+    word: "やさい"
+    answer: "キャベツ"
+    wrong:
+      - { text: "りんご", mc: group_other }
+      - { text: "パン", mc: group_other }
+      - { text: "たべもの", mc: group_name }
+    hint: "はたけで そだてて、おかずに する ものは どれかな？"
+
+  - id: vo026
+    type: group
+    word: "天気"
+    answer: "くもり"
+    wrong:
+      - { text: "なつ", mc: group_other }
+      - { text: "さんぽ", mc: group_other }
+    hint: "空の ようすを あらわす ことばを さがそう。"
+
+  - id: vo027
+    type: group
+    word: "色"
+    answer: "みどり"
+    wrong:
+      - { text: "まる", mc: group_other }
+      - { text: "にじ", mc: group_other }
+    hint: "クレヨンの はこに 書いて ある 名前を 思い出そう。"
+
+  - id: vo028
+    type: group
+    word: "体の ぶぶん"
+    answer: "ひじ"
+    wrong:
+      - { text: "くつした", mc: group_other }
+      - { text: "めがね", mc: group_other }
+      - { text: "からだ", mc: group_name }
+    hint: "自分の 体を さわって たしかめて みよう。"
+
+  - id: vo029
+    type: group
+    word: "のりもの"
+    answer: "ひこうき"
+    wrong:
+      - { text: "ランドセル", mc: group_other }
+      - { text: "ことり", mc: group_other }
+    hint: "人を のせて うごく ものは どれかな？"
+
+  - id: vo030
+    type: group
+    word: "学校で つかう もの"
+    answer: "じょうぎ"
+    wrong:
+      - { text: "フライパン", mc: group_other }
+      - { text: "はブラシ", mc: group_other }
+      - { text: "どうぐ", mc: group_name }
+    hint: "ふでばこに 入れて もって いく ものは どれかな？"
+
+  - id: vo031
+    type: group
+    word: "きせつ"
+    answer: "あき"
+    wrong:
+      - { text: "あさ", mc: group_other }
+      - { text: "ゆき", mc: group_other }
+    hint: "一年の 中で、じゅんばんに めぐって くる ものの 名前だよ。"
+
+  - id: vo032
+    type: group
+    word: "魚"
+    answer: "まぐろ"
+    wrong:
+      - { text: "かもめ", mc: group_other }
+      - { text: "くじら", mc: group_other }
+      - { text: "海の 生きもの", mc: group_name }
+    hint: "水の 中で、えらで いきを する なかまだよ。"
+
+  - id: vo033
+    type: group
+    word: "鳥"
+    answer: "つばめ"
+    wrong:
+      - { text: "ちょう", mc: group_other }
+      - { text: "ねこ", mc: group_other }
+      - { text: "いきもの", mc: group_name }
+    hint: "くちばしが あって、はねで とぶ ものは どれかな？"
+
+  - id: vo034
+    type: group
+    word: "がっき"
+    answer: "ピアノ"
+    wrong:
+      - { text: "つくえ", mc: group_other }
+      - { text: "えほん", mc: group_other }
+    hint: "音を 出して 歌の えんそうに つかう ものだよ。"
+
+  - id: vo035
+    type: group
+    word: "のみもの"
+    answer: "牛にゅう"
+    wrong:
+      - { text: "コップ", mc: group_other }
+      - { text: "おにぎり", mc: group_other }
+    hint: "のどが かわいた ときに、ごくごく のむ ものだよ。"
+
+  - id: vo036
+    type: group
+    word: "きる もの"
+    answer: "セーター"
+    wrong:
+      - { text: "タオル", mc: group_other }
+      - { text: "ハンガー", mc: group_other }
+    hint: "さむい 日に 体に きて あたたかく する ものは どれかな？"
+
+  - id: vo037
+    type: group
+    word: "形"
+    answer: "さんかく"
+    wrong:
+      - { text: "あか", mc: group_other }
+      - { text: "大きい", mc: group_other }
+    hint: "かどの 数や、まるい かどうかで きまる ものだよ。"
+
+  - id: vo038
+    type: group
+    word: "あじ"
+    answer: "すっぱい"
+    wrong:
+      - { text: "つめたい", mc: group_other }
+      - { text: "かたい", mc: group_other }
+    hint: "したで かんじる、あまい・からい などの なかまだよ。"
+
+  - id: vo039
+    type: group
+    word: "だいどころで つかう もの"
+    answer: "なべ"
+    wrong:
+      - { text: "じょうぎ", mc: group_other }
+      - { text: "けしゴム", mc: group_other }
+      - { text: "どうぐ", mc: group_name }
+    hint: "りょうりを する ときに つかう ものは どれかな？"
+
+  - id: vo040
+    type: group
+    word: "かぞく"
+    answer: "おばあちゃん"
+    wrong:
+      - { text: "先生", mc: group_other }
+      - { text: "友だち", mc: group_other }
+      - { text: "人", mc: group_name }
+    hint: "いっしょに 家で くらす、父や 母や きょうだいの なかまだよ。"

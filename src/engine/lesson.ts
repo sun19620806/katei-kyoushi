@@ -30,7 +30,7 @@ export interface LessonState {
   firstMs: number | null;
   missed: boolean; // この問題で間違えた・ヒントを見た
   maxHintLevel: number;
-  current: { misconceptions: string[]; answerEventIds: string[] };
+  current: { misconceptions: string[]; answerEventIds: string[]; wrongEventIds: string[] };
   outcomes: ProblemOutcome[];
   recentPairs: string[];
   thinkAsked: boolean;
@@ -38,6 +38,8 @@ export interface LessonState {
   timeUp: boolean;
   /** 直前の回答で、次のステップに進んだ */
   stepAdvanced: boolean;
+  /** えらぶ問題で、まちがえて えらんだ 選択肢（もう えらべない） */
+  eliminated: number[];
 }
 
 export function startLesson(plan: LessonPlan, now: number, rng: Rng): LessonState {
@@ -56,20 +58,21 @@ export function startLesson(plan: LessonPlan, now: number, rng: Rng): LessonStat
     firstMs: null,
     missed: false,
     maxHintLevel: 0,
-    current: { misconceptions: [], answerEventIds: [] },
+    current: { misconceptions: [], answerEventIds: [], wrongEventIds: [] },
     outcomes: [],
     recentPairs: [],
     thinkAsked: false,
     chosenSkill: null,
     timeUp: false,
     stepAdvanced: false,
+    eliminated: [],
   };
   return loadItem(base, now, rng);
 }
 
 function newProblem(s: LessonState, skillId: SkillId, now: number, rng: Rng, isTwin: boolean): LessonState {
   const gen = generators[skill(skillId).generator];
-  const problem = gen(skillId, rng, new Set(s.recentPairs));
+  const problem = gen(skillId, rng, new Set(s.recentPairs), s.plan.levels?.[skillId] ?? 1);
   return {
     ...s,
     stage: "answering",
@@ -84,9 +87,10 @@ function newProblem(s: LessonState, skillId: SkillId, now: number, rng: Rng, isT
     firstMs: null,
     missed: false,
     maxHintLevel: 0,
-    current: { misconceptions: [], answerEventIds: [] },
+    current: { misconceptions: [], answerEventIds: [], wrongEventIds: [] },
     recentPairs: [...s.recentPairs, `${problem.a},${problem.b}`].slice(-12),
     stepAdvanced: false,
+    eliminated: [],
   };
 }
 
@@ -105,6 +109,7 @@ export const currentStep = (s: LessonState) => s.problem?.steps[s.step];
 export function answer(s: LessonState, given: number, now: number): { state: LessonState; event: AnswerEvent } {
   if (s.stage !== "answering" || !s.problem) throw new Error("not answering");
   const p = s.problem;
+  const isChoice = p.steps[s.step].type === "choice";
   const ms = now - s.problemStartedAt;
   const misconception = diagnose(p, s.step, given);
   const correct = misconception === null;
@@ -127,6 +132,7 @@ export function answer(s: LessonState, given: number, now: number): { state: Les
   const current = {
     misconceptions: correct ? s.current.misconceptions : [...s.current.misconceptions, misconception!],
     answerEventIds: [...s.current.answerEventIds, event.id],
+    wrongEventIds: correct ? s.current.wrongEventIds : [...s.current.wrongEventIds, event.id],
   };
   const missed = s.missed || !correct;
   const isLastStep = s.step === p.steps.length - 1;
@@ -142,19 +148,24 @@ export function answer(s: LessonState, given: number, now: number): { state: Les
     firstMs: firstMs ?? ms,
     misconceptions: current.misconceptions,
     answerEventIds: current.answerEventIds,
+    wrongEventIds: current.wrongEventIds,
     isTwin: s.isTwin,
   });
 
   if (correct && !isLastStep) {
     return {
-      state: { ...s, current, missed, step: s.step + 1, attemptNo: 1, hintLevel: 0, hint: null, firstMisconception: null, stepAdvanced: true },
+      state: { ...s, current, missed, step: s.step + 1, attemptNo: 1, hintLevel: 0, hint: null, firstMisconception: null, stepAdvanced: true, eliminated: [] },
       event,
     };
   }
   if (correct) {
     return { state: { ...s, stage: "correct", firstMs, current, missed, outcomes: [...s.outcomes, outcome(false)], stepAdvanced: false }, event };
   }
-  if (s.hintLevel >= 3) {
+  // 答えを見せるとき：ヒントを3つ使っても まちがえた／えらぶ問題で のこりが 正解だけに なった／2つから えらぶ問題で 2回 まちがえた
+  const choiceCount = p.steps[s.step].choices?.length ?? 0;
+  const remaining = isChoice ? choiceCount - s.eliminated.length - 1 : Infinity;
+  const stepWrongs = s.attemptNo; // この回答を ふくめた まちがいの 回数
+  if (s.hintLevel >= 3 || (isChoice && choiceCount >= 3 && remaining <= 1) || (isChoice && choiceCount === 2 && stepWrongs >= 2)) {
     return { state: { ...s, stage: "revealed", firstMs, current, missed, outcomes: [...s.outcomes, outcome(true)], stepAdvanced: false }, event };
   }
   // ヒントは推定した原因に沿って出す（分からない間違いなら、前に分かった原因を使う）
@@ -172,6 +183,8 @@ export function answer(s: LessonState, given: number, now: number): { state: Les
       hint: hintText(p, s.step, cause, level),
       firstMisconception: s.firstMisconception ?? (misconception !== "unknown" ? misconception : null),
       stepAdvanced: false,
+      // 3つ以上から えらぶ問題だけ、まちがえた選択肢を けす（2つだと 答えが わかって しまうため）
+      eliminated: isChoice && choiceCount >= 3 ? [...s.eliminated, given] : s.eliminated,
     },
     event,
   };

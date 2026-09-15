@@ -1,7 +1,7 @@
 # スキルの地図（算数・国語、小2 2学期から）
 # 並び順＝重点にする順番（前提スキルの習熟度が十分になったら次へ）。
 # review: true は1学期までの内容。重点にはせず、ウォームアップと復習にだけ出す。
-version: "2026-09-15.2"
+version: "2026-09-15.3"
 
 misconceptions:
   # たし算・ひき算
@@ -66,6 +66,20 @@ misconceptions:
   # 大きい数
   - id: zero_miss
     label: 0この位に「0」を書かない（3052→352）
+  - id: ones_first
+    label: 大きい数を くらべるとき、一の位から くらべてしまう
+  - id: sign_reversed
+    label: ＞と＜の 向きを 取りちがえる
+  - id: place_misalign
+    label: 筆算で 位を そろえずに 書く（245+38 → 625）
+  - id: op_reversed
+    label: たし算と ひき算を 取りちがえる（文章題）
+  - id: one_more
+    label: かける数が1ふえると、答えも1ふえると 考える
+  - id: gave_product
+    label: きかれていない 九九の 答えを 書く
+  - id: same_number
+    label: □に、見えている 同じ数を 書く
   # 形
   - id: open_shape
     label: 線がつながっていない形を選ぶ
@@ -108,6 +122,20 @@ misconceptions:
     label: 文章のちがう場面・段落のことを選ぶ
   - id: word_match
     label: 同じ言葉が入っているだけの選択肢を選ぶ
+  - id: particle_sound
+    label: 「は・を・へ」を、音のとおり「わ・お・え」と書く
+  - id: particle_overuse
+    label: ことばの一部なのに「は・を・へ」と書く
+  - id: particle_other
+    label: 文に合わない助詞（が・に など）を選ぶ
+  - id: similar_meaning
+    label: はんたいの言葉をきかれて、にた意味の言葉を選ぶ
+  - id: related_not_opposite
+    label: 関係はあるが、はんたいではない言葉を選ぶ
+  - id: group_other
+    label: べつの なかまの 言葉を選ぶ
+  - id: group_name
+    label: なかまの名前そのもの（大きな なかま）を選ぶ
   - id: who_confused
     label: 登場人物（説明しているもの）を取りちがえる
 
@@ -143,6 +171,16 @@ skills:
     generator: sub2d2dBorrow
     misconceptions: [smaller_from_larger, borrow_no_decrement, calc_slip]
 
+  - id: math.length.cm_mm
+    subject: math
+    group: 1学期のふくしゅう
+    review: true
+    label: 長さ（cm と mm のかきかえ）
+    kidLabel: cm と mm
+    prereqs: []
+    generator: lengthCmMm
+    misconceptions: [ratio_wrong, small_whole]
+
   - id: math.time.read
     subject: math
     group: 1学期のふくしゅう
@@ -171,6 +209,33 @@ skills:
     prereqs: [math.sub.2d2d_borrow, math.add.2d2d_to3d]
     generator: sub3d2dBorrow
     misconceptions: [smaller_from_larger, borrow_no_decrement, calc_slip]
+
+  - id: math.add.3d2d
+    subject: math
+    group: 100をこえる ひっさん
+    label: たし算の筆算（3けた＋2けた）
+    kidLabel: 3けたの たしざん
+    prereqs: [math.add.2d2d_to3d]
+    generator: add3d2d
+    misconceptions: [place_misalign, no_carry, calc_slip]
+
+  - id: math.sub.from_zero
+    subject: math
+    group: 100をこえる ひっさん
+    label: ひき算の筆算（100−36・402−57 のような 十の位が0）
+    kidLabel: 0の ある ひきざん
+    prereqs: [math.sub.3d2d_borrow]
+    generator: subFromZero
+    misconceptions: [smaller_from_larger, borrow_no_decrement, calc_slip]
+
+  - id: math.addsub.word
+    subject: math
+    group: たし算と ひき算の 文章題
+    label: たし算・ひき算の文章題（式を選んで答える）
+    kidLabel: たしざん・ひきざんの ぶんしょうもんだい
+    prereqs: [math.add.2d2d_to3d]
+    generator: addSubWord
+    misconceptions: [op_reversed, no_carry, smaller_from_larger, borrow_no_decrement, calc_slip]
 
   # ───── 時こくと時間・かさ・形 ─────
   - id: math.time.shift
@@ -282,6 +347,24 @@ skills:
     generator: mulDan9
     misconceptions: [neighbor_fact, neighbor_dan, add_instead]
 
+  - id: math.mul.dan1
+    subject: math
+    group: 九九
+    label: 九九 1の段
+    kidLabel: 1の だん
+    prereqs: [math.mul.dan9]
+    generator: mulDan1
+    misconceptions: [neighbor_fact]
+
+  - id: math.mul.rule
+    subject: math
+    group: 九九
+    label: 九九のきまり（1ふえると いくつ ふえる・かける じゅんばん）
+    kidLabel: 九九の きまり
+    prereqs: [math.mul.dan5, math.mul.dan2, math.mul.dan3]
+    generator: mulRule
+    misconceptions: [one_more, gave_product, same_number]
+
   - id: math.mul.mix
     subject: math
     group: 九九
@@ -309,6 +392,15 @@ skills:
     prereqs: []
     generator: placeCompose
     misconceptions: [zero_miss]
+
+  - id: math.number.compare
+    subject: math
+    group: 大きい数
+    label: 大きい数の 大小（＞・＜）
+    kidLabel: かずの くらべっこ
+    prereqs: [math.number.4digit]
+    generator: compareNumbers
+    misconceptions: [ones_first, sign_reversed]
 
   - id: math.length.m_cm
     subject: math
@@ -393,3 +485,30 @@ skills:
     prereqs: [jp.reading.story]
     generator: jpReadingExplain
     misconceptions: [not_in_text, wrong_part, word_match, who_confused]
+
+  - id: jp.vocab.opposite
+    subject: japanese
+    group: ことばの いみ
+    label: はんたいの いみの ことば
+    kidLabel: はんたいの ことば
+    prereqs: []
+    generator: jpVocabOpposite
+    misconceptions: [similar_meaning, related_not_opposite]
+
+  - id: jp.vocab.group
+    subject: japanese
+    group: ことばの いみ
+    label: なかまの ことば
+    kidLabel: なかまの ことば
+    prereqs: []
+    generator: jpVocabGroup
+    misconceptions: [group_other, group_name]
+
+  - id: jp.particles
+    subject: japanese
+    group: ことばの きまり
+    label: 「は・を・へ」の書き分け
+    kidLabel: は・を・へ
+    prereqs: []
+    generator: jpParticle
+    misconceptions: [particle_sound, particle_overuse, particle_other]

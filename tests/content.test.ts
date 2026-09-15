@@ -2,7 +2,7 @@
  * 教材ファイルの検証。Claude Code で教材を足したら、必ず `npm run validate` を実行する。
  */
 import { describe, expect, it } from "vitest";
-import { HINTS, JP, LINES, MISCONCEPTIONS, SKILLS, STORIES, skill } from "../src/domain/content";
+import { ADD_SUB_STORIES, HINTS, JP, LINES, MISCONCEPTIONS, SKILLS, STORIES, skill } from "../src/domain/content";
 import { hintText } from "../src/domain/hints";
 import { findHint, fill, problemVars } from "../src/domain/hints";
 import { simulateWrong } from "../src/domain/math/diagnose";
@@ -23,6 +23,14 @@ describe("教材ファイル", () => {
       for (const w of FORBIDDEN) expect(t, t).not.toContain(w);
       expect(t).not.toMatch(/https?:|www\.|@/);
       expect(t.length, t).toBeLessThanOrEqual(MAX_LEN);
+    }
+    for (const st of ADD_SUB_STORIES) {
+      for (const w of FORBIDDEN) expect(st.text, st.id).not.toContain(w);
+      expect(st.text.length, st.id).toBeLessThanOrEqual(STORY_MAX_LEN);
+      expect(st.text.split("{a}").length, st.id).toBe(2);
+      expect(st.text.split("{b}").length, st.id).toBe(2);
+      expect(st.text, st.id).toContain(st.key);
+      expect(["add", "sub"]).toContain(st.op);
     }
     for (const st of STORIES) {
       for (const w of FORBIDDEN) expect(st.text).not.toContain(w);
@@ -139,6 +147,12 @@ describe("教材ファイル", () => {
       check("jp.grammar.subject", it.id, it.answer, it.wrong, it.hint, [it.sentence]);
       for (const t of [it.answer, ...it.wrong.map((w) => w.text)]) expect(it.sentence, `${it.id}: ${t}`).toContain(t);
     }
+    for (const it of JP.particles) {
+      expect(it.sentence.split("{blank}").length, it.id).toBe(2);
+      check("jp.particles", it.id, it.answer, it.wrong, undefined, [it.sentence, it.hint ?? ""]);
+      if (it.hint) expect(it.hint, it.id).not.toContain(`「${it.answer}」`);
+    }
+    for (const it of JP.vocab) check(it.type === "opposite" ? "jp.vocab.opposite" : "jp.vocab.group", it.id, it.answer, it.wrong, it.hint, [it.word]);
     for (const ps of JP.reading) {
       expect(ps.text.length, ps.id).toBeLessThanOrEqual(320);
       for (const f of FORBIDDEN) expect(ps.text, `${ps.id}: ${f}`).not.toContain(f);
@@ -157,7 +171,9 @@ describe("教材ファイル", () => {
             for (const level of [1, 2, 3] as const) {
               const h = hintText(p, step, mc, level);
               expect(h, `${s.id} ${mc} L${level}`).not.toBeNull();
-              expect(h!.text, `${s.id} ${p.jp?.itemId} step${step}`).not.toContain(correct);
+              // 1文字の答え（は・を など）は、ふつうの ことばにも 入るので「」つきで 書いて いないかを 見る
+              const needle = correct.length === 1 ? `「${correct}」` : correct;
+              expect(h!.text, `${s.id} ${p.jp?.itemId} step${step}`).not.toContain(needle);
             }
           }
         });

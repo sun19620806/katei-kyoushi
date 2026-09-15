@@ -152,6 +152,12 @@ lines:
       - "こたえは {answer} だよ。どこで ずれたか、いっしょに たしかめよう。"
       - "いまのは {answer}。むずかしい もんだいだったね。"
 
+  - id: reveal_choice
+    scene: reveal_choice
+    variants:
+      - "こたえは これ だよ。どこで ずれたか、いっしょに たしかめよう。"
+      - "いまのは これ。むずかしい もんだいだったね。"
+
   - id: twin
     scene: twin
     variants:

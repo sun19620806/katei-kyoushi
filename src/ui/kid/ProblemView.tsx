@@ -35,6 +35,10 @@ export function problemSpeech(p: Problem, step: number): string {
     }
     case "shape":
       return p.steps[0].prompt;
+    case "rule":
+      return p.rule === "step" ? `${p.a}×${p.b + 1}は、${p.a}×${p.b}より いくつ 大きい？` : `□ × ${p.a} = ${p.a} × ${p.b}。□に はいる かずは？`;
+    case "compare":
+      return `${p.a} と ${p.b}、どちらが 大きい？`;
     case "kanji_read":
       // 読みの問題は、文を読み上げると答えがわかってしまうので読まない
       return "せんの 漢字の 読みかたは どれかな？";
@@ -46,6 +50,10 @@ export function problemSpeech(p: Problem, step: number): string {
       return `${p.jp!.sentence} ${p.steps[0].prompt}`;
     case "reading":
       return `もんだい${step + 1}。${p.steps[step].prompt}`;
+    case "particle":
+      return "□に 入る 字は どれかな？";
+    case "vocab":
+      return p.jp!.vocabType === "opposite" ? `${p.jp!.word}の はんたいの いみの ことばは どれ？` : `${p.jp!.word}の なかまに 入る ことばは どれ？`;
     default:
       return `${p.a} ${opSymbol(p)} ${p.b} は？`;
   }
@@ -172,11 +180,47 @@ export default function ProblemView({ problem: p, step, input, visual, state, no
     case "shape":
       body = <p className="shape-q">{p.steps[0].prompt}</p>;
       break;
+    case "rule":
+      body =
+        p.rule === "step" ? (
+          <div className="rule">
+            <div className="eq small-eq">
+              <span>{p.a}</span><span className="op">×</span><span>{p.b + 1}</span><span className="op">は</span>
+            </div>
+            <div className="eq small-eq">
+              <span>{p.a}</span><span className="op">×</span><span>{p.b}</span><span className="op">より</span>
+              {box(value)}<small>大きい</small>
+            </div>
+          </div>
+        ) : (
+          <div className="eq">
+            {box(value)}
+            <span className="op">×</span><span>{p.a}</span><span className="op">=</span><span>{p.a}</span><span className="op">×</span><span>{p.b}</span>
+          </div>
+        );
+      break;
+    case "compare": {
+      const st = p.steps[0];
+      const sign = state === "answering" ? "" : st.choices![st.answer];
+      body = (
+        <div className="eq compare">
+          <span>{p.a}</span>
+          <span className={`answer sign ${state}`}>
+            <span className="answer-text">{sign || " "}</span>
+            {state === "correct" && <RedCircle />}
+          </span>
+          <span>{p.b}</span>
+        </div>
+      );
+      break;
+    }
     case "kanji_read":
     case "kanji_write":
     case "katakana":
     case "grammar":
     case "reading":
+    case "vocab":
+    case "particle":
       body = <JapaneseView problem={p} step={step} state={state} />;
       break;
     case "story": {
@@ -286,7 +330,7 @@ function Hissan({ problem: p, shown, visual, state }: { problem: Problem; shown:
   }
 
   const cell = (n: number, place: number, show: boolean) => (show ? String(digit(n, place as 1 | 10 | 100)) : "");
-  const answerDigits = shown.padStart(3, " ").slice(-3).split("");
+  const answerDigits = shown.padStart(4, " ").slice(-4).split("");
 
   return (
     <div className="hissan" aria-label={`${p.a} ${opSymbol(p)} ${p.b}`}>
@@ -318,9 +362,10 @@ function Hissan({ problem: p, shown, visual, state }: { problem: Problem; shown:
       </div>
       <div className="h-rule" />
       <div className={`h-row result ${state}`}>
-        <span />
+        {/* 4けたに なった とき（くり上がりの まちがい など）は、記号の 列に 千のくらいを 出す */}
+        <span className="cell extra">{answerDigits[0].trim()}</span>
         {places.map((pl, i) => (
-          <span key={pl} className={`cell ${hot(pl)}`}>{answerDigits[i].trim()}</span>
+          <span key={pl} className={`cell ${hot(pl)}`}>{answerDigits[i + 1].trim()}</span>
         ))}
         {state === "correct" && <RedCircle />}
       </div>
@@ -393,6 +438,18 @@ function JapaneseView({ problem: p, step, state }: { problem: Problem; step: num
         </div>
       );
     }
+    case "particle": {
+      const [before, after] = split(jp.sentence!, "{blank}");
+      return (
+        <div className="jp">
+          <p className="jp-sentence">
+            {before}
+            <span className={`blank particle ${state}`}>{done ? correctText : "□"}</span>
+            {after}
+          </p>
+        </div>
+      );
+    }
     case "kanji_write": {
       const [before, after] = split(jp.sentence!, "{blank}");
       return (
@@ -419,6 +476,17 @@ function JapaneseView({ problem: p, step, state }: { problem: Problem; step: num
           <p className="jp-word">
             <span className="kana-from">{jp.reading}</span>
             <span className="arrow" aria-hidden="true">→</span>
+            <span className={`kana-to ${state}`}>{done ? correctText : "？"}</span>
+          </p>
+        </div>
+      );
+    case "vocab":
+      return (
+        <div className="jp vocab">
+          <p className="jp-ask">{jp.vocabType === "opposite" ? "はんたいの いみの ことば" : "なかまの ことば"}</p>
+          <p className="jp-word">
+            <span className="vocab-word">{jp.word}</span>
+            <span className="arrow" aria-hidden="true">{jp.vocabType === "opposite" ? "⇔" : "の なかま"}</span>
             <span className={`kana-to ${state}`}>{done ? correctText : "？"}</span>
           </p>
         </div>

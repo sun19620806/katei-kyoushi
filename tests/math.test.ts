@@ -12,7 +12,7 @@ describe("問題生成", () => {
     it(`${s.label}: 答えが正しく、条件を満たす`, () => {
       const rng = seededRng(42);
       for (let i = 0; i < N; i++) {
-        const p = generators[s.generator](s.id, rng);
+        const p = generators[s.generator](s.id, rng, undefined, (i % 3) as 0 | 1 | 2);
         const last = p.steps.at(-1)!;
         expect(last.answer).toBe(p.answer);
         switch (p.kind) {
@@ -59,7 +59,7 @@ describe("間違いの原因の推定", () => {
     it(`${s.label}: どの間違い方も、その原因として判定される`, () => {
       const rng = seededRng(7);
       for (let i = 0; i < N; i++) {
-        const p = generators[s.generator](s.id, rng);
+        const p = generators[s.generator](s.id, rng, undefined, (i % 3) as 0 | 1 | 2);
         p.steps.forEach((step, k) => {
           expect(diagnose(p, k, step.answer)).toBeNull();
           for (const mc of s.misconceptions) {
@@ -89,6 +89,21 @@ describe("間違いの原因の推定", () => {
     expect(diagnose(p, 0, 48)).toBe("neighbor_dan");
     expect(diagnose(p, 0, 15)).toBe("add_instead");
     expect(diagnose(p, 0, 30)).toBe("unknown");
+  });
+
+  it("時こく：○分後 と ○分前 の どちらも 出る", () => {
+    const rng = seededRng(3);
+    const dirs = new Set<string>();
+    for (let i = 0; i < 200; i++) dirs.add(generators.clockShift("math.time.shift", rng).clock!.dir!);
+    expect(dirs).toEqual(new Set(["after", "before"]));
+  });
+
+  it("むずかしさ：九九の やさしめは ×2〜×5 だけ", () => {
+    const rng = seededRng(9);
+    for (let i = 0; i < 200; i++) {
+      const p = generators.mulDan7("math.mul.dan7", rng, undefined, 0);
+      expect(p.b).toBeLessThanOrEqual(5);
+    }
   });
 
   it("3けたのひき算: 十の位が0のくり下がり（103−45）", () => {

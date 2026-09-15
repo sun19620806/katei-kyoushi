@@ -398,3 +398,399 @@ items:
       - { text: "まるだ", mc: dakuten_miss }
       - { text: "がんた", mc: on_kun_mix }
     hint: "「太」は「大」に 点が 1つ ついた 字だよ。"
+
+  - id: kr041
+    word: "百回"
+    reading: "ひゃっかい"
+    sentence: "なわとびを {word} とんだよ。"
+    wrong:
+      - { text: "ひゃくかい", mc: sokuon_miss }
+      - { text: "ひやっかい", mc: youon_miss }
+      - { text: "ひゃっがい", mc: dakuten_miss }
+    hint: "「ひゃく」と「かい」が つながると、音が つまるよ。"
+
+  - id: kr042
+    word: "日光"
+    reading: "にっこう"
+    sentence: "{word}を あびて 草が のびた。"
+    wrong:
+      - { text: "にちこう", mc: sokuon_miss }
+      - { text: "にっこ", mc: long_vowel_miss }
+      - { text: "にっごう", mc: dakuten_miss }
+    hint: "「日」と「光」が つながると、音が つまって のびるよ。"
+
+  - id: kr043
+    word: "一点"
+    reading: "いってん"
+    sentence: "あと {word}で おいつくよ。"
+    wrong:
+      - { text: "いちてん", mc: sokuon_miss }
+      - { text: "いてん", mc: sokuon_miss }
+      - { text: "いっでん", mc: dakuten_miss }
+    hint: "「いち」と「てん」が つながると、音が つまるよ。"
+
+  - id: kr044
+    word: "作った"
+    reading: "つくった"
+    sentence: "紙で 小さな 車を {word}。"
+    wrong:
+      - { text: "つくた", mc: sokuon_miss }
+      - { text: "つくつた", mc: sokuon_miss }
+      - { text: "さくった", mc: on_kun_mix }
+    hint: "「作る」が 形を かえると、小さい 字が 入るよ。"
+
+  - id: kr045
+    word: "原っぱ"
+    reading: "はらっぱ"
+    sentence: "{word}で バッタを 見つけた。"
+    wrong:
+      - { text: "はらぱ", mc: sokuon_miss }
+      - { text: "はらっば", mc: dakuten_miss }
+      - { text: "げんっぱ", mc: on_kun_mix }
+    hint: "「はら」の あとで 音が つまるよ。「゜」に 気を つけよう。"
+
+  - id: kr046
+    word: "高校"
+    reading: "こうこう"
+    sentence: "いとこは {word}に 通っている。"
+    wrong:
+      - { text: "こうこ", mc: long_vowel_miss }
+      - { text: "こおこう", mc: long_vowel_miss }
+      - { text: "たかこう", mc: on_kun_mix }
+    hint: "「高」も「校」も、のばす 音で 読むよ。"
+
+  - id: kr047
+    word: "大通り"
+    reading: "おおどおり"
+    sentence: "{word}を 車が たくさん 走る。"
+    wrong:
+      - { text: "おどおり", mc: long_vowel_miss }
+      - { text: "おおどうり", mc: long_vowel_miss }
+      - { text: "おおとおり", mc: dakuten_miss }
+    hint: "「大」も「通」も のばす 音。「通」の 音は にごるよ。"
+
+  - id: kr048
+    word: "交番"
+    reading: "こうばん"
+    sentence: "道が わからなくて {word}で 聞いた。"
+    wrong:
+      - { text: "こばん", mc: long_vowel_miss }
+      - { text: "こうはん", mc: dakuten_miss }
+      - { text: "ちちばん", mc: similar_kanji }
+    hint: "「父」と 見くらべよう。のばす 音と「゛」も あるよ。"
+
+  - id: kr049
+    word: "時計"
+    reading: "とけい"
+    sentence: "{word}の はりが 三時を さした。"
+    wrong:
+      - { text: "とけえ", mc: long_vowel_miss }
+      - { text: "どけい", mc: dakuten_miss }
+      - { text: "じけい", mc: on_kun_mix }
+    hint: "時間を 見る ものだよ。のばす 音は「い」と「え」の どちらかな。"
+
+  - id: kr050
+    word: "妹"
+    reading: "いもうと"
+    sentence: "{word}と 人形で あそんだ。"
+    wrong:
+      - { text: "いもおと", mc: long_vowel_miss }
+      - { text: "いもと", mc: long_vowel_miss }
+      - { text: "あね", mc: similar_kanji }
+    hint: "「姉」と 見くらべよう。のばす 音は「う」で 書くよ。"
+
+  - id: kr051
+    word: "多い"
+    reading: "おおい"
+    sentence: "きょうは しゅくだいが {word}。"
+    wrong:
+      - { text: "おうい", mc: long_vowel_miss }
+      - { text: "おい", mc: long_vowel_miss }
+      - { text: "たい", mc: on_kun_mix }
+    hint: "「おおきい」と 同じように、のばす 音を「お」で 書くよ。"
+
+  - id: kr052
+    word: "黄色"
+    reading: "きいろ"
+    sentence: "{word}の 花が さいた。"
+    wrong:
+      - { text: "きろ", mc: long_vowel_miss }
+      - { text: "ぎいろ", mc: dakuten_miss }
+      - { text: "こういろ", mc: on_kun_mix }
+    hint: "「黄」を のばす 音で 読むよ。「゛」は つかないよ。"
+
+  - id: kr053
+    word: "日曜日"
+    reading: "にちようび"
+    sentence: "{word}に 家ぞくで 出かけた。"
+    wrong:
+      - { text: "にちよび", mc: long_vowel_miss }
+      - { text: "にちようひ", mc: dakuten_miss }
+      - { text: "にちようにち", mc: on_kun_mix }
+    hint: "「曜」は のばす 音。さいごの「日」には「゛」が つくよ。"
+
+  - id: kr054
+    word: "読書"
+    reading: "どくしょ"
+    sentence: "{word}の 時間に 絵本を ひらいた。"
+    wrong:
+      - { text: "どくしよ", mc: youon_miss }
+      - { text: "とくしょ", mc: dakuten_miss }
+      - { text: "よみしょ", mc: on_kun_mix }
+    hint: "「書」は 小さい「ょ」で 読むよ。「読」には「゛」が つくよ。"
+
+  - id: kr055
+    word: "昼食"
+    reading: "ちゅうしょく"
+    sentence: "{word}に おにぎりを 食べた。"
+    wrong:
+      - { text: "ちゆうしょく", mc: youon_miss }
+      - { text: "ちゅしょく", mc: long_vowel_miss }
+      - { text: "ひるしょく", mc: on_kun_mix }
+    hint: "「昼」は 小さい「ゅ」と のばす 音。「食」も 小さい 字が 入るよ。"
+
+  - id: kr056
+    word: "教室"
+    reading: "きょうしつ"
+    sentence: "{word}の まどを あけた。"
+    wrong:
+      - { text: "きようしつ", mc: youon_miss }
+      - { text: "きょしつ", mc: long_vowel_miss }
+      - { text: "きょうじつ", mc: dakuten_miss }
+    hint: "「教」は 小さい「ょ」と のばす 音。「室」は にごらないよ。"
+
+  - id: kr057
+    word: "図書室"
+    reading: "としょしつ"
+    sentence: "{word}で 本を かりた。"
+    wrong:
+      - { text: "としよしつ", mc: youon_miss }
+      - { text: "どしょしつ", mc: dakuten_miss }
+      - { text: "こくしょしつ", mc: similar_kanji }
+    hint: "「図」と「国」の 形を 見くらべよう。小さい「ょ」も あるよ。"
+
+  - id: kr058
+    word: "汽車"
+    reading: "きしゃ"
+    sentence: "けむりを 出して {word}が 走る。"
+    wrong:
+      - { text: "きしや", mc: youon_miss }
+      - { text: "ぎしゃ", mc: dakuten_miss }
+      - { text: "きくるま", mc: on_kun_mix }
+    hint: "「車」を 小さい「ゃ」で 読むよ。「汽」は にごらないよ。"
+
+  - id: kr059
+    word: "会社"
+    reading: "かいしゃ"
+    sentence: "父は 電車で {word}に 行く。"
+    wrong:
+      - { text: "かいしや", mc: youon_miss }
+      - { text: "がいしゃ", mc: dakuten_miss }
+      - { text: "あいしゃ", mc: on_kun_mix }
+    hint: "「社」は 小さい「ゃ」で 読むよ。「会」は にごらないよ。"
+
+  - id: kr060
+    word: "自分"
+    reading: "じぶん"
+    sentence: "{word}で へやを かたづけた。"
+    wrong:
+      - { text: "じふん", mc: dakuten_miss }
+      - { text: "しぶん", mc: dakuten_miss }
+      - { text: "めぶん", mc: similar_kanji }
+    hint: "「目」と にているけど、上に 点が あるよ。どちらも「゛」が つくよ。"
+
+  - id: kr061
+    word: "近道"
+    reading: "ちかみち"
+    sentence: "{word}を 通って 家に 帰った。"
+    wrong:
+      - { text: "とおみち", mc: similar_kanji }
+      - { text: "ちがみち", mc: dakuten_miss }
+      - { text: "きんどう", mc: on_kun_mix }
+    hint: "「遠」と「近」の 形を 見くらべよう。「゛」は つかないよ。"
+
+  - id: kr062
+    word: "雪だるま"
+    reading: "ゆきだるま"
+    sentence: "にわに 大きな {word}を 作った。"
+    wrong:
+      - { text: "くもだるま", mc: similar_kanji }
+      - { text: "ゆきたるま", mc: dakuten_miss }
+      - { text: "せつだるま", mc: on_kun_mix }
+    hint: "「雨」の 下に「ヨ」の 形が ある 字だよ。"
+
+  - id: kr063
+    word: "海水"
+    reading: "かいすい"
+    sentence: "{word}を なめると しょっぱい。"
+    wrong:
+      - { text: "まいすい", mc: similar_kanji }
+      - { text: "かいずい", mc: dakuten_miss }
+      - { text: "うみみず", mc: on_kun_mix }
+    hint: "「毎」に さんずいが ついた 字だよ。「水」は にごらないよ。"
+
+  - id: kr064
+    word: "電池"
+    reading: "でんち"
+    sentence: "おもちゃの {word}を 入れかえた。"
+    wrong:
+      - { text: "でんじ", mc: similar_kanji }
+      - { text: "てんち", mc: dakuten_miss }
+      - { text: "でんいけ", mc: on_kun_mix }
+    hint: "土へんでは なく、さんずいの 字だよ。「電」は にごる 音。"
+
+  - id: kr065
+    word: "午前"
+    reading: "ごぜん"
+    sentence: "{word}中に しゅくだいを すませた。"
+    wrong:
+      - { text: "ぎゅうぜん", mc: similar_kanji }
+      - { text: "ごせん", mc: dakuten_miss }
+      - { text: "ごまえ", mc: on_kun_mix }
+    hint: "「午」と「牛」を 見くらべよう。「前」は にごるよ。"
+
+  - id: kr066
+    word: "鳴き声"
+    reading: "なきごえ"
+    sentence: "森で 小鳥の {word}が 聞こえた。"
+    wrong:
+      - { text: "とりごえ", mc: similar_kanji }
+      - { text: "なきこえ", mc: dakuten_miss }
+      - { text: "めいせい", mc: on_kun_mix }
+    hint: "「鳥」に 口が ついた 字だよ。「声」の 音が にごるよ。"
+
+  - id: kr067
+    word: "一万"
+    reading: "いちまん"
+    sentence: "町の 人は {word}人 いる。"
+    wrong:
+      - { text: "いっぽう", mc: similar_kanji }
+      - { text: "いちほう", mc: similar_kanji }
+      - { text: "ひとまん", mc: on_kun_mix }
+    hint: "「方」と にているけど、上に 点が ない 字だよ。"
+
+  - id: kr068
+    word: "毛糸"
+    reading: "けいと"
+    sentence: "{word}で マフラーを あんだ。"
+    wrong:
+      - { text: "けえと", mc: long_vowel_miss }
+      - { text: "げいと", mc: dakuten_miss }
+      - { text: "もういと", mc: on_kun_mix }
+    hint: "「毛」は のばす 音で 読むよ。「い」か「え」か 考えよう。"
+
+  - id: kr069
+    word: "西日"
+    reading: "にしび"
+    sentence: "{word}が まどから さしこむ。"
+    wrong:
+      - { text: "にしひ", mc: dakuten_miss }
+      - { text: "せいじつ", mc: on_kun_mix }
+    hint: "夕方に さす 日の ことだよ。「日」の 音が にごるよ。"
+
+  - id: kr070
+    word: "冬休み"
+    reading: "ふゆやすみ"
+    sentence: "{word}に 雪あそびを した。"
+    wrong:
+      - { text: "ふうやすみ", mc: long_vowel_miss }
+      - { text: "とうやすみ", mc: on_kun_mix }
+    hint: "さむい きせつの 休みだよ。「冬」は のばさないよ。"
+
+  - id: kr071
+    word: "野原"
+    reading: "のはら"
+    sentence: "{word}で 花を つんだ。"
+    wrong:
+      - { text: "のばら", mc: dakuten_miss }
+      - { text: "やげん", mc: on_kun_mix }
+      - { text: "のうはら", mc: long_vowel_miss }
+    hint: "「野」は のばさずに 読むよ。「原」は にごらないよ。"
+
+  - id: kr072
+    word: "夜中"
+    reading: "よなか"
+    sentence: "{word}に 目が さめた。"
+    wrong:
+      - { text: "やなか", mc: on_kun_mix }
+      - { text: "よるなか", mc: on_kun_mix }
+      - { text: "よなが", mc: dakuten_miss }
+    hint: "「夜」は ここでは 1文字で 読むよ。「゛」は つかないよ。"
+
+  - id: kr073
+    word: "来週"
+    reading: "らいしゅう"
+    sentence: "{word} えんそくに 行く。"
+    wrong:
+      - { text: "らいしゆう", mc: youon_miss }
+      - { text: "らいしゅ", mc: long_vowel_miss }
+      - { text: "くるしゅう", mc: on_kun_mix }
+    hint: "「週」は 小さい「ゅ」と のばす 音で 読むよ。"
+
+  - id: kr074
+    word: "手首"
+    reading: "てくび"
+    sentence: "{word}を くるくる 回した。"
+    wrong:
+      - { text: "てぐび", mc: dakuten_miss }
+      - { text: "しゅしゅ", mc: on_kun_mix }
+      - { text: "てみち", mc: similar_kanji }
+    hint: "「道」の 中に ある 字だよ。「首」の はじめは にごらないよ。"
+
+  - id: kr075
+    word: "弓矢"
+    reading: "ゆみや"
+    sentence: "むかしの 人は {word}を つかった。"
+    wrong:
+      - { text: "ひきや", mc: similar_kanji }
+      - { text: "きゅうし", mc: on_kun_mix }
+    hint: "「引」の 左がわと 同じ 形の 字だよ。"
+
+  - id: kr076
+    word: "売り場"
+    reading: "うりば"
+    sentence: "おもちゃ {word}に 行った。"
+    wrong:
+      - { text: "うりは", mc: dakuten_miss }
+      - { text: "ばいば", mc: on_kun_mix }
+      - { text: "よみば", mc: similar_kanji }
+    hint: "「読」の 右がわと 同じ 形の 字だよ。「場」は にごるよ。"
+
+  - id: kr077
+    word: "春風"
+    reading: "はるかぜ"
+    sentence: "あたたかい {word}が ふいた。"
+    wrong:
+      - { text: "はるがぜ", mc: dakuten_miss }
+      - { text: "はるかせ", mc: dakuten_miss }
+      - { text: "しゅんぷう", mc: on_kun_mix }
+    hint: "「風」は、はじめの 音は にごらず、あとの 音が にごるよ。"
+
+  - id: kr078
+    word: "親友"
+    reading: "しんゆう"
+    sentence: "{word}と 同じ クラスに なった。"
+    wrong:
+      - { text: "しんゆ", mc: long_vowel_miss }
+      - { text: "おやとも", mc: on_kun_mix }
+    hint: "「友」は のばす 音で 読むよ。"
+
+  - id: kr079
+    word: "外国"
+    reading: "がいこく"
+    sentence: "{word}の お話を 読んだ。"
+    wrong:
+      - { text: "かいこく", mc: dakuten_miss }
+      - { text: "がいごく", mc: dakuten_miss }
+      - { text: "そとこく", mc: on_kun_mix }
+    hint: "「外」には「゛」が つくよ。「国」は にごらないよ。"
+
+  - id: kr080
+    word: "強風"
+    reading: "きょうふう"
+    sentence: "{word}で かさが とばされた。"
+    wrong:
+      - { text: "きようふう", mc: youon_miss }
+      - { text: "きょふう", mc: long_vowel_miss }
+      - { text: "つよかぜ", mc: on_kun_mix }
+    hint: "「強」は 小さい「ょ」と のばす 音。「風」も のばすよ。"

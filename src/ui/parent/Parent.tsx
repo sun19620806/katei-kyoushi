@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { DEFAULT_PROFILE, currentStreak, db, exportData, loadModel, saveProfile } from "../../db/db";
 import { SKILLS, SKILL_GROUPS, hasSkill, misconceptionLabel, skill } from "../../domain/content";
-import { addDays, ymd } from "../../domain/dates";
+import { addDays, localDay, ymd } from "../../domain/dates";
 import { activeStumbles, masterySymbol } from "../../domain/learner";
 import { planLesson } from "../../domain/planner";
 import { uid } from "../../domain/random";
 import type { AnswerEvent, Episode, Profile, SessionEvent, SkillState, Stumble } from "../../domain/types";
-import { speak } from "../speech";
+import { speak, unlockSpeech } from "../speech";
 
 type Tab = "today" | "map" | "log" | "settings";
 
@@ -88,19 +88,90 @@ export default function Parent({ profile, onProfileChange, onExit, onTrial }: Pa
   );
 }
 
+/** 回答の記録を 問題ごとに まとめる（読みとりの 3問・とけいの 時と分 も 1問と 数える） */
+function problemsOn(answers: AnswerEvent[], day: string) {
+  const byProblem = new Map<string, AnswerEvent[]>();
+  for (const a of answers) {
+    if (localDay(a.at) !== day) continue;
+    byProblem.set(a.problem.id, [...(byProblem.get(a.problem.id) ?? []), a]);
+  }
+  const list = [...byProblem.values()];
+  const ok = list.filter((evs) => evs.every((e) => e.correct && e.hintLevel === 0)).length;
+  const hinted = list.filter((evs) => evs.some((e) => e.hintLevel > 0)).length;
+  return { total: list.length, ok, hinted };
+}
+
+/** この7日間の 問題数（ヒントなし正解と、それ以外） */
+function WeekChart({ data, today }: { data: Data; today: string }) {
+  const days = Array.from({ length: 7 }, (_, i) => addDays(today, i - 6));
+  const rows = days.map((d) => {
+    const { total, ok } = problemsOn(data.answers, d);
+    const minutes = data.sessions.filter((s) => s.kind === "finish" && localDay(s.at) === d).reduce((m, s) => m + (s.minutes ?? 0), 0);
+    return { d, ok, other: total - ok, minutes };
+  });
+  const max = Math.max(10, ...rows.map((r) => r.ok + r.other));
+  const W = 560;
+  const H = 150;
+  const bw = 44;
+  const gap = (W - 40 - bw * 7) / 6;
+  const y = (v: number) => H - 24 - (v / max) * (H - 44);
+  const week = ["日", "月", "火", "水", "木", "金", "土"];
+  return (
+    <section className="box wide week-chart">
+      <h2>この7日間</h2>
+      <div className="chart-wrap">
+        <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="この7日間の 問題数">
+          {[0, max / 2, max].map((v) => (
+            <g key={v}>
+              <line x1="30" x2={W} y1={y(v)} y2={y(v)} stroke="var(--grid)" />
+              <text x="24" y={y(v) + 4} textAnchor="end" fontSize="11" fill="var(--ink-3)">
+                {Math.round(v)}
+              </text>
+            </g>
+          ))}
+          {rows.map((r, i) => {
+            const x = 40 + i * (bw + gap);
+            const total = r.ok + r.other;
+            return (
+              <g key={r.d}>
+                <rect x={x} y={y(total)} width={bw} height={y(0) - y(total)} rx="5" fill="var(--pencil-tint)" />
+                <rect x={x} y={y(r.ok)} width={bw} height={y(0) - y(r.ok)} rx="5" fill="var(--pencil)" />
+                {total > 0 && (
+                  <text x={x + bw / 2} y={y(total) - 5} textAnchor="middle" fontSize="12" fontWeight="700" fill="var(--ink)">
+                    {total}
+                  </text>
+                )}
+                <text x={x + bw / 2} y={H - 6} textAnchor="middle" fontSize="12" fill={r.d === today ? "var(--ink)" : "var(--ink-3)"} fontWeight={r.d === today ? 700 : 400}>
+                  {week[new Date(`${r.d}T12:00:00`).getDay()]}
+                </text>
+              </g>
+            );
+          })}
+        </svg>
+      </div>
+      <p className="legend small">
+        <span><i className="swatch ok" />ヒントなしで正解</span>
+        <span><i className="swatch other" />ヒントを使った・まちがえた</span>
+        <span>合計 {rows.reduce((m, r) => m + r.minutes, 0)}分</span>
+      </p>
+    </section>
+  );
+}
+
 function Today({ data, profile }: { data: Data; profile: Profile }) {
   const today = ymd();
   const weekAgo = addDays(today, -6);
-  const todays = data.answers.filter((a) => a.at.slice(0, 10) === today && a.attemptNo === 1);
+  const counts = problemsOn(data.answers, today);
+  const todays = { length: counts.total };
   const minutes = data.sessions
-    .filter((s) => s.kind === "finish" && s.at.slice(0, 10) === today)
+    .filter((s) => s.kind === "finish" && localDay(s.at) === today)
     .reduce((sum, s) => sum + (s.minutes ?? 0), 0);
-  const noHint = todays.filter((a) => a.correct && a.hintLevel === 0).length;
-  const hinted = new Set(data.answers.filter((a) => a.at.slice(0, 10) === today && a.hintLevel > 0).map((a) => a.problem.id)).size;
+  const noHint = counts.ok;
+  const hinted = counts.hinted;
   const weekEpisodes = data.episodes.filter((e) => e.date >= weekAgo);
   const stumbles = activeStumbles(data.stumbles, today).filter((s) => hasSkill(s.skillId)).sort((a, b) => (a.status === "confirmed" ? -1 : 1) - (b.status === "confirmed" ? -1 : 1));
   const plan = planLesson({ profile, states: data.states, stumbles: data.stumbles, mood: "futsu", today });
-  const moods = data.sessions.filter((s) => s.kind === "start" && s.mood && s.at.slice(0, 10) >= addDays(today, -2)).map((s) => s.mood);
+  const moods = data.sessions.filter((s) => s.kind === "start" && s.mood && localDay(s.at) >= addDays(today, -2)).map((s) => s.mood);
   const tiredStreak = moods.length >= 2 && moods.slice(-2).every((m) => m === "tsukare");
 
   const firstTry = todays.length ? Math.round((noHint / todays.length) * 100) : 0;
@@ -124,6 +195,7 @@ function Today({ data, profile }: { data: Data; profile: Profile }) {
           <b>{data.streak}<span>日</span></b>
         </div>
       </section>
+      <WeekChart data={data} today={today} />
       <section className="box wide">
         <h2>今日の連絡帳</h2>
         {todays.length === 0 ? (
@@ -197,7 +269,8 @@ function SkillMap({ data, profile, onProfileChange, onTrial }: { data: Data; pro
   const toggle = async (id: string) => {
     const off = profile.disabledSkills.includes(id);
     const disabledSkills = off ? profile.disabledSkills.filter((x) => x !== id) : [...profile.disabledSkills, id];
-    if (disabledSkills.length >= SKILLS.length) return;
+    const stillOn = SKILLS.filter((s) => profile.subjects.includes(s.subject) && !disabledSkills.includes(s.id));
+    if (stillOn.length === 0) return; // 出す 単元が 1つも ない 状態には しない
     await saveProfile({ ...profile, disabledSkills });
     onProfileChange();
   };
@@ -240,7 +313,7 @@ function SkillMap({ data, profile, onProfileChange, onTrial }: { data: Data; pro
                     <span className="toggle-track" aria-hidden="true" />
                     <span className="toggle-label">{on ? "出す" : "出さない"}</span>
                   </label>
-                  <button className="btn-mini" onClick={() => onTrial(id)}>
+                  <button className="btn-mini" onClick={() => { unlockSpeech(); onTrial(id); }}>
                     ためす
                   </button>
                 </li>
@@ -282,6 +355,9 @@ function Log({ data }: { data: Data }) {
       case "fraction_shape": return `1/${p.a}の図`;
       case "place_compose": return `4けたの数 ${p.b}`;
       case "shape_pick": return p.steps[0]?.prompt ?? "形";
+      case "mul_rule": return p.rule === "step" ? `${p.a}×${p.b + 1}は${p.a}×${p.b}より□大きい` : `□×${p.a}=${p.a}×${p.b}`;
+      case "compare": return `${p.a} □ ${p.b}`;
+      case "addsub_word": return a.step === 0 ? "文章題（式）" : `文章題 ${p.a} ${p.addsub?.op === "add" ? "+" : "−"} ${p.b}`;
       case "jp_choice": return `${skill(p.skillId).label}：${p.jp?.word ?? p.jp?.reading ?? p.jp?.title ?? ""}`;
       default: return "";
     }
@@ -337,7 +413,17 @@ function Settings({ profile, onProfileChange, onDataChange }: { profile: Profile
   const set = <K extends keyof Profile>(k: K, v: Profile[K]) => setP({ ...p, [k]: v });
 
   const save = async () => {
-    await saveProfile(p);
+    const clamp = (v: number, lo: number, hi: number, d: number) => (Number.isFinite(v) ? Math.min(hi, Math.max(lo, Math.round(v))) : d);
+    const time = (v: string, d: string) => (/^\d{2}:\d{2}$/.test(v) ? v : d);
+    const fixed: Profile = {
+      ...p,
+      problemsPerSession: clamp(p.problemsPerSession, 5, 20, DEFAULT_PROFILE.problemsPerSession),
+      maxMinutes: clamp(p.maxMinutes, 5, 40, DEFAULT_PROFILE.maxMinutes),
+      allowedFrom: time(p.allowedFrom, DEFAULT_PROFILE.allowedFrom),
+      allowedTo: time(p.allowedTo, DEFAULT_PROFILE.allowedTo),
+    };
+    setP(fixed);
+    await saveProfile(fixed);
     onProfileChange();
     setSaved("保存しました。");
   };
@@ -350,23 +436,35 @@ function Settings({ profile, onProfileChange, onDataChange }: { profile: Profile
     setSaved("思い出を追加しました。先生があいさつで話します。");
   };
 
-  const download = async () => {
-    const json = JSON.stringify(await exportData(), null, 2);
-    const file = new File([json], `katei-kyoushi-${ymd()}.json`, { type: "application/json" });
-    if (navigator.canShare?.({ files: [file] })) {
-      await navigator.share({ files: [file] }).catch(() => undefined);
+  // 書き出す ファイルは 先に 作っておく（iPad の「共有」は タップの すぐ あとで ないと ひらかないため）
+  const [exportFile, setExportFile] = useState<File | null>(null);
+  useEffect(() => {
+    exportData()
+      .then((data) => setExportFile(new File([JSON.stringify(data, null, 2)], `katei-kyoushi-${ymd()}.json`, { type: "application/json" })))
+      .catch(() => setSaved("記録を準備できませんでした。ページを開き直してください。"));
+  }, []);
+
+  const download = () => {
+    if (!exportFile) return;
+    if (navigator.canShare?.({ files: [exportFile] })) {
+      navigator.share({ files: [exportFile] }).catch((e: unknown) => {
+        if (e instanceof Error && e.name !== "AbortError") setSaved(`書き出せませんでした（${e.message}）。`);
+      });
     } else {
       const a = document.createElement("a");
-      a.href = URL.createObjectURL(file);
-      a.download = file.name;
+      a.href = URL.createObjectURL(exportFile);
+      a.download = exportFile.name;
       a.click();
-      URL.revokeObjectURL(a.href);
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+      setSaved("記録ファイルを書き出しました。");
     }
   };
 
   const resetAll = async () => {
     if (!confirm("学習の記録をすべて消します。元に戻せません。先に「記録を書き出す」でバックアップすることをおすすめします。消しますか？")) return;
-    await Promise.all([db.events.clear(), db.skillStates.clear(), db.stumbles.clear(), db.episodes.clear(), db.lineUsage.clear()]);
+    await db.transaction("rw", [db.events, db.skillStates, db.stumbles, db.episodes, db.lineUsage, db.ink], async () => {
+      await Promise.all([db.events.clear(), db.skillStates.clear(), db.stumbles.clear(), db.episodes.clear(), db.lineUsage.clear(), db.ink.clear()]);
+    });
     onDataChange();
     setSaved("記録を消しました。");
   };
@@ -424,7 +522,7 @@ function Settings({ profile, onProfileChange, onDataChange }: { profile: Profile
       <section className="box">
         <h2>データ</h2>
         <p className="muted small">記録はこのiPadの中だけにあります。週1回の先生会議の前と、月に1回のバックアップに書き出してください。呼び名と暗証番号は含まれません。</p>
-        <button className="btn primary" onClick={download}>記録を書き出す</button>
+        <button className="btn primary" onClick={download} disabled={!exportFile}>{exportFile ? "記録を書き出す" : "準備中…"}</button>
         <button className="btn danger" onClick={resetAll}>記録をすべて消す</button>
       </section>
       {saved && <p className="toast wide">{saved}</p>}

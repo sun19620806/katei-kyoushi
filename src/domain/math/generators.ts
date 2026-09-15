@@ -1,4 +1,4 @@
-import { JP, type JpWrong, skill, STORIES } from "../content";
+import { ADD_SUB_STORIES, JP, type JpWrong, skill, STORIES } from "../content";
 import { fill } from "../fill";
 import { int, pick, type Rng, uid } from "../random";
 import type { Problem, SkillId, Step } from "../types";
@@ -8,7 +8,7 @@ import { diagnose, digit, exprText, shiftTime, simulateWrong } from "./diagnose"
  * 問題の生成。数値は「間違い方ごとに違う答えになる」ように選ぶ。
  * recent には最近出した "a,b" を渡すと、同じ問題が続かないようにする。
  */
-export type Generator = (skillId: SkillId, rng: Rng, recent?: Set<string>) => Problem;
+export type Generator = (skillId: SkillId, rng: Rng, recent?: Set<string>, level?: 0 | 1 | 2) => Problem;
 
 const numberStep = (answer: number, prompt = "こたえを いれよう", unit?: string): Step => ({ type: "number", answer, prompt, unit });
 
@@ -69,13 +69,16 @@ const add2d2dCarry: Generator = (skillId, rng, recent) =>
   }, recent);
 
 /** 67+85 のような 2けた＋2けた、答えが3けた（くり上がり1〜2回） */
-const add2d2dTo3d: Generator = (skillId, rng, recent) =>
+const add2d2dTo3d: Generator = (skillId, rng, recent, level = 1) =>
   generate(() => {
     const a = int(rng, 25, 98);
     const b = int(rng, 25, 98);
     const onesCarry = digit(a, 1) + digit(b, 1) >= 10;
-    // 百の位へくり上がり、答えが100〜198。くり上がり2回を多めに
-    if (a + b < 110 || (!onesCarry && rng() < 0.7)) return null;
+    // 百の位へくり上がり、答えが100〜198。やさしめは くり上がり1回、むずかしめは 2回を多めに
+    if (a + b < 110) return null;
+    if (level === 0 && onesCarry) return null;
+    if (level === 2 && !onesCarry && rng() < 0.85) return null;
+    if (level === 1 && !onesCarry && rng() < 0.6) return null;
     return base(skillId, "add", a, b, "vertical", [numberStep(a + b)]);
   }, recent);
 
@@ -92,9 +95,9 @@ const sub2d2dBorrow: Generator = (skillId, rng, recent) =>
   }, recent);
 
 /** 134-56 のような 3けた−2けた、くり下がり2回（103-45 のような十の位が0も含む） */
-const sub3d2dBorrow: Generator = (skillId, rng, recent) =>
+const sub3d2dBorrow: Generator = (skillId, rng, recent, level = 1) =>
   generate(() => {
-    const a = int(rng, 100, 180);
+    const a = int(rng, level === 0 ? 120 : 100, 180);
     const b = int(rng, 12, 98);
     const d = a - b;
     const double = digit(a, 1) < digit(b, 1) && digit(a, 10) - 1 < digit(b, 10);
@@ -105,15 +108,83 @@ const sub3d2dBorrow: Generator = (skillId, rng, recent) =>
 /** 九九。×1 は除き、後半（5〜9）を多めに出す */
 const mulDan =
   (n: number): Generator =>
-  (skillId, rng, recent) =>
+  (skillId, rng, recent, level = 1) =>
     generate(
       () => {
-        const m = rng() < 0.6 ? int(rng, 5, 9) : int(rng, 2, 9);
+        // やさしめは ×2〜×5、ふつうは ぜんぶ（後半多め）、むずかしめは ×6〜×9 中心
+        const m = level === 0 ? int(rng, 2, 5) : level === 2 ? (rng() < 0.8 ? int(rng, 6, 9) : int(rng, 2, 5)) : rng() < 0.6 ? int(rng, 5, 9) : int(rng, 2, 9);
         return base(skillId, "mul", n, m, "inline", [numberStep(n * m)]);
       },
       recent,
       false,
     );
+
+/** 九九のきまり：7×6は 7×5より いくつ大きい？ ／ □×8 = 8×6 */
+const mulRule: Generator = (skillId, rng, recent) =>
+  generate(() => {
+    const a = int(rng, 2, 9);
+    const b = int(rng, 2, 8);
+    if (rng() < 0.55) {
+      return base(skillId, "mul_rule", a, b, "rule", [numberStep(a, "いくつ 大きい？")], { rule: "step" });
+    }
+    if (a === b) return null;
+    return base(skillId, "mul_rule", a, b, "rule", [numberStep(b, "□に はいる かずは？")], { rule: "commute" });
+  }, recent);
+
+/** 245+38 のような 3けた＋2けた（一の位でくり上がり、答えは3けた） */
+const add3d2d: Generator = (skillId, rng, recent) =>
+  generate(() => {
+    const a = int(rng, 101, 889);
+    const b = int(rng, 12, 98);
+    if (digit(a, 1) + digit(b, 1) < 10 || a + b >= 1000 || digit(a, 10) === 0) return null;
+    return base(skillId, "add", a, b, "vertical", [numberStep(a + b)]);
+  }, recent);
+
+/** 100−36・402−57 のような、十の位が0の ひき算（くり下がり2回） */
+const subFromZero: Generator = (skillId, rng, recent) =>
+  generate(() => {
+    const h = int(rng, 1, 5);
+    const ones = rng() < 0.5 ? 0 : int(rng, 1, 5);
+    const a = h * 100 + ones;
+    const b = int(rng, 12, 98);
+    if (digit(a, 1) >= digit(b, 1) || a - b < 10) return null;
+    return base(skillId, "sub", a, b, "vertical", [numberStep(a - b)]);
+  }, recent);
+
+/** 大きい数の大小：3050 □ 3500 */
+const compareNumbers: Generator = (skillId, rng, recent) =>
+  generate(() => {
+    const a = int(rng, 1000, 9999);
+    // 上の位が同じで、とちゅうの位で差がつく数（一の位から比べると逆になるようにする）
+    const place = pick(rng, [100, 10]);
+    const hi = Math.floor(a / (place * 10)) * place * 10;
+    const dA = digit(a, place as 10 | 100);
+    let dB = int(rng, 0, 9);
+    if (dB === dA) dB = (dA + 3) % 10;
+    const b = hi + dB * place + (place === 100 ? int(rng, 0, 99) : int(rng, 0, 9));
+    if (a === b) return null;
+    const bigger = a > b;
+    // 一の位だけ見ると、ぎゃくの答えに なる とき「一の位から比べる」
+    const onesFirst = digit(a, 1) > digit(b, 1) !== bigger && digit(a, 1) !== digit(b, 1);
+    const choices = ["＞", "＜"];
+    const correct = bigger ? 0 : 1;
+    return base(
+      skillId,
+      "compare",
+      a,
+      b,
+      "compare",
+      [
+        {
+          type: "choice",
+          answer: correct,
+          choices,
+          choiceMcs: choices.map((_, i) => (i === correct ? null : onesFirst ? "ones_first" : "sign_reversed")),
+          prompt: "□に ＞か ＜を いれよう",
+        },
+      ],
+    );
+  }, recent);
 
 /** 九九ミックス：6〜9の段を多めに */
 const mulMix: Generator = (skillId, rng, recent) =>
@@ -160,17 +231,44 @@ const mulWord: Generator = (skillId, rng, recent) =>
 
 type UnitPair = { big: string; small: string; ratio: number };
 
+/** たし算・ひき算の文章題：式を選ぶ → 答え */
+const addSubWord: Generator = (skillId, rng, recent) =>
+  generate(() => {
+    const story = pick(rng, ADD_SUB_STORIES);
+    const a = int(rng, 24, 96);
+    const b = int(rng, 11, a - 6);
+    if (a + b > 198) return null;
+    // くり上がり・くり下がりのある問題を多めに
+    const hard = story.op === "add" ? digit(a, 1) + digit(b, 1) >= 10 : digit(a, 1) < digit(b, 1);
+    if (!hard && rng() < 0.6) return null;
+    const choices = [`${a} + ${b}`, `${a} − ${b}`];
+    const correct = story.op === "add" ? 0 : 1;
+    const answer = story.op === "add" ? a + b : a - b;
+    return base(
+      skillId,
+      "addsub_word",
+      a,
+      b,
+      "story",
+      [
+        { type: "choice", answer: correct, choices, choiceMcs: choices.map((_, i) => (i === correct ? null : "op_reversed")), prompt: "しきを えらぼう" },
+        numberStep(answer, "こたえは？", story.unit),
+      ],
+      { story: fill(story.text, { a: String(a), b: String(b) }), addsub: { op: story.op, key: story.key } },
+    );
+  }, recent);
+
 /** 単位のかきかえ：2m30cm = □cm ／ 135cm = 1m□cm（かさ・長さ共通） */
 const unitConvert =
   (pairs: UnitPair[]): Generator =>
-  (skillId, rng, recent) =>
+  (skillId, rng, recent, level = 1) =>
     generate(() => {
       const u = pick(rng, pairs);
       const a = int(rng, 1, u.ratio === 1000 ? 2 : 3);
       const b =
         u.ratio === 10 ? int(rng, 1, 9) : u.ratio === 100 ? (rng() < 0.3 ? int(rng, 2, 9) : int(rng, 11, 99)) : pick(rng, [100, 200, 250, 300, 500, 600, 800]);
       const total = a * u.ratio + b;
-      if (rng() < 0.5) {
+      if (level === 0 || rng() < 0.5) {
         return base(skillId, "unit_to_small", a, b, "unit", [numberStep(total, `なん${u.small}？`, u.small)], { unit: { ...u, total } });
       }
       if (b === 1 || b === a || b === u.ratio) return null; // ヒントの数字と答えが同じにならないように
@@ -178,6 +276,7 @@ const unitConvert =
     }, recent);
 
 const lengthMcm = unitConvert([{ big: "m", small: "cm", ratio: 100 }]);
+const lengthCmMm = unitConvert([{ big: "cm", small: "mm", ratio: 10 }]);
 const volume = unitConvert([
   { big: "L", small: "dL", ratio: 10 },
   { big: "dL", small: "mL", ratio: 100 },
@@ -185,10 +284,10 @@ const volume = unitConvert([
 ]);
 
 /** とけいを読む：なん時 → なん分 */
-const clockRead: Generator = (skillId, rng, recent) =>
+const clockRead: Generator = (skillId, rng, recent, level = 1) =>
   generate(() => {
     const h = int(rng, 1, 12);
-    const m = rng() < 0.75 ? int(rng, 1, 11) * 5 : int(rng, 1, 58);
+    const m = level === 0 || rng() < 0.7 ? int(rng, 1, 11) * 5 : int(rng, 1, 58);
     if (m % 5 === 0 && m / 5 === h) return null;
     return base(skillId, "clock_read", h, m, "clock", [numberStep(h, "なん時？", "時"), numberStep(m, "なん分？", "分")], { clock: { h, m } });
   }, recent);
@@ -206,7 +305,8 @@ const clockShift: Generator = (skillId, rng, recent) =>
     // ヒントの数字（のこりの分など）と答えが同じにならないように
     const toHour = dir === "after" ? 60 - m : m;
     const rest = shift - toHour;
-    if ([toHour, rest, shift].includes(t.m) || [toHour, rest, shift].includes(t.h)) return null;
+    void rest;
+    if ([toHour, shift].includes(t.m) || [toHour, shift].includes(t.h)) return null;
     return base(
       skillId,
       "clock_shift",
@@ -219,9 +319,9 @@ const clockShift: Generator = (skillId, rng, recent) =>
   }, recent);
 
 /** 12この 1/4は なんこ？ */
-const fractionOf: Generator = (skillId, rng, recent) =>
+const fractionOf: Generator = (skillId, rng, recent, level = 1) =>
   generate(() => {
-    const b = pick(rng, [2, 3, 4, 8]);
+    const b = pick(rng, level === 0 ? [2, 4] : [2, 3, 4, 8]);
     const answer = int(rng, 2, b === 8 ? 3 : 6);
     const a = answer * b;
     if (answer === b) return null;
@@ -355,6 +455,23 @@ const jpGrammar: Generator = (skillId, rng, recent) => {
   });
 };
 
+const jpVocab =
+  (type: "opposite" | "group"): Generator =>
+  (skillId, rng, recent) => {
+    const [it, i] = jpPick(rng, JP.vocab.filter((v) => v.type === type), recent);
+    const prompt = type === "opposite" ? `「${it.word}」の はんたいは？` : `「${it.word}」の なかまは？`;
+    return base(skillId, "jp_choice", i, 0, "vocab", [jpStep(rng, it.answer, it.wrong, prompt)], {
+      jp: { itemId: it.id, word: it.word, vocabType: type, hints: [it.hint] },
+    });
+  };
+
+const jpParticle: Generator = (skillId, rng, recent) => {
+  const [it, i] = jpPick(rng, JP.particles, recent);
+  return base(skillId, "jp_choice", i, 0, "particle", [jpStep(rng, it.answer, it.wrong, "□に 入る 字は？")], {
+    jp: { itemId: it.id, sentence: it.sentence, hints: [it.hint] },
+  });
+};
+
 const jpReading =
   (genre: "story" | "explain"): Generator =>
   (skillId, rng, recent) => {
@@ -376,6 +493,9 @@ export const generators: Record<string, Generator> = {
   jpKanjiWrite,
   jpKatakana,
   jpGrammar,
+  jpParticle,
+  jpVocabOpposite: jpVocab("opposite"),
+  jpVocabGroup: jpVocab("group"),
   jpReadingStory: jpReading("story"),
   jpReadingExplain: jpReading("explain"),
   add1d1dCarry,
@@ -392,6 +512,13 @@ export const generators: Record<string, Generator> = {
   mulDan8: mulDan(8),
   mulDan9: mulDan(9),
   mulMix,
+  mulDan1: mulDan(1),
+  mulRule,
+  addSubWord,
+  add3d2d,
+  subFromZero,
+  compareNumbers,
+  lengthCmMm,
   mulMissing,
   mulWord,
   lengthMcm,

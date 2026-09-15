@@ -18,6 +18,7 @@ import { ymd } from "../../domain/dates";
 import { finalizeSession } from "../../domain/finalize";
 import { pickLine } from "../../domain/lines";
 import { planLesson } from "../../domain/planner";
+import { hintText } from "../../domain/hints";
 import { uid } from "../../domain/random";
 import type { Episode, LessonPhase, Mood, Profile, SkillState, Stumble } from "../../domain/types";
 import {
@@ -34,6 +35,7 @@ import {
 import { ArrowIcon, BulbIcon, CloseIcon, MoodFace, SpeakerIcon, StarIcon } from "../icons";
 import { StickerIcon, STICKER_NAME } from "../stickers";
 import { speak, stopSpeaking } from "../speech";
+import { setUpdateSafe } from "../swUpdate";
 import Teacher, { type Face } from "../Teacher";
 import ChoicePad from "./ChoicePad";
 import { makeTemplate, type Template } from "../../domain/handwriting/pdollar";
@@ -69,10 +71,15 @@ const THINK_CARDS: Record<string, string[]> = {
   fraction_shape: ["おなじ 大きさか 見た", "いくつに わけたか かぞえた", "なんとなく", "わからない"],
   place_compose: ["くらいの へやに わけた", "0を わすれずに かいた", "なんとなく", "わからない"],
   shape_pick: ["へんと かどを かぞえた", "線が つながって いるか 見た", "なんとなく", "わからない"],
+  addsub_word: ["ことばに 目を つけた", "ずを おもいうかべた", "なんとなく", "わからない"],
+  mul_rule: ["九九を ならべて くらべた", "かたまりが ふえると かんがえた", "なんとなく", "わからない"],
+  compare: ["上の くらいから くらべた", "けたの かずを 見た", "なんとなく", "わからない"],
   kanji_read: ["こえに 出して 読んだ", "しって いる ことばだった", "なんとなく", "わからない"],
   kanji_write: ["文の いみを 考えた", "漢字の 形を よく 見た", "なんとなく", "わからない"],
   katakana: ["こえに 出して たしかめた", "形を よく 見た", "なんとなく", "わからない"],
   grammar: ["「〜が」を さがした", "文の おわりを 見た", "なんとなく", "わからない"],
+  particle: ["ことばの うしろか 見た", "文を 読んで たしかめた", "なんとなく", "わからない"],
+  vocab: ["ようすを 思いうかべた", "しって いる ことばだった", "なんとなく", "わからない"],
   reading: ["ぶんしょうに もどって さがした", "おぼえて いた", "なんとなく", "わからない"],
 };
 
@@ -87,7 +94,17 @@ interface Summary {
 /**
  * trial にスキルを渡すと「おためし」：そのスキルを3問だけ出し、記録は残さない（おうちの人が中身を確かめる用）。
  */
-export default function Lesson({ profile, onExit, trial }: { profile: Profile; onExit: () => void; trial?: string }) {
+export default function Lesson({
+  profile,
+  onExit,
+  trial,
+  onProfileChange,
+}: {
+  profile: Profile;
+  onExit: () => void;
+  trial?: string;
+  onProfileChange?: () => void;
+}) {
   const rng = Math.random;
   const [ui, setUi] = useState<Ui>("loading");
   const [bubble, setBubble] = useState("");
@@ -99,6 +116,15 @@ export default function Lesson({ profile, onExit, trial }: { profile: Profile; o
   const [inputMode, setInputMode] = useState<"tap" | "write">(profile.inputMode ?? "tap");
   const [inkTemplates, setInkTemplates] = useState<Template[]>([]);
   const written = useRef<Written | null>(null);
+  const [saving, setSaving] = useState(false);
+  const savingRef = useRef(false);
+  const mounted = useRef(true);
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
 
   const model = useRef<{ states: Record<string, SkillState>; stumbles: Record<string, Stumble> }>({ states: {}, stumbles: {} });
   const recent = useRef<string[]>([]);
@@ -122,6 +148,7 @@ export default function Lesson({ profile, onExit, trial }: { profile: Profile; o
   };
 
   const show = (parts: Said[], f: Face = "smile") => {
+    if (!mounted.current) return; // 画面を はなれた あとに しゃべらない
     const display = parts.map((p) => p.display).filter(Boolean).join(" ");
     const speech = parts.map((p) => p.speech).filter(Boolean).join("。 ");
     setBubble(display);
@@ -180,7 +207,7 @@ export default function Lesson({ profile, onExit, trial }: { profile: Profile; o
     if (s.stage !== "answering" || !s.problem) return;
     const parts = [...prefix];
     const phase = currentPhase(s);
-    const phaseKey = phase === "main" ? `main:${s.problem.skillId}` : phase;
+    const phaseKey = phase === "main" || phase === "review" ? `${phase}:${s.problem.skillId}` : phase;
     if (s.isTwin) parts.push(line("twin"));
     else if (phaseKey !== lastPhase.current) {
       parts.push(line(`phase_${phase}`, { skill: skill(s.problem.skillId).kidLabel, strong: s.plan.warmupIsStrong ? "1" : undefined }));
@@ -231,11 +258,22 @@ export default function Lesson({ profile, onExit, trial }: { profile: Profile; o
               : "correct";
       show([line(scene)], scene === "correct" ? "smile" : "wow");
     } else if (state.stage === "revealed") {
-      show([line("reveal", { answer: String(state.problem!.answer) })], "calm");
+      // 答えは「いまの ステップ」の答え。選ぶ問題は 選択肢の ことば（図なら「これ」）で 言う
+      const st = currentStep(state)!;
+      const text = st.type === "choice" ? st.choices![st.answer] : `${st.answer}${st.unit ?? ""}`;
+      const isPicture = /^(shape|frac):/.test(text);
+      const why = st.type === "choice" ? hintText(state.problem!, state.step, state.firstMisconception, 3) : null;
+      show(
+        [
+          isPicture ? line("reveal_choice") : line("reveal", { answer: st.type === "choice" ? `「${text}」` : text }),
+          ...(why ? [{ display: why.text, speech: why.text }] : []),
+        ],
+        "calm",
+      );
     } else if (state.stepAdvanced) {
       const st = currentStep(state)!;
       const p = state.problem!;
-      show([line(p.kind === "mul_word" ? "step_ok_expr" : "step_ok"), { display: st.prompt, speech: problemSpeech(p, state.step) }], "smile");
+      show([line(p.kind === "mul_word" || p.kind === "addsub_word" ? "step_ok_expr" : "step_ok"), { display: st.prompt, speech: problemSpeech(p, state.step) }], "smile");
     } else if (state.hint) {
       show([line("wrong_nudge"), { display: "", speech: state.hint.text }], "think");
     }
@@ -274,6 +312,26 @@ export default function Lesson({ profile, onExit, trial }: { profile: Profile; o
     announce(s);
   };
 
+  /** 学習の記録に反映する（2回 はしらないように） */
+  const saveSession = async (outcomes: LessonState["outcomes"]) => {
+    if (savingRef.current) return null;
+    savingRef.current = true;
+    setSaving(true);
+    setUpdateSafe(false);
+    try {
+      const today = ymd();
+      const firstToday = !(await studyDays()).includes(today);
+      const minutes = Math.max(1, Math.round((Date.now() - startedAt.current) / 60_000));
+      await addEvent({ id: uid(), type: "session", sessionId: sessionId.current, at: new Date().toISOString(), kind: "finish", minutes, empty: outcomes.length === 0 });
+      const streak = await currentStreak(today);
+      const result = finalizeSession(model.current.states, model.current.stumbles, outcomes, today, firstToday ? streak : 0);
+      await saveSessionResult(result);
+      return { result, minutes, streak, days: await studyDays() };
+    } finally {
+      if (mounted.current) setSaving(false);
+    }
+  };
+
   async function finish(s: LessonState, prefix: Said[]) {
     setUi("summary");
     if (trial) {
@@ -281,13 +339,9 @@ export default function Lesson({ profile, onExit, trial }: { profile: Profile; o
       setSummary({ count: main.length, noHint: main.filter((o) => o.firstTryCorrect).length, minutes: Math.max(1, Math.round((Date.now() - startedAt.current) / 60_000)), growth: [], days: [] });
       return show([{ display: "おためし おわり。", speech: "おためし おわり。" }]);
     }
-    const today = ymd();
-    const firstToday = !(await studyDays()).includes(today);
-    const minutes = Math.max(1, Math.round((Date.now() - startedAt.current) / 60_000));
-    await addEvent({ id: uid(), type: "session", sessionId: sessionId.current, at: new Date().toISOString(), kind: "finish", minutes });
-    const streak = await currentStreak(today);
-    const result = finalizeSession(model.current.states, model.current.stumbles, s.outcomes, today, firstToday ? streak : 0);
-    await saveSessionResult(result);
+    const saved = await saveSession(s.outcomes);
+    if (!saved || !mounted.current) return;
+    const { result, minutes, streak, days } = saved;
 
     const main = s.outcomes.filter((o) => !o.isTwin);
     const growthLines = result.episodes.slice(0, 2).map((e) =>
@@ -298,7 +352,7 @@ export default function Lesson({ profile, onExit, trial }: { profile: Profile; o
       noHint: main.filter((o) => o.firstTryCorrect).length,
       minutes,
       growth: result.episodes,
-      days: await studyDays(),
+      days,
     });
     show([...prefix, line("finish", { count: String(main.length) }), ...growthLines, line("goodbye")], "smile");
   }
@@ -322,15 +376,10 @@ export default function Lesson({ profile, onExit, trial }: { profile: Profile; o
 
   /** とちゅうでやめても、解いた問題のぶんは学習の記録に反映する */
   const quitAndSave = async () => {
+    if (savingRef.current) return;
+    setConfirmQuit(false);
     stopSpeaking();
-    if (!trial && lesson && lesson.outcomes.length > 0 && ui === "run") {
-      const today = ymd();
-      const firstToday = !(await studyDays()).includes(today);
-      const minutes = Math.max(1, Math.round((Date.now() - startedAt.current) / 60_000));
-      await addEvent({ id: uid(), type: "session", sessionId: sessionId.current, at: new Date().toISOString(), kind: "finish", minutes });
-      const streak = await currentStreak(today);
-      await saveSessionResult(finalizeSession(model.current.states, model.current.stumbles, lesson.outcomes, today, firstToday ? streak : 0));
-    }
+    if (!trial && lesson && ui === "run") await saveSession(lesson.outcomes);
     onExit();
   };
 
@@ -343,7 +392,7 @@ export default function Lesson({ profile, onExit, trial }: { profile: Profile; o
   return (
     <main className="kid lesson">
       <header className="topbar">
-        <button className="quit" onClick={() => (ui === "run" && !trial ? setConfirmQuit(true) : exit())}>
+        <button className="quit" disabled={saving} onClick={() => (ui === "run" && !trial ? setConfirmQuit(true) : exit())}>
           <CloseIcon /> やめる
         </button>
         {ui === "run" && lesson && (
@@ -492,8 +541,8 @@ export default function Lesson({ profile, onExit, trial }: { profile: Profile; o
                 </div>
               )}
               {!trial && <WeekStamps days={summary.days} />}
-              <button className="btn-start" onClick={exit}>
-                おわる
+              <button className="btn-start" onClick={exit} disabled={saving}>
+                {saving ? "きろくして いるよ…" : "おわる"}
               </button>
             </div>
           )}
@@ -524,7 +573,7 @@ export default function Lesson({ profile, onExit, trial }: { profile: Profile; o
                           onClick={() => {
                             setInputMode(m);
                             setInput("");
-                            if (!trial) saveProfile({ ...profile, inputMode: m });
+                            if (!trial) saveProfile({ ...profile, inputMode: m }).then(() => onProfileChange?.());
                           }}
                         >
                           {m === "tap" ? "タップ" : "かく"}
@@ -534,10 +583,10 @@ export default function Lesson({ profile, onExit, trial }: { profile: Profile; o
                   )}
                 </div>
                 {step.type === "choice" ? (
-                  <ChoicePad choices={step.choices ?? []} onPick={(i) => submit(i)} />
+                  <ChoicePad choices={step.choices ?? []} onPick={(i) => submit(i)} eliminated={lesson.eliminated} />
                 ) : inputMode === "write" ? (
                   <HandwritePad
-                    boxes={String(step.answer).length >= 4 || (lesson.problem.unit?.total ?? 0) >= 1000 || lesson.problem.kind === "place_compose" ? 4 : 3}
+                    boxes={String(step.answer).length >= 4 || lesson.problem.layout === "vertical" || (lesson.problem.unit?.total ?? 0) >= 1000 || lesson.problem.kind === "place_compose" ? 4 : 3}
                     templates={inkTemplates}
                     resetKey={`${lesson.problem.id}-${lesson.step}-${lesson.attemptNo}`}
                     onChange={(w) => {
@@ -555,6 +604,9 @@ export default function Lesson({ profile, onExit, trial }: { profile: Profile; o
               </>
             ) : (
               <div className="after">
+                {stage === "revealed" && step?.type === "choice" && (
+                  <ChoicePad choices={step.choices ?? []} onPick={() => undefined} disabled correct={step.answer} eliminated={lesson.eliminated} />
+                )}
                 <p className={`after-label ${stage}`}>{stage === "correct" ? "せいかい" : "こたえを たしかめよう"}</p>
                 <button className="btn-next" onClick={goNext} autoFocus>
                   {stage === "revealed" && !lesson.isTwin ? "にた もんだいへ" : "つぎへ"}

@@ -27,8 +27,9 @@ export function diagnose(p: Problem, step: number, given: number): Misconception
   switch (p.kind) {
     case "add": {
       const onesSum = digit(a, 1) + digit(b, 1);
+      if (a >= 100 && b < 100 && b >= 10 && given === a + b * 10) return "place_misalign";
       if (a >= 10 || b >= 10) {
-        if (onesSum >= 10 && given === (digit(a, 10) + digit(b, 10)) * 100 + onesSum) return "concat_ones";
+        if (a < 100 && onesSum >= 10 && given === (digit(a, 10) + digit(b, 10)) * 100 + onesSum) return "concat_ones";
         if ([10, 100, 110].includes(p.answer - given)) return "no_carry";
         if (Math.abs(given - p.answer) === 1) return "calc_slip";
       } else {
@@ -73,7 +74,9 @@ export function diagnose(p: Problem, step: number, given: number): Misconception
 
 /** 新しい種類の問題は「間違い方 → そのときの答え」の表で判定する（simulateWrong と同じ表） */
 function diagnoseByTable(p: Problem, step: number, given: number): MisconceptionId {
-  for (const [mc, value] of wrongTable(p, step)) if (value === given) return mc;
+  const rows = wrongTable(p, step);
+  for (const [mc, value] of rows) if (value === given) return mc;
+  if (rows.some(([mc]) => mc === "calc_slip") && Math.abs(given - p.steps[step].answer) === 1) return "calc_slip";
   return "unknown";
 }
 
@@ -128,6 +131,24 @@ export function wrongTable(p: Problem, step: number): [MisconceptionId, number][
     case "fraction_of":
       rows.push(["gave_denominator", b], ["used_half", b !== 2 && a % 2 === 0 ? a / 2 : null], ["subtracted", a - b]);
       break;
+    case "addsub_word": {
+      if (step === 0) break;
+      const op = p.addsub!.op;
+      const other = op === "add" ? a - b : a + b;
+      rows.push(["op_reversed", other]);
+      if (op === "add") {
+        if (digit(a, 1) + digit(b, 1) >= 10) rows.push(["no_carry", p.answer - 10]);
+      } else {
+        rows.push(["smaller_from_larger", digitwiseAbsDiff(a, b)]);
+        if (digit(a, 1) < digit(b, 1)) rows.push(["borrow_no_decrement", p.answer + 10]);
+      }
+      rows.push(["calc_slip", p.answer + 1]);
+      break;
+    }
+    case "mul_rule":
+      if (p.rule === "step") rows.push(["one_more", 1], ["gave_product", a * (b + 1)]);
+      else rows.push(["gave_product", a * b], ["same_number", a]);
+      break;
     case "place_compose": {
       const { thousands, hundreds, tens, ones } = p.place!;
       const nonZero = [thousands, hundreds, tens, ones].filter((x) => x !== 0).join("");
@@ -165,7 +186,8 @@ export function simulateWrong(p: Problem, step: number, mc: MisconceptionId): nu
     case "add": {
       const onesSum = digit(a, 1) + digit(b, 1);
       if (mc === "no_carry") return onesSum >= 10 ? p.answer - 10 : null;
-      if (mc === "concat_ones") return a >= 10 && onesSum >= 10 ? (digit(a, 10) + digit(b, 10)) * 100 + onesSum : null;
+      if (mc === "concat_ones") return a >= 10 && a < 100 && onesSum >= 10 ? (digit(a, 10) + digit(b, 10)) * 100 + onesSum : null;
+      if (mc === "place_misalign") return a >= 100 && b >= 10 && b < 100 ? a + b * 10 : null;
       if (mc === "calc_slip" || mc === "count_slip") return p.answer + 1;
       return null;
     }
