@@ -55,6 +55,14 @@ export function problemVars(p: Problem): Record<string, string> {
       rule_l3: step ? "九九の ひょうで、となりの こたえとの ちがいを 見よう。" : "□に 入るのは、右の しきに ある かずの どちらかだよ。",
     });
   }
+  if (p.graph) {
+    const g = p.graph;
+    Object.assign(text, {
+      graph_l1: g.ask === "max" ? "いちばん 高く ○が つんで ある 列を さがそう。" : "きかれて いる 名前の 列を ゆびで おさえよう。",
+      graph_l3: g.ask === "diff" ? "ふたつの 列の ○の かずを かぞえて、大きい ほうから 小さい ほうを ひこう。" : g.ask === "max" ? "いちばん 高い 列の ○を 下から かぞえよう。" : "その 列の ○を、上まで ぜんぶ かぞえよう。",
+      graph_other: g.ask === "max" ? "いちばん 高い 列を 見て いるかな？" : "となりの 列を 読んで いないかな？ 下の 名前を たしかめよう。",
+    });
+  }
   if (p.addsub) Object.assign(text, { key: p.addsub.key, op_word: p.addsub.op === "add" ? "たしざん" : "ひきざん" });
   return { ...Object.fromEntries(Object.entries(vars).map(([k, v]) => [k, String(v)])), ...text };
 }

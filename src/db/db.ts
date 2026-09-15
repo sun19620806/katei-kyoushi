@@ -161,23 +161,41 @@ export async function saveInk(samples: { digit: number; strokes: { x: number; y:
   });
 }
 
+let recovering: Promise<void> | null = null;
+
 /**
  * とちゅうで とじられた 授業（はじまりの記録は あるのに おわりの記録が ない）を しめくくる。
- * 答え終わった 問題の ぶんを 学習の記録に 反映する。アプリを 開いた ときに よぶ。
+ * 答え終わった 問題の ぶんを 学習の記録に 反映する。アプリを 開いた とき・ホームに もどった ときに よぶ。
+ * 同時に 2回 はしらないように し、1つの セッションごとに まとめて 書く（とちゅうで 止まっても 二重に ならない）。
  */
-export async function recoverUnfinishedSessions(now = Date.now()) {
-  const sessionEvents = (await db.events.where("type").equals("session").toArray()) as SessionEventRow[];
-  const finished = new Set(sessionEvents.filter((e) => e.kind === "finish").map((e) => e.sessionId));
-  const open = sessionEvents.filter((e) => e.kind === "start" && !finished.has(e.sessionId) && now - Date.parse(e.at) > 30 * 60 * 1000);
-  for (const start of open) {
-    const answers = (await db.events.where("sessionId").equals(start.sessionId).toArray()).filter((e): e is AnswerEventRow => e.type === "answer");
-    const outcomes = rebuildOutcomes(answers);
-    const last = answers.map((a) => a.at).sort().at(-1) ?? start.at;
-    const minutes = Math.max(1, Math.round((Date.parse(last) - Date.parse(start.at)) / 60000));
-    await db.events.put({ id: crypto.randomUUID?.() ?? `${start.sessionId}-finish`, type: "session", sessionId: start.sessionId, at: last, kind: "finish", minutes, recovered: true, empty: outcomes.length === 0 });
-    if (outcomes.length === 0) continue;
-    const model = await loadModel();
-    await saveSessionResult(finalizeSession(model.states, model.stumbles, outcomes, localDay(last), 0));
-  }
+export function recoverUnfinishedSessions(minAgeMs = 0): Promise<void> {
+  if (recovering) return recovering;
+  recovering = (async () => {
+    const sessionEvents = (await db.events.where("type").equals("session").toArray()) as SessionEventRow[];
+    const finished = new Set(sessionEvents.filter((e) => e.kind === "finish").map((e) => e.sessionId));
+    const open = sessionEvents
+      .filter((e) => e.kind === "start" && !finished.has(e.sessionId) && Date.now() - Date.parse(e.at) >= minAgeMs)
+      .sort((a, b) => a.at.localeCompare(b.at));
+    for (const start of open) {
+      await db.transaction("rw", [db.events, db.skillStates, db.stumbles, db.episodes], async () => {
+        const already = await db.events.where("sessionId").equals(start.sessionId).filter((e) => e.type === "session" && e.kind === "finish").count();
+        if (already) return;
+        const answers = (await db.events.where("sessionId").equals(start.sessionId).toArray()).filter((e): e is AnswerEventRow => e.type === "answer");
+        const outcomes = rebuildOutcomes(answers);
+        const last = answers.map((a) => a.at).sort().at(-1) ?? start.at;
+        const minutes = Math.max(1, Math.round((Date.parse(last) - Date.parse(start.at)) / 60000));
+        await db.events.put({ id: `${start.sessionId}-recovered`, type: "session", sessionId: start.sessionId, at: last, kind: "finish", minutes, recovered: true, empty: outcomes.length === 0 });
+        if (outcomes.length === 0) return;
+        const model = await loadModel();
+        const r = finalizeSession(model.states, model.stumbles, outcomes, localDay(last), 0);
+        await db.skillStates.bulkPut(r.changedSkills.map((id) => r.states[id]));
+        await db.stumbles.bulkPut(Object.values(r.stumbles));
+        await db.episodes.bulkPut(r.episodes);
+      });
+    }
+  })().finally(() => {
+    recovering = null;
+  });
+  return recovering;
 }
 

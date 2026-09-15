@@ -145,6 +145,35 @@ export function wrongTable(p: Problem, step: number): [MisconceptionId, number][
       rows.push(["calc_slip", p.answer + 1]);
       break;
     }
+    case "graph_read": {
+      const g = p.graph!;
+      if (g.ask === "diff") rows.push(["sum_instead", g.values[g.i] + g.values[g.j!]]);
+      // ほかの 列の 数（となり・きかれて いない 列）を 読んだ
+      const others = [...new Set(g.values.filter((v, k) => k !== g.i && v !== p.answer && v !== p.answer + 1))];
+      for (const v of others) rows.push(["read_other", v]);
+      rows.push(["count_slip", p.answer + 1]);
+      break;
+    }
+    case "number_line": {
+      const n = p.numberLine!;
+      if (n.unit !== 1) rows.push(["tick_as_one", n.start + n.pos]);
+      if (n.unit !== 10) rows.push(["tick_as_ten", n.start + n.pos * 10]);
+      if (n.start !== 0) rows.push(["start_ignored", n.pos * n.unit]);
+      break;
+    }
+    case "clock_duration": {
+      const d = p.duration!;
+      if (d.h2 !== d.h1) rows.push(["hour_as_100", (d.h2 * 100 + d.m2) - (d.h1 * 100 + d.m1)]);
+      rows.push(["added_times", d.m1 + d.m2]);
+      break;
+    }
+    case "clock_set": {
+      const { h, m } = p.clock!;
+      if (m % 5 === 0 && m > 0) rows.push(["hands_swapped", ((m / 5) % 12 || 12) * 60 + ((h % 12) * 5)]);
+      rows.push(["hour_off", (h % 12 + 1) * 60 + m]);
+      rows.push(["hour_off", ((h + 10) % 12 + 1) * 60 + m]); // 1時間 前
+      break;
+    }
     case "mul_rule":
       if (p.rule === "step") rows.push(["one_more", 1], ["gave_product", a * (b + 1)]);
       else rows.push(["gave_product", a * b], ["same_number", a]);

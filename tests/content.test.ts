@@ -152,6 +152,16 @@ describe("教材ファイル", () => {
       check("jp.particles", it.id, it.answer, it.wrong, undefined, [it.sentence, it.hint ?? ""]);
       if (it.hint) expect(it.hint, it.id).not.toContain(`「${it.answer}」`);
     }
+    const symbolOnly = (t: string) => /^[。、「」]+$/.test(t);
+    for (const it of JP.punctuation) {
+      if (it.type === "mark") expect(it.sentence?.split("{blank}").length, it.id).toBe(2);
+      check("jp.punctuation", it.id, it.answer, it.wrong, symbolOnly(it.answer) ? undefined : it.hint, [it.sentence ?? "", it.hint ?? ""]);
+      if (it.hint && symbolOnly(it.answer)) expect(it.hint, it.id).not.toContain(`「${it.answer}」`);
+    }
+    for (const it of JP.yousu) {
+      expect(it.sentence.split("{blank}").length, it.id).toBe(2);
+      check("jp.yousu", it.id, it.answer, it.wrong, it.hint, [it.sentence]);
+    }
     for (const it of JP.vocab) check(it.type === "opposite" ? "jp.vocab.opposite" : "jp.vocab.group", it.id, it.answer, it.wrong, it.hint, [it.word]);
     for (const ps of JP.reading) {
       expect(ps.text.length, ps.id).toBeLessThanOrEqual(320);
@@ -172,7 +182,7 @@ describe("教材ファイル", () => {
               const h = hintText(p, step, mc, level);
               expect(h, `${s.id} ${mc} L${level}`).not.toBeNull();
               // 1文字の答え（は・を など）は、ふつうの ことばにも 入るので「」つきで 書いて いないかを 見る
-              const needle = correct.length === 1 ? `「${correct}」` : correct;
+              const needle = correct.length === 1 || /^[。、「」]+$/.test(correct) ? `「${correct}」` : correct;
               expect(h!.text, `${s.id} ${p.jp?.itemId} step${step}`).not.toContain(needle);
             }
           }

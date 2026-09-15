@@ -3,7 +3,7 @@ import { digit } from "../../domain/math/diagnose";
 import type { HintVisual, Problem } from "../../domain/types";
 import { RedCircle, SpeakerIcon } from "../icons";
 import { speak } from "../speech";
-import { ClockFace, FracGroups, PlaceBlocks, UnitTape } from "./visuals";
+import { CircleGraph, ClockFace, FracGroups, NumberLineView, PlaceBlocks, UnitTape } from "./visuals";
 
 export const opSymbol = (p: Problem) => (p.kind === "add" ? "+" : p.kind === "sub" ? "−" : "×");
 
@@ -35,6 +35,16 @@ export function problemSpeech(p: Problem, step: number): string {
     }
     case "shape":
       return p.steps[0].prompt;
+    case "graph":
+      return `${p.graph!.title}の グラフを 見よう。${p.steps[0].prompt}`;
+    case "numberline":
+      return "やじるしの めもりは いくつ？";
+    case "duration": {
+      const d = p.duration!;
+      return `${d.h1}時${d.m1}分から ${d.h2}時${d.m2 === 0 ? "" : `${d.m2}分`}までは なん分間？`;
+    }
+    case "clockset":
+      return `とけいの はりを うごかして、${p.steps[0].prompt}`;
     case "rule":
       return p.rule === "step" ? `${p.a}×${p.b + 1}は、${p.a}×${p.b}より いくつ 大きい？` : `□ × ${p.a} = ${p.a} × ${p.b}。□に はいる かずは？`;
     case "compare":
@@ -52,6 +62,10 @@ export function problemSpeech(p: Problem, step: number): string {
       return `もんだい${step + 1}。${p.steps[step].prompt}`;
     case "particle":
       return "□に 入る 字は どれかな？";
+    case "punctuation":
+      return p.jp!.markType === "mark" ? "□に 入る しるしは どれかな？" : "丸や 点、かぎの つけかたが 正しい 文は どれかな？";
+    case "yousu":
+      return `${p.jp!.sentence!.replace("{blank}", "なに")}。□に 合う ことばは どれ？`;
     case "vocab":
       return p.jp!.vocabType === "opposite" ? `${p.jp!.word}の はんたいの いみの ことばは どれ？` : `${p.jp!.word}の なかまに 入る ことばは どれ？`;
     default:
@@ -180,6 +194,61 @@ export default function ProblemView({ problem: p, step, input, visual, state, no
     case "shape":
       body = <p className="shape-q">{p.steps[0].prompt}</p>;
       break;
+    case "graph": {
+      const g = p.graph!;
+      // 答えたあとに、きかれた 列を 色で しめす（「いちばん多い」は その列）
+      const asked = g.ask === "max" ? [g.values.indexOf(Math.max(...g.values))] : g.ask === "diff" ? [g.i, g.j!] : [g.i];
+      body = (
+        <div className="nl-wrap">
+          <CircleGraph title={g.title} labels={g.labels} values={g.values} highlight={state === "answering" ? [] : asked} />
+          <div className="eq small-eq">
+            {box(value)}
+            <small>{g.unit}</small>
+          </div>
+        </div>
+      );
+      break;
+    }
+    case "numberline": {
+      const n = p.numberLine!;
+      body = (
+        <div className="nl-wrap">
+          <NumberLineView start={n.start} unit={n.unit} pos={n.pos} showUnit={state !== "answering"} />
+          <div className="eq small-eq">{box(value)}</div>
+        </div>
+      );
+      break;
+    }
+    case "duration": {
+      const d = p.duration!;
+      body = (
+        <div className="duration">
+          <div className="duration-clocks">
+            <figure>
+              <ClockFace h={d.h1} m={d.m1} size={170} />
+              <figcaption>{d.h1}時{d.m1}分</figcaption>
+            </figure>
+            <span className="duration-arrow" aria-hidden="true">→</span>
+            <figure>
+              <ClockFace h={d.h2} m={d.m2} size={170} />
+              <figcaption>{d.h2}時{d.m2 === 0 ? "" : `${d.m2}分`}</figcaption>
+            </figure>
+          </div>
+          <div className="eq small-eq">{box(value)}<small>分間</small></div>
+        </div>
+      );
+      break;
+    }
+    case "clockset":
+      body = (
+        <div className="clockset-q">
+          <p>
+            <b>{p.clock!.h}時{p.clock!.m === 0 ? "" : `${p.clock!.m}分`}</b>に あわせよう
+          </p>
+          {state !== "answering" && <ClockFace h={p.clock!.h} m={p.clock!.m} size={200} />}
+        </div>
+      );
+      break;
     case "rule":
       body =
         p.rule === "step" ? (
@@ -221,6 +290,8 @@ export default function ProblemView({ problem: p, step, input, visual, state, no
     case "reading":
     case "vocab":
     case "particle":
+    case "punctuation":
+    case "yousu":
       body = <JapaneseView problem={p} step={step} state={state} />;
       break;
     case "story": {
@@ -438,13 +509,23 @@ function JapaneseView({ problem: p, step, state }: { problem: Problem; step: num
         </div>
       );
     }
+    case "punctuation":
+    case "yousu":
     case "particle": {
+      if (p.layout === "punctuation" && jp.markType === "sentence") {
+        return (
+          <div className="jp">
+            <p className="jp-ask">丸（。）・点（、）・かぎ（「」）</p>
+            <p className="jp-sentence small">{done ? correctText : "しるしの つけかたが 正しい 文を えらぼう。"}</p>
+          </div>
+        );
+      }
       const [before, after] = split(jp.sentence!, "{blank}");
       return (
         <div className="jp">
           <p className="jp-sentence">
             {before}
-            <span className={`blank particle ${state}`}>{done ? correctText : "□"}</span>
+            <span className={`blank particle ${p.layout} ${state}`}>{done ? correctText : "□"}</span>
             {after}
           </p>
         </div>

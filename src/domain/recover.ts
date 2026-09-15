@@ -19,7 +19,7 @@ export function rebuildOutcomes(answers: AnswerEvent[]): ProblemOutcome[] {
     const lastStep = (p.steps?.length ?? 1) - 1;
     const lastStepEvents = events.filter((e) => (e.step ?? 0) === lastStep);
     const solved = lastStepEvents.some((e) => e.correct);
-    const revealed = !solved && events.some((e) => !e.correct && e.hintLevel >= 3);
+    const revealed = !solved && events.some((e) => e.revealed || (!e.correct && e.hintLevel >= 3));
     if (!solved && !revealed) continue;
     const wrong = events.filter((e) => !e.correct);
     const maxHintLevel = Math.max(0, ...events.map((e) => e.hintLevel));

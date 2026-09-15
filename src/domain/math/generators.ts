@@ -231,6 +231,75 @@ const mulWord: Generator = (skillId, rng, recent) =>
 
 type UnitPair = { big: string; small: string; ratio: number };
 
+const GRAPH_THEMES = [
+  { title: "すきな くだもの", unit: "人", labels: ["りんご", "みかん", "いちご", "ぶどう", "もも"] },
+  { title: "すきな あそび", unit: "人", labels: ["おにごっこ", "なわとび", "ボール", "かくれんぼ", "すなば"] },
+  { title: "池に いる 生きもの", unit: "ひき", labels: ["めだか", "かえる", "ざりがに", "こい", "あめんぼ"] },
+  { title: "1しゅうかんに 読んだ 本", unit: "さつ", labels: ["月よう", "火よう", "水よう", "木よう", "金よう"] },
+  { title: "すきな きせつ", unit: "人", labels: ["春", "夏", "秋", "冬"] },
+];
+
+/** ○グラフを 読む（いくつ・いちばん多い・ちがい） */
+const graphRead: Generator = (skillId, rng, recent, level = 1) =>
+  generate(() => {
+    const theme = pick(rng, GRAPH_THEMES);
+    const n = Math.min(theme.labels.length, level === 0 ? 4 : 5);
+    const values = Array.from({ length: n }, () => int(rng, 1, 9));
+    if (new Set(values).size < n - 1) return null;
+    const ask = level === 0 ? pick(rng, ["value", "max"] as const) : pick(rng, ["value", "max", "diff"] as const);
+    const i = int(rng, 0, n - 1);
+    let j = int(rng, 0, n - 1);
+    if (j === i) j = (i + 1) % n;
+    const max = Math.max(...values);
+    if (ask === "max" && values.filter((v) => v === max).length > 1) return null;
+    if (ask === "diff" && values[i] <= values[j]) return null;
+    const answer = ask === "value" ? values[i] : ask === "max" ? max : values[i] - values[j];
+    const prompt =
+      ask === "value" ? `${theme.labels[i]}は なん${theme.unit}？` : ask === "max" ? `いちばん 多いのは なん${theme.unit}？` : `${theme.labels[i]}は ${theme.labels[j]}より なん${theme.unit} 多い？`;
+    return base(skillId, "graph_read", i, j, "graph", [numberStep(answer, prompt, theme.unit)], {
+      graph: { title: theme.title, unit: theme.unit, labels: theme.labels.slice(0, n), values, ask, i, j },
+    });
+  }, recent);
+
+/** 数直線の めもり */
+const numberLine: Generator = (skillId, rng, recent, level = 1) =>
+  generate(() => {
+    const unit = level === 0 ? pick(rng, [1, 10]) : pick(rng, [1, 10, 100]);
+    const start = unit === 100 ? 0 : unit === 10 ? int(rng, 0, 8) * 100 : int(rng, 0, 9) * 10 + (rng() < 0.5 ? 0 : 100);
+    const pos = int(rng, 1, 19);
+    if (pos % 10 === 0) return null;
+    return base(skillId, "number_line", start, pos, "numberline", [numberStep(start + pos * unit, "↑の めもりは いくつ？")], {
+      numberLine: { start, unit, pos },
+    });
+  }, recent);
+
+/** ○時○分から ○時○分まで なん分間 */
+const clockDuration: Generator = (skillId, rng, recent, level = 1) =>
+  generate(() => {
+    const h1 = int(rng, 1, 10);
+    const m1 = int(rng, 1, 10) * 5;
+    const span = int(rng, 2, 11) * 5;
+    const total = m1 + span;
+    if (level === 0 && total >= 60) return null;
+    if (level === 2 && total < 60 && rng() < 0.7) return null;
+    if (total > 60 + 55) return null;
+    const h2 = total >= 60 ? h1 + 1 : h1;
+    const m2 = total % 60;
+    if (m1 + m2 === span) return null;
+    return base(skillId, "clock_duration", h1, m1, "duration", [numberStep(span, "なん分間？", "分間")], { duration: { h1, m1, h2, m2 } });
+  }, recent);
+
+/** とけいの はりを うごかして あわせる */
+const clockSet: Generator = (skillId, rng, recent, level = 1) =>
+  generate(() => {
+    const h = int(rng, 1, 12);
+    const m = level === 0 ? pick(rng, [0, 30]) : int(rng, 0, 11) * 5;
+    if (m > 0 && ((m / 5) % 12 || 12) === h) return null;
+    return base(skillId, "clock_set", h, m, "clockset", [{ type: "clock", answer: h * 60 + m, prompt: `${h}時${m === 0 ? "" : `${m}分`}に あわせよう` }], {
+      clock: { h, m },
+    });
+  }, recent);
+
 /** たし算・ひき算の文章題：式を選ぶ → 答え */
 const addSubWord: Generator = (skillId, rng, recent) =>
   generate(() => {
@@ -472,6 +541,21 @@ const jpParticle: Generator = (skillId, rng, recent) => {
   });
 };
 
+const jpPunctuation: Generator = (skillId, rng, recent) => {
+  const [it, i] = jpPick(rng, JP.punctuation, recent);
+  const prompt = it.type === "mark" ? "□に 入る しるしは？" : "しるしの つけかたが 正しい 文は？";
+  return base(skillId, "jp_choice", i, 0, "punctuation", [jpStep(rng, it.answer, it.wrong, prompt)], {
+    jp: { itemId: it.id, sentence: it.sentence, markType: it.type, hints: [it.hint] },
+  });
+};
+
+const jpYousu: Generator = (skillId, rng, recent) => {
+  const [it, i] = jpPick(rng, JP.yousu, recent);
+  return base(skillId, "jp_choice", i, 0, "yousu", [jpStep(rng, it.answer, it.wrong, "□に 合う ことばは？")], {
+    jp: { itemId: it.id, sentence: it.sentence, hints: [it.hint] },
+  });
+};
+
 const jpReading =
   (genre: "story" | "explain"): Generator =>
   (skillId, rng, recent) => {
@@ -494,6 +578,8 @@ export const generators: Record<string, Generator> = {
   jpKatakana,
   jpGrammar,
   jpParticle,
+  jpPunctuation,
+  jpYousu,
   jpVocabOpposite: jpVocab("opposite"),
   jpVocabGroup: jpVocab("group"),
   jpReadingStory: jpReading("story"),
@@ -515,6 +601,10 @@ export const generators: Record<string, Generator> = {
   mulDan1: mulDan(1),
   mulRule,
   addSubWord,
+  graphRead,
+  numberLine,
+  clockDuration,
+  clockSet,
   add3d2d,
   subFromZero,
   compareNumbers,

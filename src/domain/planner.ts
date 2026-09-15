@@ -22,7 +22,10 @@ export function planLesson({ profile, states, stumbles, mood, today }: PlanInput
   const enabled = inSubjects.some((s) => !disabled.has(s.id)) ? inSubjects.filter((s) => !disabled.has(s.id)) : inSubjects;
   const st = (id: SkillId) => states[id] ?? initialSkillState(id);
   // 前提スキルが「出さない」か「1学期のふくしゅう」なら、できているものとして扱う
-  const ready = (p: SkillId) => disabled.has(p) || skill(p).review || st(p).mastery >= UNLOCK_THRESHOLD;
+  // 前提スキルが できている とみなす：1学期のふくしゅう、または 習熟度が じゅうぶん。
+  // 「出さない（まだ習っていない）」に した 前提は できて いない ので、その先の 単元も 出ない。
+  // ただし 教科を 出して いない ときの 前提（ほかの 教科）は むしする。
+  const ready = (p: SkillId) => skill(p).review || st(p).mastery >= UNLOCK_THRESHOLD || !subjects.includes(skill(p).subject);
   const unlocked = (id: SkillId) => enabled.some((s) => s.id === id) && skill(id).prereqs.every(ready);
   const stumbleSkills = new Set(activeStumbles(stumbles, today).filter((s) => s.status === "confirmed").map((s) => s.skillId));
 
@@ -47,9 +50,11 @@ export function planLesson({ profile, states, stumbles, mood, today }: PlanInput
   const strong = [...light]
     .filter((s) => st(s.id).attempts > 0 && st(s.id).mastery >= UNLOCK_THRESHOLD)
     .sort((a, b) => st(b.id).mastery - st(a.id).mastery)[0]?.id;
-  const firstReview = light.find((s) => s.review && st(s.id).attempts === 0)?.id ?? light.find((s) => s.review)?.id;
-  const easiest = [...light].sort((a, b) => st(b.id).mastery - st(a.id).mastery)[0]?.id;
-  const warm = strong ?? firstReview ?? easiest ?? focus;
+  // つぎの 候補：まだ やって いない 1学期の ふくしゅう → やった ことの ある 単元で いちばん できる もの → 前提を みたす 地図の はじめの 単元
+  const firstReview = light.find((s) => s.review && st(s.id).attempts === 0)?.id;
+  const unlockedLight = light.filter((s) => unlocked(s.id));
+  const bestAttempted = [...unlockedLight].filter((s) => st(s.id).attempts > 0).sort((a, b) => st(b.id).mastery - st(a.id).mastery)[0]?.id;
+  const warm = strong ?? firstReview ?? bestAttempted ?? unlockedLight[0]?.id ?? focus;
 
   const due = light
     .filter((s) => s.id !== warm && st(s.id).nextReview && st(s.id).nextReview! <= today)
@@ -67,7 +72,11 @@ export function planLesson({ profile, states, stumbles, mood, today }: PlanInput
   // 教科の配分。読みとり（重さ3）は1問で 2わく ぶんとして数える
   let mathCount = mathFocus ? slots : 0;
   let jpCount = 0;
-  if (mathFocus && jpFocus) {
+  if (mathFocus && jpFocus && slots < 2) {
+    // わくが 1つしか ないときは、その日の はじめの 教科だけに する（設定の 問題数を こえないように）
+    mathCount = Number(today.slice(-2)) % 2 === 0 ? 1 : 0;
+    jpCount = mathCount ? 0 : 1;
+  } else if (mathFocus && jpFocus) {
     const heavy = (skill(jpFocus).weight ?? 1) >= 3;
     jpCount = heavy ? 1 : Math.max(1, Math.round(slots * 0.4));
     mathCount = Math.max(1, slots - (heavy ? 2 : jpCount));

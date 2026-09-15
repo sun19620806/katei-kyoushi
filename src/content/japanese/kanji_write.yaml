@@ -141,7 +141,7 @@ items:
     wrong:
       - { text: "公遠", mc: homophone }
       - { text: "工園", mc: homophone }
-    hint: "「えん」は、まわりを 口の 形で かこんだ 字だよ。"
+    hint: "「こう」は 上が「ハ」の 形の 字。「えん」は 口の 形で かこんだ 字。"
 
   - id: kw016
     reading: "てんすう"

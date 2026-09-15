@@ -166,6 +166,7 @@ export function answer(s: LessonState, given: number, now: number): { state: Les
   const remaining = isChoice ? choiceCount - s.eliminated.length - 1 : Infinity;
   const stepWrongs = s.attemptNo; // この回答を ふくめた まちがいの 回数
   if (s.hintLevel >= 3 || (isChoice && choiceCount >= 3 && remaining <= 1) || (isChoice && choiceCount === 2 && stepWrongs >= 2)) {
+    event.revealed = true;
     return { state: { ...s, stage: "revealed", firstMs, current, missed, outcomes: [...s.outcomes, outcome(true)], stepAdvanced: false }, event };
   }
   // ヒントは推定した原因に沿って出す（分からない間違いなら、前に分かった原因を使う）

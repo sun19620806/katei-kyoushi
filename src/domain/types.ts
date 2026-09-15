@@ -42,11 +42,15 @@ export type ProblemKind =
   | "mul_rule" // 九九のきまり（7×6は7×5よりいくつ大きい、□×8=8×6）
   | "compare" // 大きい数のくらべ（＞・＜）
   | "addsub_word" // たし算・ひき算の文章題（式を選ぶ → 答え）
+  | "graph_read" // ○グラフを読む
+  | "number_line" // 数直線の めもりを 読む
+  | "clock_duration" // ○時○分から ○時○分まで なん分間
+  | "clock_set" // とけいの はりを うごかして 時こくに あわせる
   | "jp_choice"; // 国語（えらぶ問題）
 
 /** 1問の中の1つの答え（文章題は「式を選ぶ」→「答えを入れる」の2ステップ） */
 export interface Step {
-  type: "number" | "choice";
+  type: "number" | "choice" | "clock"; // clock: とけいの はりを うごかして 答える（答えは 時×60＋分）
   answer: number; // choice のときは正しい選択肢の番号
   /** 選択肢。"shape:…" "frac:…" で始まるものは図としてえがく */
   choices?: string[];
@@ -78,13 +82,19 @@ export interface Problem {
     | "shape"
     | "rule"
     | "compare"
+    | "graph"
+    | "numberline"
+    | "duration"
+    | "clockset"
     | "kanji_read"
     | "kanji_write"
     | "katakana"
     | "grammar"
     | "reading"
     | "vocab"
-    | "particle";
+    | "particle"
+    | "punctuation"
+    | "yousu";
   steps: Step[];
   story?: string; // 文章題の本文
   product?: number; // mul_missing の積
@@ -95,6 +105,9 @@ export interface Problem {
   shape?: { target: string };
   rule?: "step" | "commute";
   addsub?: { op: "add" | "sub"; key: string };
+  graph?: { title: string; unit: string; labels: string[]; values: number[]; ask: "value" | "max" | "diff"; i: number; j?: number };
+  numberLine?: { start: number; unit: number; pos: number };
+  duration?: { h1: number; m1: number; h2: number; m2: number };
   /** 国語の問題の中身 */
   jp?: {
     itemId: string;
@@ -104,6 +117,7 @@ export interface Problem {
     clue?: string; // かたかなの手がかり
     ask?: "subject" | "predicate";
     vocabType?: "opposite" | "group";
+    markType?: "mark" | "sentence";
     title?: string;
     passage?: string;
     questions?: string[]; // 読みとりの各ステップの問い
@@ -190,6 +204,8 @@ export interface AnswerEvent {
   ms: number;
   phase: LessonPhase;
   contentVersion: string;
+  /** この回答で 答えを 見せた（とちゅうで とじた 授業を 立てなおす ときに 使う） */
+  revealed?: boolean;
 }
 
 export interface SessionEvent {

@@ -12,6 +12,9 @@ import grammarRaw from "../content/japanese/grammar.yaml?raw";
 import readingRaw from "../content/japanese/reading.yaml?raw";
 import vocabRaw from "../content/japanese/vocab.yaml?raw";
 import particlesRaw from "../content/japanese/particles.yaml?raw";
+import punctuationRaw from "../content/japanese/punctuation.yaml?raw";
+import yousuRaw from "../content/japanese/yousu.yaml?raw";
+import reading2Raw from "../content/japanese/reading2.yaml?raw";
 import type { HintDef, LineDef, MisconceptionDef, SkillDef, SkillId } from "./types";
 
 interface SkillsFile {
@@ -46,6 +49,8 @@ export interface JpGrammar { id: string; sentence: string; ask: "subject" | "pre
 export interface JpQuestion { ask: string; answer: string; wrong: JpWrong[]; hint?: string }
 export interface JpVocab { id: string; type: "opposite" | "group"; word: string; answer: string; wrong: JpWrong[]; hint?: string }
 export interface JpParticle { id: string; sentence: string; answer: string; wrong: JpWrong[]; hint?: string }
+export interface JpPunctuation { id: string; type: "mark" | "sentence"; sentence?: string; answer: string; wrong: JpWrong[]; hint?: string }
+export interface JpYousu { id: string; sentence: string; answer: string; wrong: JpWrong[]; hint?: string }
 export interface JpPassage { id: string; genre: "story" | "explain"; title: string; text: string; questions: JpQuestion[] }
 
 export const JP = {
@@ -53,9 +58,11 @@ export const JP = {
   kanjiWrite: (load(kanjiWriteRaw) as { items: JpKanjiWrite[] }).items,
   katakana: (load(katakanaRaw) as { items: JpKatakana[] }).items,
   grammar: (load(grammarRaw) as { items: JpGrammar[] }).items,
-  reading: (load(readingRaw) as { passages: JpPassage[] }).passages,
+  reading: [...(load(readingRaw) as { passages: JpPassage[] }).passages, ...(load(reading2Raw) as { passages: JpPassage[] }).passages],
   vocab: (load(vocabRaw) as { items: JpVocab[] }).items,
   particles: (load(particlesRaw) as { items: JpParticle[] }).items,
+  punctuation: (load(punctuationRaw) as { items: JpPunctuation[] }).items,
+  yousu: (load(yousuRaw) as { items: JpYousu[] }).items,
 };
 
 const skillMap = new Map(SKILLS.map((s) => [s.id, s]));

@@ -357,6 +357,10 @@ function Log({ data }: { data: Data }) {
       case "shape_pick": return p.steps[0]?.prompt ?? "形";
       case "mul_rule": return p.rule === "step" ? `${p.a}×${p.b + 1}は${p.a}×${p.b}より□大きい` : `□×${p.a}=${p.a}×${p.b}`;
       case "compare": return `${p.a} □ ${p.b}`;
+      case "graph_read": return `グラフ：${p.steps[0]?.prompt ?? ""}`;
+      case "number_line": return `数直線（${p.numberLine?.start}から 1めもり${p.numberLine?.unit}、${p.numberLine?.pos}めもり目）`;
+      case "clock_duration": return `${p.duration?.h1}時${p.duration?.m1}分→${p.duration?.h2}時${p.duration?.m2}分`;
+      case "clock_set": return `とけいを ${p.clock?.h}時${p.clock?.m ? `${p.clock.m}分` : ""}に`;
       case "addsub_word": return a.step === 0 ? "文章題（式）" : `文章題 ${p.a} ${p.addsub?.op === "add" ? "+" : "−"} ${p.b}`;
       case "jp_choice": return `${skill(p.skillId).label}：${p.jp?.word ?? p.jp?.reading ?? p.jp?.title ?? ""}`;
       default: return "";
@@ -364,6 +368,7 @@ function Log({ data }: { data: Data }) {
   };
   const givenText = (a: AnswerEvent) => {
     const st = a.problem.steps?.[a.step ?? 0];
+    if (st?.type === "clock") return `${Math.floor(a.given / 60)}時${a.given % 60 ? `${a.given % 60}分` : ""}`;
     if (st?.type !== "choice") return String(a.given);
     const c = st.choices?.[a.given] ?? "";
     return c.startsWith("shape:") || c.startsWith("frac:") ? `${a.given + 1}ばんの図` : c;

@@ -229,3 +229,33 @@ hints:
   - { skillId: math.addsub.word, misconception: borrow_no_decrement, step: 1, level: 1, text: "10を かした 十のくらいは、1 へるよ。", visual: none }
   - { skillId: math.addsub.word, misconception: calc_slip, step: 1, level: 1, text: "おしい！ 1だけ ずれて いるかも。もう いちど たしかめよう。", visual: none }
 
+  # ───── グラフ ─────
+  - { skillId: math.graph.read, misconception: "*", level: 1, text: "{graph_l1}", visual: none }
+  - { skillId: math.graph.read, misconception: "*", level: 2, text: "○を 下から 1つずつ かぞえよう。", visual: none }
+  - { skillId: math.graph.read, misconception: "*", level: 3, text: "{graph_l3}", visual: none }
+  - { skillId: math.graph.read, misconception: read_other, level: 1, text: "{graph_other}", visual: none }
+  - { skillId: math.graph.read, misconception: sum_instead, level: 1, text: "「なん人 多い」は ちがいを きいて いるよ。ひきざんで かんがえよう。", visual: none }
+  - { skillId: math.graph.read, misconception: count_slip, level: 1, text: "おしい！ ○を もう いちど かぞえてみよう。", visual: none }
+
+  # ───── 数直線 ─────
+  - { skillId: math.number.line, misconception: "*", level: 1, text: "大きい めもりと 大きい めもりの あいだが 10こに わけて あるよ。", visual: none }
+  - { skillId: math.number.line, misconception: "*", level: 2, text: "1めもりは いくつ ぶんかな？ 数が 書いて ある めもりから かんがえよう。", visual: none }
+  - { skillId: math.number.line, misconception: "*", level: 3, text: "左の 数から、1めもり ずつ ふやして かぞえよう。", visual: none }
+  - { skillId: math.number.line, misconception: tick_as_one, level: 1, text: "1めもりが 1とは かぎらないよ。書いて ある 数を 見くらべよう。", visual: none }
+  - { skillId: math.number.line, misconception: tick_as_ten, level: 1, text: "1めもりの 大きさを、2つの 数の ちがいから かんがえよう。", visual: none }
+  - { skillId: math.number.line, misconception: start_ignored, level: 1, text: "はじまりの 数から かぞえよう。0から では ないよ。", visual: none }
+
+  # ───── なん分間 ─────
+  - { skillId: math.time.duration, misconception: "*", level: 1, text: "ながい はりが どれだけ すすんだかを かんがえよう。", visual: none }
+  - { skillId: math.time.duration, misconception: "*", level: 2, text: "12を こえるときは、12までの 分と、12からの 分に わけよう。", visual: none }
+  - { skillId: math.time.duration, misconception: "*", level: 3, text: "5分ずつ、めもりを かぞえて いこう。", visual: none }
+  - { skillId: math.time.duration, misconception: hour_as_100, level: 1, text: "1時間は 60分だよ。100分では ないよ。", visual: none }
+  - { skillId: math.time.duration, misconception: added_times, level: 1, text: "分どうしを たすのでは なく、どれだけ すすんだかを かんがえよう。", visual: none }
+
+  # ───── とけいを あわせる ─────
+  - { skillId: math.time.set, misconception: "*", level: 1, text: "ながい はりは「分」、みじかい はりは「時」だよ。", visual: none }
+  - { skillId: math.time.set, misconception: "*", level: 2, text: "ながい はりは、5分で すうじ 1つ ぶん すすむよ。", visual: none }
+  - { skillId: math.time.set, misconception: "*", level: 3, text: "みじかい はりは、分が すすむと 少しずつ つぎの すうじに ちかづくよ。", visual: none }
+  - { skillId: math.time.set, misconception: hands_swapped, level: 1, text: "ながい はりと みじかい はりが 入れかわって いないかな？", visual: none }
+  - { skillId: math.time.set, misconception: hour_off, level: 1, text: "みじかい はりの すうじを たしかめよう。", visual: none }
+

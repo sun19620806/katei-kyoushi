@@ -56,3 +56,38 @@ describe("とちゅうで とじた 授業の 立てなおし", () => {
     expect(outcomes[0].revealed).toBe(true);
   });
 });
+
+import { SKILLS } from "../src/domain/content";
+import { planLesson } from "../src/domain/planner";
+import { seededRng } from "../src/domain/random";
+import { answer, startLesson } from "../src/engine/lesson";
+
+describe("立てなおしと 授業エンジンの 結果が 同じ", () => {
+  it("選ぶ問題で 答えを 見せた ときも、立てなおしで「答えを見た」に なる", () => {
+    const profile = {
+      name: "t", nameYomi: "t", teacherName: "n", teacherLook: "note" as const, inputMode: "tap" as const, favorites: [],
+      problemsPerSession: 10, maxMinutes: 15, allowedFrom: "06:00", allowedTo: "21:00", speech: false, speechRate: 1,
+      parentPin: "0000", disabledSkills: [], subjects: ["math" as const, "japanese" as const],
+    };
+    const base = planLesson({ profile, states: {}, stumbles: {}, mood: "futsu", today: "2026-09-14" });
+    const rng = seededRng(4);
+    for (const skillId of ["jp.katakana", "math.number.compare", "math.shape.basic"]) {
+      expect(SKILLS.some((s) => s.id === skillId)).toBe(true);
+      const plan = { ...base, items: [{ phase: "main" as const, skillId }] };
+      let s = startLesson(plan, 0, rng);
+      const events = [];
+      for (let k = 0; k < 6 && s.stage === "answering"; k++) {
+        const st = s.problem!.steps[s.step];
+        const wrong = st.choices!.findIndex((_, i) => i !== st.answer && !s.eliminated.includes(i));
+        const r = answer(s, wrong, 1000 + k);
+        events.push(r.event);
+        s = r.state;
+      }
+      expect(s.stage, skillId).toBe("revealed");
+      const rebuilt = rebuildOutcomes(events);
+      expect(rebuilt, skillId).toHaveLength(1);
+      expect(rebuilt[0].revealed).toBe(s.outcomes[0].revealed);
+      expect(rebuilt[0].misconceptions).toEqual(s.outcomes[0].misconceptions);
+    }
+  });
+});

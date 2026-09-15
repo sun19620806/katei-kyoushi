@@ -157,7 +157,7 @@ items:
     word: "上"
     answer: "下"
     wrong:
-      - { text: "うえ", mc: similar_meaning }
+      - { text: "てっぺん", mc: similar_meaning }
       - { text: "右", mc: related_not_opposite }
     hint: "空と 地めんの うち、地めんの ほうを あらわす 字だよ。"
 
@@ -280,7 +280,7 @@ items:
     answer: "じょうぎ"
     wrong:
       - { text: "フライパン", mc: group_other }
-      - { text: "はブラシ", mc: group_other }
+      - { text: "まくら", mc: group_other }
       - { text: "どうぐ", mc: group_name }
     hint: "ふでばこに 入れて もって いく ものは どれかな？"
 
@@ -376,4 +376,4 @@ items:
       - { text: "先生", mc: group_other }
       - { text: "友だち", mc: group_other }
       - { text: "人", mc: group_name }
-    hint: "いっしょに 家で くらす、父や 母や きょうだいの なかまだよ。"
+    hint: "父や 母や きょうだいと 同じ なかまに 入る 人だよ。"

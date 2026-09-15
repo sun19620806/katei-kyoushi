@@ -81,11 +81,13 @@ describe("授業の計画", () => {
     expect(plan.items[0].skillId).not.toBe("math.sub.3d2d_borrow"); // ウォームアップは得意なもの
   });
 
-  it("「出さない」にしたスキルは出ない。前提が出さないスキルでも先に進める", () => {
-    const off = { ...profile, disabledSkills: ["math.add.2d2d_to3d", "math.sub.3d2d_borrow"] };
+  it("「出さない（まだ習っていない）」に した 単元と、その先の 単元は 出ない", () => {
+    const off = { ...profile, disabledSkills: ["math.add.2d2d_to3d", "math.sub.3d2d_borrow", "math.mul.dan2", "math.mul.dan5"] };
     const plan = planLesson({ profile: off, states: {}, stumbles: {}, mood: "futsu", today: "2026-09-14" });
-    expect(plan.focusSkill).toBe("math.add.3d2d");
-    expect(plan.items.map((i) => i.skillId)).not.toContain("math.add.2d2d_to3d");
+    const ids = [...plan.items.map((i) => i.skillId), plan.choiceOptions.challenge];
+    for (const locked of ["math.add.2d2d_to3d", "math.add.3d2d", "math.sub.from_zero", "math.addsub.word", "math.mul.word", "math.fraction.of"]) {
+      expect(ids, locked).not.toContain(locked);
+    }
   });
 });
 

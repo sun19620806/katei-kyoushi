@@ -79,3 +79,19 @@ hints:
   - { skillId: jp.particles, misconception: particle_overuse, level: 1, text: "ことばの 一ぶの ときは、音の とおりに 書くよ。" }
   - { skillId: jp.particles, misconception: particle_other, level: 1, text: "文の いみに 合うかな？ もう いちど 読んでみよう。" }
 
+  # ───── 丸・点・かぎ ─────
+  - { skillId: jp.punctuation, misconception: "*", level: 1, text: "文の おわりには 丸、とちゅうの 区切りには 点を つけるよ。" }
+  - { skillId: jp.punctuation, misconception: "*", level: 2, text: "話した ことばは、かぎで かこむよ。" }
+  - { skillId: jp.punctuation, misconception: "*", level: 3, text: "{item_hint}" }
+  - { skillId: jp.punctuation, misconception: period_comma, level: 1, text: "文が おわる ところかな？ とちゅうの 区切りかな？" }
+  - { skillId: jp.punctuation, misconception: quote_missing, level: 1, text: "だれかが 話した ことばには、かぎを つけるよ。" }
+  - { skillId: jp.punctuation, misconception: quote_misplaced, level: 1, text: "かぎは、話した ことばの はじめと おわりに つけるよ。" }
+  - { skillId: jp.punctuation, misconception: mark_position, level: 1, text: "区切りの しるしは、いみの 切れめに つけるよ。" }
+
+  # ───── ようすを あらわす ことば ─────
+  - { skillId: jp.yousu, misconception: "*", level: 1, text: "文の ようすを 思いうかべて みよう。" }
+  - { skillId: jp.yousu, misconception: "*", level: 2, text: "音や うごきの つよさ・大きさも 考えよう。" }
+  - { skillId: jp.yousu, misconception: "*", level: 3, text: "{item_hint}" }
+  - { skillId: jp.yousu, misconception: sound_mismatch, level: 1, text: "その ことばは、べつの ものの 音や ようすだよ。" }
+  - { skillId: jp.yousu, misconception: intensity_mismatch, level: 1, text: "ようすは にて いるけど、つよさや 大きさが 合うかな？" }
+

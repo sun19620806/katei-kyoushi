@@ -16,7 +16,7 @@ items:
     wrong:
       - { text: "わ", mc: particle_sound }
       - { text: "を", mc: particle_other }
-    hint: "「だれが」を あらわす ときの 字だよ。"
+    hint: "「ぼく」の 話を する 目じるしの 字。読む 音と 書く 字が ずれるよ。"
 
   - id: pt002
     sentence: "わたし{blank} 二年生です。"
@@ -74,7 +74,7 @@ items:
     wrong:
       - { text: "お", mc: particle_sound }
       - { text: "に", mc: particle_other }
-    hint: "食べた ものの 後ろに つく 字。わ行の おわりの 字だよ。"
+    hint: "食べた ものの 後ろに つく 字。わ行に ある 字だよ。"
 
   - id: pt009
     sentence: "ねる 前に 本{blank} 読む。"

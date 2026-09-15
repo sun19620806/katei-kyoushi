@@ -103,7 +103,7 @@ items:
       - { text: "光る", mc: predicate_for_subject }
       - { text: "空で", mc: modifier_chosen }
       - { text: "夜に", mc: modifier_chosen }
-    hint: "「なにが」に あたる ことばは、文の うしろの ほうに あるよ。"
+    hint: "「〜が」の 形の ことばを さがそう。「〜で」「〜に」は ばしょや 時だよ。"
 
   # ───── 述語（どうする・どんなだ・なんだ） ─────
   - id: gr011
@@ -223,7 +223,7 @@ items:
       - { text: "なきはじめた", mc: predicate_for_subject }
       - { text: "にわで", mc: modifier_chosen }
       - { text: "ゆうがた", mc: modifier_chosen }
-    hint: "「なにが」に あたる ことばは、文の まん中より うしろに あるよ。"
+    hint: "「〜が」の 形で、「なにが」に あたる ことばを さがそう。"
 
   - id: gr023
     sentence: "毎朝 早く、兄が 金魚に えさを やる。"
@@ -347,13 +347,13 @@ items:
     hint: "「だれが どう した」の「どう した」に あたる ことばだよ。"
 
   - id: gr035
-    sentence: "この 石は つるつるで きれいだ。"
+    sentence: "川で ひろった 石は きれいだ。"
     ask: predicate
     answer: "きれいだ"
     wrong:
       - { text: "石は", mc: subject_for_predicate }
-      - { text: "つるつるで", mc: modifier_chosen }
-      - { text: "この", mc: modifier_chosen }
+      - { text: "ひろった", mc: modifier_chosen }
+      - { text: "川で", mc: modifier_chosen }
     hint: "文の いちばん さいごに ある「どんなだ」を さがそう。"
 
   - id: gr036

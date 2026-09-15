@@ -10,7 +10,7 @@ misconceptions:
   - id: concat_ones
     label: 一の位の合計をそのまま書く（例 38+25→513）
   - id: count_slip
-    label: 数え足しで1ずれる
+    label: 数えまちがい（1ずれる）
   - id: smaller_from_larger
     label: 各位で大きい数から小さい数を引いてしまう
   - id: borrow_no_decrement
@@ -72,6 +72,20 @@ misconceptions:
     label: ＞と＜の 向きを 取りちがえる
   - id: place_misalign
     label: 筆算で 位を そろえずに 書く（245+38 → 625）
+  - id: read_other
+    label: グラフで ほかの 列を 読んでしまう
+  - id: sum_instead
+    label: 「ちがい」を きかれて たし算を してしまう
+  - id: tick_as_one
+    label: 数直線の 1めもりを いつも 1と 考える
+  - id: tick_as_ten
+    label: 数直線の 1めもりの 大きさを 取りちがえる
+  - id: start_ignored
+    label: 数直線の はじまりの 数を 見ていない
+  - id: added_times
+    label: 時間を きかれて、分どうしを たしてしまう
+  - id: hour_off
+    label: 短いはりを 1時間 ずれた 所に あわせる
   - id: op_reversed
     label: たし算と ひき算を 取りちがえる（文章題）
   - id: one_more
@@ -128,6 +142,18 @@ misconceptions:
     label: ことばの一部なのに「は・を・へ」と書く
   - id: particle_other
     label: 文に合わない助詞（が・に など）を選ぶ
+  - id: period_comma
+    label: 丸（。）と 点（、）を 取りちがえる
+  - id: quote_missing
+    label: 話した ことばに かぎ（「」）を つけない
+  - id: quote_misplaced
+    label: かぎ（「」）の 場所が ずれる
+  - id: mark_position
+    label: 丸や 点を 変な 場所に つける
+  - id: sound_mismatch
+    label: ようすや 音に 合わない ことばを 選ぶ
+  - id: intensity_mismatch
+    label: ようすは にて いるが、つよさや 大きさが 合わない ことばを 選ぶ
   - id: similar_meaning
     label: はんたいの言葉をきかれて、にた意味の言葉を選ぶ
   - id: related_not_opposite
@@ -238,6 +264,24 @@ skills:
     misconceptions: [op_reversed, no_carry, smaller_from_larger, borrow_no_decrement, calc_slip]
 
   # ───── 時こくと時間・かさ・形 ─────
+  - id: math.time.set
+    subject: math
+    group: 時こくと時間
+    label: とけいの はりを あわせる
+    kidLabel: とけいあわせ
+    prereqs: []
+    generator: clockSet
+    misconceptions: [hands_swapped, hour_off]
+
+  - id: math.time.duration
+    subject: math
+    group: 時こくと時間
+    label: ○時○分から ○時○分まで なん分間
+    kidLabel: なん分間
+    prereqs: [math.time.read]
+    generator: clockDuration
+    misconceptions: [hour_as_100, added_times]
+
   - id: math.time.shift
     subject: math
     group: 時こくと時間
@@ -393,6 +437,15 @@ skills:
     generator: placeCompose
     misconceptions: [zero_miss]
 
+  - id: math.number.line
+    subject: math
+    group: 大きい数
+    label: 数直線の めもりを 読む
+    kidLabel: かずの せんの めもり
+    prereqs: []
+    generator: numberLine
+    misconceptions: [tick_as_one, tick_as_ten, start_ignored]
+
   - id: math.number.compare
     subject: math
     group: 大きい数
@@ -401,6 +454,15 @@ skills:
     prereqs: [math.number.4digit]
     generator: compareNumbers
     misconceptions: [ones_first, sign_reversed]
+
+  - id: math.graph.read
+    subject: math
+    group: ひょうと グラフ
+    label: ○グラフを 読む（いくつ・いちばん多い・ちがい）
+    kidLabel: グラフの よみかた
+    prereqs: []
+    generator: graphRead
+    misconceptions: [read_other, sum_instead, count_slip]
 
   - id: math.length.m_cm
     subject: math
@@ -461,7 +523,7 @@ skills:
     subject: japanese
     group: 読みとり
     label: 読みとり（ものがたり）
-    kidLabel: ものがたりを よもう
+    kidLabel: ものがたりの よみとり
     weight: 3
     prereqs: []
     generator: jpReadingStory
@@ -480,7 +542,7 @@ skills:
     subject: japanese
     group: 読みとり
     label: 読みとり（せつめい文）
-    kidLabel: せつめいの 文を よもう
+    kidLabel: せつめい文の よみとり
     weight: 3
     prereqs: [jp.reading.story]
     generator: jpReadingExplain
@@ -512,3 +574,21 @@ skills:
     prereqs: []
     generator: jpParticle
     misconceptions: [particle_sound, particle_overuse, particle_other]
+
+  - id: jp.punctuation
+    subject: japanese
+    group: ことばの きまり
+    label: 丸（。）・点（、）・かぎ（「」）の つかいかた
+    kidLabel: 丸・点・かぎ
+    prereqs: []
+    generator: jpPunctuation
+    misconceptions: [period_comma, quote_missing, quote_misplaced, mark_position]
+
+  - id: jp.yousu
+    subject: japanese
+    group: ことばの いみ
+    label: ようすを あらわす ことば（きらきら・ざあざあ など）
+    kidLabel: ようすを あらわす ことば
+    prereqs: []
+    generator: jpYousu
+    misconceptions: [sound_mismatch, intensity_mismatch]

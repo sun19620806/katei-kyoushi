@@ -1,0 +1,251 @@
+# ようすを あらわす ことば。小2 2学期。
+# sentence: {blank} を 1回 ふくむ 文。answer: 合う ことば（ひらがな or かたかな）
+# mc: sound_mismatch（音と ようすが 合わない ことばを 選ぶ・雨が「ごろごろ」など）/ intensity_mismatch（ようすは にて いるが つよさや 大きさが 合わない・小雨に「ざあざあ」など）
+# hint: 45文字以内、答えを そのまま 書かない
+# 文章は すべて オリジナル。漢字は 小1・小2で 習う ものだけ。
+
+items:
+  # ───── 天気・空 ─────
+  - id: ys001
+    sentence: "よぞらに 星が {blank} 光って いる。"
+    answer: "きらきら"
+    wrong:
+      - { text: "ざあざあ", mc: sound_mismatch }
+      - { text: "ぎらぎら", mc: intensity_mismatch }
+    hint: "小さな 光が たくさん かがやく ようすだよ。"
+
+  - id: ys002
+    sentence: "小雨が {blank} ふって いる。"
+    answer: "しとしと"
+    wrong:
+      - { text: "ざあざあ", mc: intensity_mismatch }
+      - { text: "ごろごろ", mc: sound_mismatch }
+    hint: "よわい 雨が しずかに ふりつづく ようすだよ。"
+
+  - id: ys003
+    sentence: "かさを さしても ぬれるほど、雨が {blank} ふって きた。"
+    answer: "ざあざあ"
+    wrong:
+      - { text: "しとしと", mc: intensity_mismatch }
+      - { text: "ぴかぴか", mc: sound_mismatch }
+    hint: "つよい 雨が 音を 立てて いっぱい ふる ようすだよ。"
+
+  - id: ys004
+    sentence: "かみなりが 遠くで {blank} 鳴って いる。"
+    answer: "ごろごろ"
+    wrong:
+      - { text: "ころころ", mc: intensity_mismatch }
+      - { text: "ひらひら", mc: sound_mismatch }
+    hint: "空の 上で ひくく 大きく ひびく 音だよ。"
+
+  - id: ys005
+    sentence: "台風の 風が {blank} ふいて いる。"
+    answer: "びゅうびゅう"
+    wrong:
+      - { text: "そよそよ", mc: intensity_mismatch }
+      - { text: "ぽかぽか", mc: sound_mismatch }
+    hint: "とても つよい 風が 音を 立てる ようすだよ。"
+
+  - id: ys006
+    sentence: "春の やさしい 風が {blank} ふいて いる。"
+    answer: "そよそよ"
+    wrong:
+      - { text: "びゅうびゅう", mc: intensity_mismatch }
+      - { text: "ざくざく", mc: sound_mismatch }
+    hint: "よわい 風が しずかに ふく ようすだよ。"
+
+  - id: ys007
+    sentence: "日なたは お日さまが あたって {blank} あたたかい。"
+    answer: "ぽかぽか"
+    wrong:
+      - { text: "じりじり", mc: intensity_mismatch }
+      - { text: "ぶんぶん", mc: sound_mismatch }
+    hint: "ちょうど よい あたたかさを あらわす ことばだよ。"
+
+  # ───── 生きもの ─────
+  - id: ys008
+    sentence: "ひよこが 小さな 声で {blank} 鳴いて いる。"
+    answer: "ぴよぴよ"
+    wrong:
+      - { text: "もうもう", mc: sound_mismatch }
+      - { text: "ケロケロ", mc: sound_mismatch }
+    hint: "生まれて まもない 小さな 鳥の 鳴き声だよ。"
+
+  - id: ys009
+    sentence: "大きな 犬が 強い 声で {blank} ほえた。"
+    answer: "ワンワン"
+    wrong:
+      - { text: "キャンキャン", mc: intensity_mismatch }
+      - { text: "チュンチュン", mc: sound_mismatch }
+    hint: "犬が 元気よく ほえる ときの 声だよ。高く 小さな 声では ないよ。"
+
+  - id: ys010
+    sentence: "池で かえるが {blank} 鳴いて いる。"
+    answer: "ケロケロ"
+    wrong:
+      - { text: "コケコッコー", mc: sound_mismatch }
+      - { text: "メエメエ", mc: sound_mismatch }
+    hint: "水の 近くに いる 生きものの 声だよ。"
+
+  - id: ys011
+    sentence: "大きな ぞうが {blank} 歩いて いる。"
+    answer: "のっしのっし"
+    wrong:
+      - { text: "とことこ", mc: intensity_mismatch }
+      - { text: "ひらひら", mc: sound_mismatch }
+    hint: "おもい 体で ゆっくり 歩く ようすだよ。"
+
+  - id: ys012
+    sentence: "小さな ねずみが かべの 近くを {blank} 走りまわる。"
+    answer: "ちょろちょろ"
+    wrong:
+      - { text: "のっしのっし", mc: intensity_mismatch }
+      - { text: "ぴかぴか", mc: sound_mismatch }
+    hint: "小さな ものが すばやく 右へ 左へ うごく ようすだよ。"
+
+  - id: ys013
+    sentence: "ちょうが 花の まわりを {blank} とんで いる。"
+    answer: "ひらひら"
+    wrong:
+      - { text: "ぶんぶん", mc: sound_mismatch }
+      - { text: "どしどし", mc: sound_mismatch }
+    hint: "うすい はねが かるく ゆれる ようすだよ。"
+
+  - id: ys014
+    sentence: "はちが {blank} 音を 立てて とんで きた。"
+    answer: "ぶんぶん"
+    wrong:
+      - { text: "ひらひら", mc: sound_mismatch }
+      - { text: "ぽろぽろ", mc: sound_mismatch }
+    hint: "はねを すばやく うごかす ときの 音だよ。"
+
+  # ───── 食べる・のむ・ねる ─────
+  - id: ys015
+    sentence: "おひるが まちきれなくて、おなかが {blank} 鳴った。"
+    answer: "ぐうぐう"
+    wrong:
+      - { text: "りんりん", mc: sound_mismatch }
+      - { text: "ぽつぽつ", mc: sound_mismatch }
+    hint: "おなかが すいた ときに 聞こえる 音だよ。"
+
+  - id: ys016
+    sentence: "かたい おせんべいを {blank} かじった。"
+    answer: "ばりばり"
+    wrong:
+      - { text: "ふわふわ", mc: sound_mismatch }
+      - { text: "すやすや", mc: sound_mismatch }
+    hint: "かたい ものを かんで わる ときの 音だよ。"
+
+  - id: ys017
+    sentence: "のどが かわいて、水を {blank} のんだ。"
+    answer: "ごくごく"
+    wrong:
+      - { text: "ぺらぺら", mc: sound_mismatch }
+      - { text: "ころころ", mc: sound_mismatch }
+    hint: "いきおいよく のみこむ ときの 音だよ。"
+
+  - id: ys018
+    sentence: "赤ちゃんが ベッドで しずかに {blank} ねむって いる。"
+    answer: "すやすや"
+    wrong:
+      - { text: "ぐうぐう", mc: intensity_mismatch }
+      - { text: "がたがた", mc: sound_mismatch }
+    hint: "音を 立てずに 気もちよく ねむる ようすだよ。"
+
+  # ───── 水・もの ─────
+  - id: ys019
+    sentence: "小川の 水が {blank} ながれて いる。"
+    answer: "さらさら"
+    wrong:
+      - { text: "ごうごう", mc: intensity_mismatch }
+      - { text: "ぺたぺた", mc: sound_mismatch }
+    hint: "あさい 水が かるく すんだ 音で ながれる ようすだよ。"
+
+  - id: ys020
+    sentence: "みがいた くつが {blank} 光って いる。"
+    answer: "ぴかぴか"
+    wrong:
+      - { text: "ぎらぎら", mc: intensity_mismatch }
+      - { text: "ふわふわ", mc: sound_mismatch }
+    hint: "つやが あって きれいに 光る ようすだよ。"
+
+  - id: ys021
+    sentence: "お日さまに ほした ふとんが {blank} して いる。"
+    answer: "ふかふか"
+    wrong:
+      - { text: "ざらざら", mc: sound_mismatch }
+      - { text: "べとべと", mc: sound_mismatch }
+    hint: "空気を ふくんで やわらかく ふくらんだ ようすだよ。"
+
+  - id: ys022
+    sentence: "ぬけそうな はが {blank} して いる。"
+    answer: "ぐらぐら"
+    wrong:
+      - { text: "ぴかぴか", mc: sound_mismatch }
+      - { text: "ぺこぺこ", mc: sound_mismatch }
+    hint: "しっかり くっついて いなくて、大きく ゆれる ようすだよ。"
+
+  - id: ys023
+    sentence: "小さな ボールが さかみちを {blank} ころがって いった。"
+    answer: "ころころ"
+    wrong:
+      - { text: "ごろごろ", mc: intensity_mismatch }
+      - { text: "ひらひら", mc: sound_mismatch }
+    hint: "小さくて かるい ものが ころがる ようすだよ。"
+
+  - id: ys024
+    sentence: "友だちの 家の ドアを そっと {blank} たたいた。"
+    answer: "とんとん"
+    wrong:
+      - { text: "どんどん", mc: intensity_mismatch }
+      - { text: "ぺこぺこ", mc: sound_mismatch }
+    hint: "そっと かるく たたく 音だよ。"
+
+  - id: ys025
+    sentence: "手を {blank} たたいて、はく手を おくった。"
+    answer: "ぱちぱち"
+    wrong:
+      - { text: "ぽたぽた", mc: sound_mismatch }
+      - { text: "ぐうぐう", mc: sound_mismatch }
+    hint: "手と 手を 合わせて 鳴らす 音だよ。"
+
+  # ───── 気もち・人の ようす ─────
+  - id: ys026
+    sentence: "友だちに ほめられて、{blank} わらった。"
+    answer: "にこにこ"
+    wrong:
+      - { text: "げらげら", mc: intensity_mismatch }
+      - { text: "しくしく", mc: sound_mismatch }
+    hint: "声を 出さずに うれしそうに わらう ようすだよ。"
+
+  - id: ys027
+    sentence: "おもしろい まんがを 読んで、兄は おなかを かかえて {blank} わらった。"
+    answer: "げらげら"
+    wrong:
+      - { text: "にこにこ", mc: intensity_mismatch }
+      - { text: "ひそひそ", mc: sound_mismatch }
+    hint: "大きな 声を 出して わらう ようすだよ。"
+
+  - id: ys028
+    sentence: "妹は 小さな 声で {blank} ないて いた。"
+    answer: "しくしく"
+    wrong:
+      - { text: "わあわあ", mc: intensity_mismatch }
+      - { text: "にこにこ", mc: sound_mismatch }
+    hint: "声を おさえて、しずかに なく ようすだよ。"
+
+  - id: ys029
+    sentence: "みんなの 前で 話す とき、むねが {blank} した。"
+    answer: "どきどき"
+    wrong:
+      - { text: "のろのろ", mc: sound_mismatch }
+      - { text: "ざらざら", mc: sound_mismatch }
+    hint: "きんちょうして、むねの 音が 早く なる ようすだよ。"
+
+  - id: ys030
+    sentence: "あしたは 遠足。楽しみで {blank} する。"
+    answer: "わくわく"
+    wrong:
+      - { text: "しょんぼり", mc: sound_mismatch }
+      - { text: "すやすや", mc: sound_mismatch }
+    hint: "楽しい ことを まって、気もちが はずむ ようすだよ。"

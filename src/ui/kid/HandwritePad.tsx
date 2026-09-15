@@ -18,7 +18,8 @@ interface Props {
 }
 
 /** いちど ペンが つかわれたら、その あとは ゆび（手のひら）を むしする（マスや 問題が かわっても おぼえておく） */
-let penSeen = false;
+let penSeenAt = 0;
+const PEN_MEMORY_MS = 15_000; // ペンを 15びょう つかって いなければ、ゆびでも 書ける（ペンの 電池ぎれ など）
 
 type Cell = { digit: number | null; strokes: XY[][]; alternatives: number[]; unsure: boolean };
 type Flush = () => Cell | null;
@@ -28,6 +29,8 @@ const RECOGNIZE_DELAY = 700; // ペンを はなしてから 読むまで（4・
 /** Apple Pencil・ゆびで すうじを 書く。1マスに 1もじ */
 export default function HandwritePad({ boxes, templates, onChange, onSubmit, resetKey }: Props) {
   const flushers = useRef<(Flush | null)[]>([]);
+  const templatesRef = useRef(templates);
+  templatesRef.current = templates;
   const [cells, setCells] = useState<Cell[]>(() =>
     Array.from({ length: boxes }, () => ({ digit: null, strokes: [], alternatives: [], unsure: false })),
   );
@@ -47,7 +50,7 @@ export default function HandwritePad({ boxes, templates, onChange, onSubmit, res
   const update = (i: number, patch: Partial<Cell>) => setCells((cs) => cs.map((c, k) => (k === i ? { ...c, ...patch } : c)));
 
   const readCell = (strokes: XY[][]): Cell => {
-    const r = recognizeDigit(strokes, templates);
+    const r = recognizeDigit(strokes, templatesRef.current);
     const unsure = r.digit !== null && (r.score < 0.35 || isConfusable(r.digit, r.alternatives[0]));
     return { strokes, digit: r.digit, alternatives: r.alternatives, unsure };
   };
@@ -180,11 +183,15 @@ function InkBox({ digit, unsure, alternatives, onStrokes, onPick, onClear, regis
   };
 
   const down = (e: React.PointerEvent) => {
-    if (e.pointerType === "pen") penSeen = true;
-    if (penSeen && e.pointerType === "touch") return; // ペンを つかって いるときは 手のひらを むし
+    if (e.pointerType === "pen") penSeenAt = Date.now();
+    if (e.pointerType === "touch" && Date.now() - penSeenAt < PEN_MEMORY_MS) return; // ペンを つかって いるときは 手のひらを むし
     e.preventDefault();
     window.clearTimeout(timer.current);
-    canvas.current!.setPointerCapture(e.pointerId);
+    try {
+      canvas.current!.setPointerCapture(e.pointerId);
+    } catch {
+      /* つかめなくても 書ける */
+    }
     drawing.current = true;
     strokes.current.push([point(e)]);
     redraw();

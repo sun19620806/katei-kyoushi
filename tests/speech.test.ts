@@ -30,4 +30,11 @@ describe("読み上げ用の文", () => {
       expect(spoken, `${t} → ${spoken}`).not.toMatch(/は(?=[\s、。！？]|$)|を|cm|[a-zA-Z]/);
     }
   });
+
+  it("曜日・分間・数えかたを 読みに 直す", () => {
+    expect(toSpeakable("月ようは 火ようより なんさつ 多い？")).toBe("げつようわかようよりなんさつ多い？");
+    expect(toSpeakable("なん分間？")).toBe("なんぷんかん？");
+    expect(toSpeakable("いちばん 多いのは なんひき？")).toBe("いちばん多いのわなんびき？");
+  });
 });
+

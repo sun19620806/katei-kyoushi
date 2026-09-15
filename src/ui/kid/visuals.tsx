@@ -1,3 +1,6 @@
+import { useRef, useState } from "react";
+import { hourFromAngle, hourHandAngle, minuteFromAngle, minuteHandAngle, pickHand } from "../../domain/clockMath";
+
 /** 問題の図（とけい・形・分数・位の積み木・単位のテープ） */
 
 const INK = "#1E2940";
@@ -193,3 +196,158 @@ export function FracGroups({ a, b }: { a: number; b: number }) {
 }
 
 export const COLORS = { INK, PENCIL, ORANGE, MARKER };
+
+/** ○グラフ（たての列に ○を つむ。からの ○は かかない） */
+export function CircleGraph({ title, labels, values, highlight }: { title: string; labels: string[]; values: number[]; highlight?: number[] }) {
+  const max = Math.max(9, ...values);
+  const col = 64;
+  const cell = 26;
+  const W = labels.length * col + 20;
+  const H = max * cell + 70;
+  return (
+    <figure className="graph">
+      <figcaption>{title}</figcaption>
+      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={title}>
+        {Array.from({ length: max }, (_, k) => (
+          <line key={k} x1="6" x2={W - 6} y1={H - 48 - k * cell - cell / 2} y2={H - 48 - k * cell - cell / 2} stroke="#E2E8F0" strokeWidth="1" />
+        ))}
+        {labels.map((label, i) => {
+          const x = 10 + i * col + col / 2;
+          const hot = highlight?.includes(i);
+          return (
+            <g key={label}>
+              {hot && <rect x={x - col / 2 + 4} y={8} width={col - 8} height={max * cell + 8} rx="10" fill={MARKER} opacity=".45" />}
+              {Array.from({ length: values[i] }, (_, k) => (
+                <circle key={k} cx={x} cy={H - 48 - k * cell} r="10" fill={PENCIL} stroke={INK} strokeWidth="2" />
+              ))}
+              <text x={x} y={H - 14} textAnchor="middle" fontSize={label.length > 4 ? 11 : 14} fontWeight="800" fill={INK}>
+                {label}
+              </text>
+            </g>
+          );
+        })}
+        <line x1="6" x2={W - 6} y1={H - 32} y2={H - 32} stroke={INK} strokeWidth="2" />
+      </svg>
+    </figure>
+  );
+}
+
+/** 数直線（数は 線の 上、やじるしは 下から 上を さす） */
+export function NumberLineView({ start, unit, pos, showUnit }: { start: number; unit: number; pos: number; showUnit?: boolean }) {
+  const ticks = 20;
+  const W = 640;
+  const x0 = 30;
+  const step = (W - 60) / ticks;
+  const ax = x0 + pos * step;
+  return (
+    <svg className="numberline" viewBox={`0 0 ${W} 160`} role="img" aria-label="かずの せん">
+      <line x1={x0 - 10} x2={W - 20} y1="70" y2="70" stroke={INK} strokeWidth="3" />
+      {Array.from({ length: ticks + 1 }, (_, k) => {
+        const x = x0 + k * step;
+        const major = k % 10 === 0;
+        const mid = k % 5 === 0;
+        return (
+          <g key={k}>
+            <line x1={x} x2={x} y1={major ? 52 : mid ? 58 : 62} y2={major ? 88 : mid ? 82 : 78} stroke={INK} strokeWidth={major ? 3 : 1.6} />
+            {major && (
+              <text x={x} y="38" textAnchor="middle" fontSize="20" fontWeight="800" fill={INK}>
+                {start + k * unit}
+              </text>
+            )}
+          </g>
+        );
+      })}
+      <path d={`M${ax} 94 l-11 20 h22 z`} fill={ORANGE} />
+      <rect x={ax - 4} y="112" width="8" height="22" rx="3" fill={ORANGE} />
+      {showUnit && (
+        <text x={W / 2} y="154" textAnchor="middle" fontSize="15" fontWeight="800" fill={ORANGE}>
+          1めもり ＝ {unit}
+        </text>
+      )}
+    </svg>
+  );
+}
+
+/** はりを うごかせる とけい。value は 時×60＋分（時は 1〜12）。touched で さわったか を 知らせる */
+export function ClockInput({ value, onChange, size = 300 }: { value: number; onChange: (v: number) => void; size?: number }) {
+  const h = Math.floor(value / 60) || 12;
+  const m = value % 60;
+  const dragging = useRef<"hour" | "minute" | null>(null);
+  const [grab, setGrab] = useState<"hour" | "minute" | null>(null);
+  const geometry = (e: { clientX: number; clientY: number }, svg: SVGSVGElement) => {
+    const r = svg.getBoundingClientRect();
+    const x = e.clientX - (r.left + r.width / 2);
+    const y = e.clientY - (r.top + r.height / 2);
+    return { angle: ((Math.atan2(y, x) * 180) / Math.PI + 90 + 360) % 360, dist: Math.hypot(x, y) / (r.width / 2) };
+  };
+  const apply = (angle: number, hand: "hour" | "minute") => {
+    if (hand === "minute") onChange(h * 60 + minuteFromAngle(angle));
+    else onChange(hourFromAngle(angle, m) * 60 + m);
+  };
+  const hand = (angle: number, length: number, width: number, color: string, name: "hour" | "minute") => {
+    const rad = ((angle - 90) * Math.PI) / 180;
+    const x2 = 100 + Math.cos(rad) * length;
+    const y2 = 100 + Math.sin(rad) * length;
+    const hot = grab === name;
+    return (
+      <g className={`hand ${name}`}>
+        <line x1="100" y1="100" x2={x2} y2={y2} stroke={hot ? ORANGE : color} strokeWidth={hot ? width + 2 : width} strokeLinecap="round" />
+        <circle cx={x2} cy={y2} r={name === "minute" ? 13 : 15} fill={hot ? ORANGE : color} opacity={hot ? 0.45 : 0.2} />
+      </g>
+    );
+  };
+  const end = () => {
+    dragging.current = null;
+    setGrab(null);
+  };
+  return (
+    <svg
+      className="clock clock-input"
+      width={size}
+      height={size}
+      viewBox="0 0 200 200"
+      role="slider"
+      aria-label={`${h}時${m}分`}
+      aria-valuenow={value}
+      style={{ touchAction: "none" }}
+      onPointerDown={(e) => {
+        const svg = e.currentTarget;
+        const g = geometry(e, svg);
+        const which = pickHand(g.angle, g.dist, h, m);
+        dragging.current = which;
+        setGrab(which);
+        try {
+          svg.setPointerCapture(e.pointerId);
+        } catch {
+          /* つかめなくても うごかせる */
+        }
+        apply(g.angle, which);
+      }}
+      onPointerMove={(e) => {
+        if (!dragging.current) return;
+        apply(geometry(e, e.currentTarget).angle, dragging.current);
+      }}
+      onPointerUp={end}
+      onPointerCancel={end}
+    >
+      <circle cx="100" cy="100" r="94" fill="#fff" stroke={INK} strokeWidth="5" />
+      {Array.from({ length: 60 }, (_, i) => {
+        const rad = ((i * 6 - 90) * Math.PI) / 180;
+        const long = i % 5 === 0;
+        return <line key={i} x1={100 + Math.cos(rad) * (long ? 80 : 85)} y1={100 + Math.sin(rad) * (long ? 80 : 85)} x2={100 + Math.cos(rad) * 90} y2={100 + Math.sin(rad) * 90} stroke={INK} strokeWidth={long ? 3 : 1.2} />;
+      })}
+      {Array.from({ length: 12 }, (_, i) => {
+        const n = i + 1;
+        const rad = ((n * 30 - 90) * Math.PI) / 180;
+        return (
+          <text key={n} x={100 + Math.cos(rad) * 66} y={100 + Math.sin(rad) * 66 + 7} textAnchor="middle" fontSize="20" fontWeight="800" fill={INK} pointerEvents="none">
+            {n}
+          </text>
+        );
+      })}
+      {hand(minuteHandAngle(m), 78, 6, PENCIL, "minute")}
+      {hand(hourHandAngle(h, m), 48, 10, INK, "hour")}
+      <circle cx="100" cy="100" r="6" fill={INK} />
+    </svg>
+  );
+}

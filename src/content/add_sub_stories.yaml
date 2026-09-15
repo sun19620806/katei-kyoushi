@@ -127,7 +127,7 @@ stories:
     kind: separate
     op: sub
     key: "かりて いきました"
-    text: "本だなに 本が {a}さつ あります。{b}さつ かりて いきました。本だなに のこって いるのは なんさつ ですか。"
+    text: "本だなに 本が {a}さつ あります。みんなが {b}さつ かりて いきました。本だなに のこって いるのは なんさつ ですか。"
     unit: さつ
   - id: as021
     kind: separate
@@ -159,7 +159,7 @@ stories:
     kind: decrease
     op: sub
     key: "へると"
-    text: "クッキーが {a}まい あります。{b}まい へると、なんまいに なりますか。"
+    text: "クッキーが {a}まい あります。みんなで 食べて {b}まい へると、なんまいに なりますか。"
     unit: まい
   - id: as026
     kind: decrease
@@ -177,7 +177,7 @@ stories:
     kind: decrease
     op: sub
     key: "かれて しまうと"
-    text: "花だんに 花が {a}本 ありました。{b}本 かれて しまうと、なん本に へりますか。"
+    text: "花だんに 花が {a}本 ありました。{b}本 かれて しまうと、さいて いる 花は なん本に なりますか。"
     unit: 本
 
   # --- compare（ちがいは・多い・少ない）---
@@ -185,7 +185,7 @@ stories:
     kind: compare
     op: sub
     key: "多い"
-    text: "赤ぐみは {a}人、白ぐみは {b}人 います。どちらが なん人 多いですか。"
+    text: "赤ぐみは {a}人、白ぐみは {b}人 います。赤ぐみは 白ぐみより なん人 多いですか。"
     unit: 人
   - id: as030
     kind: compare

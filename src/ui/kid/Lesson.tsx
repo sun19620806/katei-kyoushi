@@ -38,6 +38,7 @@ import { speak, stopSpeaking } from "../speech";
 import { setUpdateSafe } from "../swUpdate";
 import Teacher, { type Face } from "../Teacher";
 import ChoicePad from "./ChoicePad";
+import { ClockInput } from "./visuals";
 import { makeTemplate, type Template } from "../../domain/handwriting/pdollar";
 import HandwritePad, { type Written } from "./HandwritePad";
 import NumPad from "./NumPad";
@@ -72,6 +73,10 @@ const THINK_CARDS: Record<string, string[]> = {
   place_compose: ["くらいの へやに わけた", "0を わすれずに かいた", "なんとなく", "わからない"],
   shape_pick: ["へんと かどを かぞえた", "線が つながって いるか 見た", "なんとなく", "わからない"],
   addsub_word: ["ことばに 目を つけた", "ずを おもいうかべた", "なんとなく", "わからない"],
+  graph_read: ["○を 下から かぞえた", "高さを くらべた", "なんとなく", "わからない"],
+  number_line: ["1めもりの 大きさを 見た", "書いて ある かずから かぞえた", "なんとなく", "わからない"],
+  clock_duration: ["5分ずつ かぞえた", "12で わけて かんがえた", "なんとなく", "わからない"],
+  clock_set: ["ながい はりから あわせた", "みじかい はりから あわせた", "なんとなく", "わからない"],
   mul_rule: ["九九を ならべて くらべた", "かたまりが ふえると かんがえた", "なんとなく", "わからない"],
   compare: ["上の くらいから くらべた", "けたの かずを 見た", "なんとなく", "わからない"],
   kanji_read: ["こえに 出して 読んだ", "しって いる ことばだった", "なんとなく", "わからない"],
@@ -79,6 +84,8 @@ const THINK_CARDS: Record<string, string[]> = {
   katakana: ["こえに 出して たしかめた", "形を よく 見た", "なんとなく", "わからない"],
   grammar: ["「〜が」を さがした", "文の おわりを 見た", "なんとなく", "わからない"],
   particle: ["ことばの うしろか 見た", "文を 読んで たしかめた", "なんとなく", "わからない"],
+  punctuation: ["文の おわりを 見た", "話した ことばを さがした", "なんとなく", "わからない"],
+  yousu: ["ようすを 思いうかべた", "音を 思いうかべた", "なんとなく", "わからない"],
   vocab: ["ようすを 思いうかべた", "しって いる ことばだった", "なんとなく", "わからない"],
   reading: ["ぶんしょうに もどって さがした", "おぼえて いた", "なんとなく", "わからない"],
 };
@@ -116,6 +123,8 @@ export default function Lesson({
   const [inputMode, setInputMode] = useState<"tap" | "write">(profile.inputMode ?? "tap");
   const [inkTemplates, setInkTemplates] = useState<Template[]>([]);
   const written = useRef<Written | null>(null);
+  const [clockValue, setClockValue] = useState(12 * 60);
+  const [clockTouched, setClockTouched] = useState(false);
   const [saving, setSaving] = useState(false);
   const savingRef = useRef(false);
   const mounted = useRef(true);
@@ -205,6 +214,12 @@ export default function Lesson({
       return show([...prefix, line("phase_choice")]);
     }
     if (s.stage !== "answering" || !s.problem) return;
+    // とけいは 答えと ちがう 時こくから はじめる（さわらずに 正解に ならないように）
+    const target = s.problem.steps[0].type === "clock" ? s.problem.steps[0].answer : -1;
+    let startValue = (1 + Math.floor(Math.random() * 12)) * 60;
+    if (startValue === target) startValue = startValue === 720 ? 180 : startValue + 60;
+    setClockValue(startValue);
+    setClockTouched(false);
     const parts = [...prefix];
     const phase = currentPhase(s);
     const phaseKey = phase === "main" || phase === "review" ? `${phase}:${s.problem.skillId}` : phase;
@@ -260,7 +275,12 @@ export default function Lesson({
     } else if (state.stage === "revealed") {
       // 答えは「いまの ステップ」の答え。選ぶ問題は 選択肢の ことば（図なら「これ」）で 言う
       const st = currentStep(state)!;
-      const text = st.type === "choice" ? st.choices![st.answer] : `${st.answer}${st.unit ?? ""}`;
+      const text =
+        st.type === "choice"
+          ? st.choices![st.answer]
+          : st.type === "clock"
+            ? `${Math.floor(st.answer / 60)}時${st.answer % 60 === 0 ? "" : `${st.answer % 60}分`}`
+            : `${st.answer}${st.unit ?? ""}`;
       const isPicture = /^(shape|frac):/.test(text);
       const why = st.type === "choice" ? hintText(state.problem!, state.step, state.firstMisconception, 3) : null;
       show(
@@ -327,6 +347,10 @@ export default function Lesson({
       const result = finalizeSession(model.current.states, model.current.stumbles, outcomes, today, firstToday ? streak : 0);
       await saveSessionResult(result);
       return { result, minutes, streak, days: await studyDays() };
+    } catch {
+      // 保存に しっぱい：もういちど 押せるように もどす（回答の 記録は 残って いるので、つぎに ひらいた ときに 立てなおす）
+      savingRef.current = false;
+      return null;
     } finally {
       if (mounted.current) setSaving(false);
     }
@@ -340,7 +364,12 @@ export default function Lesson({
       return show([{ display: "おためし おわり。", speech: "おためし おわり。" }]);
     }
     const saved = await saveSession(s.outcomes);
-    if (!saved || !mounted.current) return;
+    if (!mounted.current) return;
+    if (!saved) {
+      const main = s.outcomes.filter((o) => !o.isTwin);
+      setSummary({ count: main.length, noHint: main.filter((o) => o.firstTryCorrect).length, minutes: Math.max(1, Math.round((Date.now() - startedAt.current) / 60_000)), growth: [], days: [] });
+      return show([{ display: "きろくが うまく できなかったよ。つぎに ひらいた ときに もういちど ためすね。", speech: "きろくが うまく できなかったよ。" }], "calm");
+    }
     const { result, minutes, streak, days } = saved;
 
     const main = s.outcomes.filter((o) => !o.isTwin);
@@ -582,11 +611,24 @@ export default function Lesson({
                     </div>
                   )}
                 </div>
-                {step.type === "choice" ? (
+                {step.type === "clock" ? (
+                  <div className="clock-answer">
+                    <ClockInput
+                      value={clockValue}
+                      onChange={(v) => {
+                        setClockValue(v);
+                        setClockTouched(true);
+                      }}
+                    />
+                    <button className="btn-next" onClick={() => submit(clockValue)} disabled={!clockTouched}>
+                      {clockTouched ? "これで いい" : "はりを うごかそう"}
+                    </button>
+                  </div>
+                ) : step.type === "choice" ? (
                   <ChoicePad choices={step.choices ?? []} onPick={(i) => submit(i)} eliminated={lesson.eliminated} />
                 ) : inputMode === "write" ? (
                   <HandwritePad
-                    boxes={String(step.answer).length >= 4 || lesson.problem.layout === "vertical" || (lesson.problem.unit?.total ?? 0) >= 1000 || lesson.problem.kind === "place_compose" ? 4 : 3}
+                    boxes={4}
                     templates={inkTemplates}
                     resetKey={`${lesson.problem.id}-${lesson.step}-${lesson.attemptNo}`}
                     onChange={(w) => {

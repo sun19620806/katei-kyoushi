@@ -397,7 +397,7 @@ items:
       - { text: "まるいぬ", mc: similar_kanji }
       - { text: "まるだ", mc: dakuten_miss }
       - { text: "がんた", mc: on_kun_mix }
-    hint: "「太」は「大」に 点が 1つ ついた 字だよ。"
+    hint: "「犬」と にているけど、点が 下の ほうに ある 字だよ。"
 
   - id: kr041
     word: "百回"
@@ -680,13 +680,14 @@ items:
     hint: "「毛」は のばす 音で 読むよ。「い」か「え」か 考えよう。"
 
   - id: kr069
-    word: "西日"
-    reading: "にしび"
-    sentence: "{word}が まどから さしこむ。"
+    word: "夜空"
+    reading: "よぞら"
+    sentence: "{word}に 月が 光っている。"
     wrong:
-      - { text: "にしひ", mc: dakuten_miss }
-      - { text: "せいじつ", mc: on_kun_mix }
-    hint: "夕方に さす 日の ことだよ。「日」の 音が にごるよ。"
+      - { text: "よそら", mc: dakuten_miss }
+      - { text: "やくう", mc: on_kun_mix }
+      - { text: "よるぞら", mc: on_kun_mix }
+    hint: "「夜」は ひらがな 1字で 読むよ。「空」の 音が にごるよ。"
 
   - id: kr070
     word: "冬休み"
@@ -715,7 +716,7 @@ items:
       - { text: "やなか", mc: on_kun_mix }
       - { text: "よるなか", mc: on_kun_mix }
       - { text: "よなが", mc: dakuten_miss }
-    hint: "「夜」は ここでは 1文字で 読むよ。「゛」は つかないよ。"
+    hint: "「夜」は ひらがな 1字で 読むよ。「中」は にごらないよ。"
 
   - id: kr073
     word: "来週"
@@ -738,13 +739,14 @@ items:
     hint: "「道」の 中に ある 字だよ。「首」の はじめは にごらないよ。"
 
   - id: kr075
-    word: "弓矢"
-    reading: "ゆみや"
-    sentence: "むかしの 人は {word}を つかった。"
+    word: "体力"
+    reading: "たいりょく"
+    sentence: "毎日 走って {word}を つけよう。"
     wrong:
-      - { text: "ひきや", mc: similar_kanji }
-      - { text: "きゅうし", mc: on_kun_mix }
-    hint: "「引」の 左がわと 同じ 形の 字だよ。"
+      - { text: "きゅうりょく", mc: similar_kanji }
+      - { text: "たいりよく", mc: youon_miss }
+      - { text: "からだちから", mc: on_kun_mix }
+    hint: "「休」と にているけど、右がわが「本」の 字だよ。"
 
   - id: kr076
     word: "売り場"

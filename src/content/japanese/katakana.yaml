@@ -167,7 +167,7 @@ items:
       - { text: "プル", mc: long_vowel_miss }
       - { text: "ブール", mc: dakuten_miss }
       - { text: "プーレ", mc: similar_katakana }
-    hint: "「る」は、さいごを 上に はねる 形だよ。のばす 音も あるよ。"
+    hint: "「る」は 2画で 書くよ。のばす 音と「゜」も わすれずに。"
 
   - id: kk018
     hiragana: "のーと"
@@ -268,7 +268,7 @@ items:
 
   - id: kk028
     hiragana: "しゃわー"
-    clue: "おふろで 頭から あびる お水"
+    clue: "おふろで 頭から あびる おゆ"
     answer: "シャワー"
     wrong:
       - { text: "シヤワー", mc: youon_miss }

@@ -1,0 +1,266 @@
+# 丸（。）・点（、）・かぎ（「」）。小2 2学期。
+# type: mark = {blank} に 入る 記号を えらぶ / sentence = 記号の 使いかたが 正しい 文を えらぶ
+# mark のとき: sentence に {blank} を 1回。answer と wrong は 記号（「。」「、」「「」「」」 など 1〜2文字）
+# sentence のとき: sentence は なし。answer と wrong は 文ぜんたい（30文字以内）
+# mc: period_comma（。と 、を 取りちがえる）/ quote_missing（話した ことばに かぎを つけない）/ quote_misplaced（かぎの 場所が ずれる・話して いない 所に つける）/ mark_position（。や 、を 文の とちゅうの 変な 場所に 打つ）
+# hint: 3だんめの ヒント（45文字以内。答えの 記号を かぎかっこで そのまま 書かない）
+# 答えが 、 や かぎの ときは、ヒントの 中にも その 記号を 使わない。
+# 文章は すべて オリジナル。漢字は 小1・小2で 習う ものだけ。
+
+items:
+  # ───── mark：{blank} に 入る 記号 ─────
+  - id: pu001
+    type: mark
+    sentence: "きのう こうえんへ 行きました{blank}"
+    answer: "。"
+    wrong:
+      - { text: "、", mc: period_comma }
+      - { text: "」", mc: quote_misplaced }
+    hint: "文の おわりに つける しるしだよ。"
+
+  - id: pu002
+    type: mark
+    sentence: "雨が ふって きたので{blank}家に 帰りました。"
+    answer: "、"
+    wrong:
+      - { text: "。", mc: period_comma }
+      - { text: "」", mc: quote_misplaced }
+    hint: "文は まだ つづくよ。とちゅうで 一休みする しるしだよ。"
+
+  - id: pu003
+    type: mark
+    sentence: "でも{blank}ぼくは さいごまで 走りました。"
+    answer: "、"
+    wrong:
+      - { text: "。", mc: period_comma }
+      - { text: "「", mc: quote_misplaced }
+    hint: "つなぐ ことばの 後ろで 少し 休む しるしだよ。"
+
+  - id: pu004
+    type: mark
+    sentence: "ねこが ひなたで ねて います{blank}"
+    answer: "。"
+    wrong:
+      - { text: "、", mc: period_comma }
+      - { text: "「", mc: quote_misplaced }
+    hint: "ここで 文が おわるよ。おわりに つける しるしは どれかな。"
+
+  - id: pu005
+    type: mark
+    sentence: "{blank}いっしょに 帰ろう。」と けんさんが 言った。"
+    answer: "「"
+    wrong:
+      - { text: "」", mc: quote_misplaced }
+      - { text: "、", mc: mark_position }
+    hint: "けんさんが 話した ことばの はじまりに つける しるしだよ。"
+
+  - id: pu006
+    type: mark
+    sentence: "「ありがとう。{blank}と お母さんが 言った。"
+    answer: "」"
+    wrong:
+      - { text: "「", mc: quote_misplaced }
+      - { text: "、", mc: mark_position }
+    hint: "お母さんが 話した ことばの おわりに つける しるしだよ。"
+
+  - id: pu007
+    type: mark
+    sentence: "「おやすみなさい{blank}と 妹が 言った。"
+    answer: "。」"
+    wrong:
+      - { text: "」。", mc: mark_position }
+      - { text: "、」", mc: period_comma }
+    hint: "話した ことばの おわりの 丸は、かぎの 中と 外の どちらかな。"
+
+  - id: pu008
+    type: mark
+    sentence: "先生が {blank}みんな、あつまって。」と 言いました。"
+    answer: "「"
+    wrong:
+      - { text: "」", mc: quote_misplaced }
+      - { text: "、", mc: mark_position }
+    hint: "先生が 話しはじめる ところに つける しるしだよ。"
+
+  - id: pu009
+    type: mark
+    sentence: "朝ごはんを 食べて{blank}学校へ 行きました。"
+    answer: "、"
+    wrong:
+      - { text: "。", mc: period_comma }
+      - { text: "」", mc: quote_misplaced }
+    hint: "文の とちゅうで 読む 人が 少し 休む しるしだよ。"
+
+  - id: pu010
+    type: mark
+    sentence: "きょうは いい 天気です{blank}空が 青いです。"
+    answer: "。"
+    wrong:
+      - { text: "、", mc: period_comma }
+      - { text: "「", mc: quote_misplaced }
+    hint: "です で 文が 一つ おわって いるよ。"
+
+  - id: pu011
+    type: mark
+    sentence: "赤{blank}青、黄色の 花が さいて いる。"
+    answer: "、"
+    wrong:
+      - { text: "。", mc: period_comma }
+      - { text: "」", mc: quote_misplaced }
+    hint: "ならべた 色の 名前の 間に 入れる しるしだよ。"
+
+  - id: pu012
+    type: mark
+    sentence: "「いただきます{blank}と みんなで 言いました。"
+    answer: "。」"
+    wrong:
+      - { text: "」。", mc: mark_position }
+      - { text: "。", mc: quote_missing }
+    hint: "丸を 書いてから、話した ことばを とじよう。"
+
+  - id: pu013
+    type: mark
+    sentence: "夜に なると{blank}星が 見えて きた。"
+    answer: "、"
+    wrong:
+      - { text: "。", mc: period_comma }
+      - { text: "「", mc: quote_misplaced }
+    hint: "文は まだ おわって いないよ。一休みの しるしを えらぼう。"
+
+  - id: pu014
+    type: mark
+    sentence: "学校から 帰りました{blank}すぐに しゅくだいを しました。"
+    answer: "。"
+    wrong:
+      - { text: "、", mc: period_comma }
+      - { text: "」", mc: quote_misplaced }
+    hint: "ました で 文が 一つ おわって いるよ。"
+
+  - id: pu015
+    type: mark
+    sentence: "すると 小鳥が {blank}ありがとう。」と 言いました。"
+    answer: "「"
+    wrong:
+      - { text: "」", mc: quote_misplaced }
+      - { text: "。", mc: mark_position }
+    hint: "小鳥が 話した ことばは どこから はじまるかな。"
+
+  # ───── sentence：記号の 使いかたが 正しい 文 ─────
+  - id: pu016
+    type: sentence
+    answer: "「おはよう。」と 先生が 言いました。"
+    wrong:
+      - { text: "おはよう。と 先生が 言いました。", mc: quote_missing }
+      - { text: "「おはよう。と 先生が」 言いました。", mc: quote_misplaced }
+    hint: "話した ことばは どこから どこまでかな？"
+
+  - id: pu017
+    type: sentence
+    answer: "ぼくは 公園で あそびました。"
+    wrong:
+      - { text: "ぼくは 公園で あそびました、", mc: period_comma }
+      - { text: "ぼくは 公園で あそび、ました。", mc: mark_position }
+    hint: "文の おわりの しるしと、ことばが 切れて いないかを 見よう。"
+
+  - id: pu018
+    type: sentence
+    answer: "「いってきます。」と 言って 家を 出た。"
+    wrong:
+      - { text: "いってきます。と 言って 家を 出た。", mc: quote_missing }
+      - { text: "「いってきます。と 言って」 家を 出た。", mc: quote_misplaced }
+    hint: "話した ことばだけを かぎで かこんで いるかな。"
+
+  - id: pu019
+    type: sentence
+    answer: "雨が やんだので、外へ 出ました。"
+    wrong:
+      - { text: "雨が やんだので。外へ 出ました。", mc: period_comma }
+      - { text: "雨が や、んだので 外へ 出ました。", mc: mark_position }
+    hint: "ので の 後ろは 文の とちゅう。ことばを 切って いないかも 見よう。"
+
+  - id: pu020
+    type: sentence
+    answer: "「おいしいね。」と 姉が 言いました。"
+    wrong:
+      - { text: "おいしいね。と 姉が 言いました。", mc: quote_missing }
+      - { text: "おいしいね。「と 姉が 言いました。」", mc: quote_misplaced }
+    hint: "姉が 話した ことばは どこかな。そこを かこもう。"
+
+  - id: pu021
+    type: sentence
+    answer: "けさは 七時に おきました。"
+    wrong:
+      - { text: "けさは 七時に お、きました。", mc: mark_position }
+      - { text: "「けさは」 七時に おきました。", mc: quote_misplaced }
+    hint: "だれかが 話した 文かな。ことばの とちゅうに しるしは つけないよ。"
+
+  - id: pu022
+    type: sentence
+    answer: "先生が 「しずかに。」と 言いました。"
+    wrong:
+      - { text: "先生が 「しずかに。と 言いました。」", mc: quote_misplaced }
+      - { text: "先生が しずかに。と 言いました。", mc: quote_missing }
+    hint: "先生が 話した ことばの おわりは どこかな。"
+
+  - id: pu023
+    type: sentence
+    answer: "夏休みに、海へ 行きました。"
+    wrong:
+      - { text: "夏休みに。海へ 行きました。", mc: period_comma }
+      - { text: "夏休みに 海へ 行き、ました。", mc: mark_position }
+    hint: "文の とちゅうに 丸は つけないよ。ことばも 切らないでね。"
+
+  - id: pu024
+    type: sentence
+    answer: "「どこへ 行くの。」と 弟が 聞いた。"
+    wrong:
+      - { text: "どこへ 「行くの。」と 弟が 聞いた。", mc: quote_misplaced }
+      - { text: "どこへ 行くの。と 弟が 聞いた。", mc: quote_missing }
+    hint: "弟が 話した ことばは どこから はじまるかな。"
+
+  - id: pu025
+    type: sentence
+    answer: "ねこが まどから 外を 見て いる。"
+    wrong:
+      - { text: "ねこが 「まどから」 外を 見て いる。", mc: quote_misplaced }
+      - { text: "ねこが まどから 外を 見て いる、", mc: period_comma }
+    hint: "この 文で 話して いる 人は いるかな。おわりの しるしも 見よう。"
+
+  - id: pu026
+    type: sentence
+    answer: "「またね。」「うん、またね。」"
+    wrong:
+      - { text: "「またね。「うん、またね。」」", mc: quote_misplaced }
+      - { text: "「またね。うん、またね。」", mc: quote_missing }
+    hint: "話す 人が かわったら、かぎも べつべつに つけるよ。"
+
+  - id: pu027
+    type: sentence
+    answer: "はるとさんは、「ただいま。」と 言った。"
+    wrong:
+      - { text: "はるとさんは、「ただいま。」と 言っ、た。", mc: mark_position }
+      - { text: "はるとさんは。「ただいま。」と 言った。", mc: period_comma }
+    hint: "文の とちゅうに 丸が ないか、ことばが 切れて いないか 見よう。"
+
+  - id: pu028
+    type: sentence
+    answer: "くもって いたけれど、雨は ふらなかった。"
+    wrong:
+      - { text: "くもって いたけれど。雨は ふらなかった。", mc: period_comma }
+      - { text: "くもって いたけれど 雨は ふら、なかった。", mc: mark_position }
+    hint: "けれど の 後ろは 文の とちゅうだよ。"
+
+  - id: pu029
+    type: sentence
+    answer: "「こんにちは。」と あいさつを しました。"
+    wrong:
+      - { text: "こんにちは。「と あいさつを しました。」", mc: quote_misplaced }
+      - { text: "こんにちは。と あいさつを しました。", mc: quote_missing }
+    hint: "口に 出して 言った ことばを かこんで いる 文を さがそう。"
+
+  - id: pu030
+    type: sentence
+    answer: "「もう すぐ 冬だね。」と 兄が 言った。"
+    wrong:
+      - { text: "「もう すぐ 冬だね」。と 兄が 言った。", mc: mark_position }
+      - { text: "もう すぐ 冬だね。と 兄が 言った。", mc: quote_missing }
+    hint: "話した ことばの 丸は、かぎを とじる 前に 書くよ。"

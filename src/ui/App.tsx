@@ -61,7 +61,12 @@ function Main() {
 
   // 授業・おうちの人の設定・はじめの設定の とちゅうでは、アプリの 更新で 読みこみ直さない
   useEffect(() => {
-    setUpdateSafe(profile !== null && ["home", "stickers", "map", "teacher", "pin"].includes(screen));
+    setUpdateSafe(profile !== null && profile !== undefined && ["home", "stickers", "map", "teacher", "pin"].includes(screen));
+  }, [screen, profile]);
+
+  // ホームに もどった ときも、とちゅうで とじた 授業が あれば しめくくる（この ページで 授業中では ないので すぐで よい）
+  useEffect(() => {
+    if (screen === "home" && profile) recoverUnfinishedSessions().catch(() => undefined);
   }, [screen, profile]);
 
   useEffect(() => {
